@@ -1,10 +1,9 @@
-//accountでモザイクを発行する
+//aliceでモザイクを発行する
 
 import { firstValueFrom } from 'rxjs';
 import {
   Deadline,
   Account,
-  TransactionService,
   RepositoryFactoryHttp,
   MosaicDefinitionTransaction,
   MosaicNonce,
@@ -14,26 +13,36 @@ import {
   MosaicSupplyChangeTransaction,
   MosaicSupplyChangeAction,
   AggregateTransaction,
+  TransactionStatus,
 } from 'symbol-sdk';
 
+import { MomijiService, SymbolService } from './BlockchainService';
+
 const property = require('./Property.ts');
-const accountPrivateKey = property.accountPrivateKey;
-const node = 'https://sym-test-03.opening-line.jp:3001';
-const repoFactory = new RepositoryFactoryHttp(node);
-const transactionHttp = repoFactory.createTransactionRepository();
-const receiptHttp = repoFactory.createReceiptRepository();
-const accountHttp = repoFactory.createAccountRepository();
-const transactionService = new TransactionService(transactionHttp, receiptHttp);
-const listener = repoFactory.createListener();
+const symbolService = new SymbolService(property);
+const momijiService = new MomijiService(property);
+
+// Symbolを使用する場合
+let service = symbolService;
+
+// Momijiを使用する場合
+// let service = momijiService;
+
+const alicePrivateKey = service.getAlicePrivateKey();
+const node = service.getNode();
+const repo = new RepositoryFactoryHttp(node);
+const txRepo = repo.createTransactionRepository();
+const tsRepo = repo.createTransactionStatusRepository();
+const listener = repo.createListener();
 
 const main = async () => {
-  const networkType = await firstValueFrom(repoFactory.getNetworkType());
+  const networkType = await firstValueFrom(repo.getNetworkType());
   const epochAdjustment = await firstValueFrom(
-    repoFactory.getEpochAdjustment()
+    repo.getEpochAdjustment()
   );
-  const generationHash = await firstValueFrom(repoFactory.getGenerationHash());
+  const generationHash = await firstValueFrom(repo.getGenerationHash());
 
-  const account = Account.createFromPrivateKey(accountPrivateKey, networkType);
+  const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
 
   const nonce = MosaicNonce.createRandom();
 
@@ -50,7 +59,7 @@ const main = async () => {
   const mosaicDefinitionTransaction = MosaicDefinitionTransaction.create(
     Deadline.create(epochAdjustment),
     nonce,
-    MosaicId.createFromNonce(nonce, account.address),
+    MosaicId.createFromNonce(nonce, alice.address),
     MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     divibility,
     duration,
@@ -68,41 +77,36 @@ const main = async () => {
   const aggregateTransaction = AggregateTransaction.createComplete(
     Deadline.create(epochAdjustment),
     [
-      mosaicDefinitionTransaction.toAggregate(account.publicAccount),
-      mosaicSupplyChangeTransaction.toAggregate(account.publicAccount),
+      mosaicDefinitionTransaction.toAggregate(alice.publicAccount),
+      mosaicSupplyChangeTransaction.toAggregate(alice.publicAccount),
     ],
     networkType,
     []
   ).setMaxFeeForAggregate(100, 1);
 
-  const signedTransaction = account.sign(aggregateTransaction, generationHash);
+  const signedTransaction = alice.sign(aggregateTransaction, generationHash);
 
-  listener.open().then(() => {
-    transactionService.announce(signedTransaction, listener).subscribe({
-      next: async (x) => {
-        console.log(x);
+  const hash = signedTransaction.hash;
+  await firstValueFrom(txRepo.announce(signedTransaction));
+  await listener.open();
+  return new Promise((resolve) => {
+    // 未承認トランザクションの検知
+      listener.unconfirmedAdded(alice.address, hash).subscribe(async (unconfirmedTx) => {
+        clearTimeout(timerId);
+        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
+        console.log(transactionStatus);
+        console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
+        listener.close();
+      });
 
-        //display mosaic id
-        console.log(
-          `以下のMosaicIDを別ファイルの”Property.ts”に入力して保存する
-        `
-        );
-        const accountInfo = await firstValueFrom(
-          accountHttp.getAccountInfo(account.address)
-        );
-        accountInfo!.mosaics.forEach(async (mosaic) => {
-          if (mosaic.id.toHex() != '72C0212E67A08BCE')
-            console.log(mosaic.id.toHex());
-        });
-      },
-      error: (err) => {
-        console.error(err);
+      //未承認トランザクションの検知ができなかった時の処理
+      const timerId = setTimeout(async function () {
+        console.log("confirmedTx");
+        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
+        console.log(transactionStatus);
+        console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
         listener.close();
-      },
-      complete: () => {
-        listener.close();
-      },
-    });
+      }, 1000); //タイマーを1秒に設定
   });
 };
 

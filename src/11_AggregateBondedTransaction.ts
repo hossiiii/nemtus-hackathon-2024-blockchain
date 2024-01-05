@@ -1,5 +1,5 @@
-//cosigner3が起案者となりcosigner3=>cosigner1へ5XYMを、cosigner1=>cosigner3へ1xymを送る取引を行う
-//この時点ではcosigner3のみの署名のためトランザクションはロックされている状態
+//aliceが起案者となりbob=>aliceへ受け取り完了のメッセージを送る取引を行う
+//この時点ではaliceのみの署名のためトランザクションはロックされている状態
 
 import { firstValueFrom } from 'rxjs';
 import {
@@ -21,19 +21,19 @@ const property = require('./Property.ts');
 const initiatorKey = property.cosigner3Key;
 
 const node = 'https://sym-test-03.opening-line.jp:3001';
-const repoFactory = new RepositoryFactoryHttp(node);
-const transactionHttp = repoFactory.createTransactionRepository();
-const receiptHttp = repoFactory.createReceiptRepository();
-const accountHttp = repoFactory.createAccountRepository();
-const transactionService = new TransactionService(transactionHttp, receiptHttp);
-const listener = repoFactory.createListener();
+const repo = new RepositoryFactoryHttp(node);
+const txRepo = repo.createTransactionRepository();
+const receiptHttp = repo.createReceiptRepository();
+const accountHttp = repo.createAccountRepository();
+const transactionService = new TransactionService(txRepo, receiptHttp);
+const listener = repo.createListener();
 
 const main = async () => {
-  const networkType = await firstValueFrom(repoFactory.getNetworkType());
+  const networkType = await firstValueFrom(repo.getNetworkType());
   const epochAdjustment = await firstValueFrom(
-    repoFactory.getEpochAdjustment()
+    repo.getEpochAdjustment()
   );
-  const generationHash = await firstValueFrom(repoFactory.getGenerationHash());
+  const generationHash = await firstValueFrom(repo.getGenerationHash());
 
   const initiatorAccount = Account.createFromPrivateKey(
     initiatorKey,

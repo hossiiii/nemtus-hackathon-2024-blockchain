@@ -1,17 +1,15 @@
-//aliceからbobへ1通貨を送金する
+//aliceアカウントにメタデータを設定する
 
 import { firstValueFrom } from 'rxjs';
 import {
-  TransferTransaction,
   Deadline,
-  Address,
-  EmptyMessage,
   Account,
   RepositoryFactoryHttp,
+  UInt64,
+  AggregateTransaction,
   TransactionStatus,
-  Mosaic,
-  MosaicId,
-  UInt64
+  KeyGenerator,
+  MetadataTransactionService,
 } from 'symbol-sdk';
 
 import { MomijiService, SymbolService } from './BlockchainService';
@@ -27,11 +25,13 @@ let service = symbolService;
 // let service = momijiService;
 
 const alicePrivateKey = service.getAlicePrivateKey();
-const targetAddress = service.getBobAddress();
 const node = service.getNode();
 const repo = new RepositoryFactoryHttp(node);
 const txRepo = repo.createTransactionRepository();
 const tsRepo = repo.createTransactionStatusRepository();
+const metaRepo = repo.createMetadataRepository();
+const metaService = new MetadataTransactionService(metaRepo);
+
 const listener = repo.createListener();
 
 const main = async () => {
@@ -40,18 +40,29 @@ const main = async () => {
     repo.getEpochAdjustment()
   );
   const generationHash = await firstValueFrom(repo.getGenerationHash());
-  const currencyMosaicId = service.getCurrencyMosaicId();
+
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
 
-  const transferTransaction = TransferTransaction.create(
-    Deadline.create(epochAdjustment),
-    Address.createFromRawAddress(targetAddress),
-    [new Mosaic(new MosaicId(currencyMosaicId), UInt64.fromUint(1000000))], //回収モザイクIDと数量
-    EmptyMessage,
-    networkType
-  ).setMaxFee(100);
+  const key = KeyGenerator.generateUInt64Key("key_account");
+  const value = "test";
+  
+  const accountMetadataTransaction = await firstValueFrom(metaService.createAccountMetadataTransaction(
+    undefined!,
+    networkType,
+    alice.address,
+    key,value,
+    alice.address,
+    UInt64.fromUint(0)
+  ));
 
-  const signedTransaction = alice.sign(transferTransaction, generationHash);
+  const aggregateTransaction = AggregateTransaction.createComplete(
+    Deadline.create(epochAdjustment),
+    [accountMetadataTransaction.toAggregate(alice.publicAccount)],
+    networkType,[]
+  ).setMaxFeeForAggregate(100, 0)
+
+  const signedTransaction = alice.sign(aggregateTransaction, generationHash);
+
   const hash = signedTransaction.hash;
   await firstValueFrom(txRepo.announce(signedTransaction));
   await listener.open();

@@ -1,17 +1,21 @@
-//aliceからbobへ1通貨を送金する
+//モザイクにメタデータを設定する
 
 import { firstValueFrom } from 'rxjs';
 import {
-  TransferTransaction,
   Deadline,
-  Address,
-  EmptyMessage,
   Account,
   RepositoryFactoryHttp,
-  TransactionStatus,
-  Mosaic,
+  MosaicDefinitionTransaction,
+  MosaicNonce,
   MosaicId,
-  UInt64
+  MosaicFlags,
+  UInt64,
+  MosaicSupplyChangeTransaction,
+  MosaicSupplyChangeAction,
+  AggregateTransaction,
+  TransactionStatus,
+  KeyGenerator,
+  MetadataTransactionService,
 } from 'symbol-sdk';
 
 import { MomijiService, SymbolService } from './BlockchainService';
@@ -27,11 +31,13 @@ let service = symbolService;
 // let service = momijiService;
 
 const alicePrivateKey = service.getAlicePrivateKey();
-const targetAddress = service.getBobAddress();
 const node = service.getNode();
 const repo = new RepositoryFactoryHttp(node);
 const txRepo = repo.createTransactionRepository();
 const tsRepo = repo.createTransactionStatusRepository();
+const metaRepo = repo.createMetadataRepository();
+const metaService = new MetadataTransactionService(metaRepo);
+
 const listener = repo.createListener();
 
 const main = async () => {
@@ -40,18 +46,67 @@ const main = async () => {
     repo.getEpochAdjustment()
   );
   const generationHash = await firstValueFrom(repo.getGenerationHash());
-  const currencyMosaicId = service.getCurrencyMosaicId();
+
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
 
-  const transferTransaction = TransferTransaction.create(
-    Deadline.create(epochAdjustment),
-    Address.createFromRawAddress(targetAddress),
-    [new Mosaic(new MosaicId(currencyMosaicId), UInt64.fromUint(1000000))], //回収モザイクIDと数量
-    EmptyMessage,
-    networkType
-  ).setMaxFee(100);
+  const nonce = MosaicNonce.createRandom();
 
-  const signedTransaction = alice.sign(transferTransaction, generationHash);
+  const supplyMutable = false;
+  const transferable = true;
+  const restrictable = false;
+  const revokable = false;
+
+  const divibility = 2;
+  const duration = UInt64.fromUint(0);
+
+  const supply = UInt64.fromUint(1000000);
+
+  const mosaicDefinitionTransaction = MosaicDefinitionTransaction.create(
+    Deadline.create(epochAdjustment),
+    nonce,
+    MosaicId.createFromNonce(nonce, alice.address),
+    MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
+    divibility,
+    duration,
+    networkType
+  );
+
+  const mosaicSupplyChangeTransaction = MosaicSupplyChangeTransaction.create(
+    Deadline.create(epochAdjustment),
+    mosaicDefinitionTransaction.mosaicId,
+    MosaicSupplyChangeAction.Increase,
+    supply,
+    networkType
+  );
+
+  const key = KeyGenerator.generateUInt64Key("key_account");
+  const value = "test";
+
+  const mosaicMetadataTransaction = await firstValueFrom(metaService.createMosaicMetadataTransaction(
+      undefined!,
+      networkType,
+      alice.address,
+      mosaicDefinitionTransaction.mosaicId,
+      key,
+      value,
+      alice.address,
+      UInt64.fromUint(0)
+    ));
+  
+
+  const aggregateTransaction = AggregateTransaction.createComplete(
+    Deadline.create(epochAdjustment),
+    [
+      mosaicDefinitionTransaction.toAggregate(alice.publicAccount),
+      mosaicSupplyChangeTransaction.toAggregate(alice.publicAccount),
+      mosaicMetadataTransaction.toAggregate(alice.publicAccount)
+    ],
+    networkType,
+    []
+  ).setMaxFeeForAggregate(100, 1);  
+
+  const signedTransaction = alice.sign(aggregateTransaction, generationHash);
+
   const hash = signedTransaction.hash;
   await firstValueFrom(txRepo.announce(signedTransaction));
   await listener.open();

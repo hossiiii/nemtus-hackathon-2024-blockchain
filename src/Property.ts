@@ -23,8 +23,10 @@ exports.bobMomijiPublicKey =
   'EE23F5ED601D046F7A1C677029A03A00437D8255E031D5F909FBB79ABE9C9055';
 exports.bobMomijiAddress = 'TAKX7KZBTL2GXHQP5AASXBBO7CGVZXGJEMCXQNY';
 
-exports.symbolNetworkGenerationHash = '49D6E1CE276A85B70EAFE52349AACCA389302E7A9754BCF1221E79494FC665A4'
-exports.symbolepochAdjustment = 1667250467
+exports.symbolNode = 'https://sym-test-03.opening-line.jp:3001'
+exports.symbolExplorer = 'https://testnet.symbol.fyi'
+exports.symbolCurrencyMosaicId = '72C0212E67A08BCE'
 
-exports.momijiNetworkGenerationHash = 'C8445F18765E3CB341113C022081D50423F2C174A620C3C22C918B673920A69B'
-exports.momijiepochAdjustment = 1703577141
+exports.momijiNode = 'http://66.94.121.126:3000'
+exports.momijiExplorer = 'http://66.94.121.126:90'
+exports.momijiCurrencyMosaicId = '309EF21B312BCED2'
