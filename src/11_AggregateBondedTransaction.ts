@@ -8,24 +8,34 @@ import {
   Address,
   EmptyMessage,
   Account,
-  TransactionService,
   RepositoryFactoryHttp,
-  NetworkCurrencies,
-  PublicAccount,
-  AggregateTransaction,
-  HashLockTransaction,
+  TransactionStatus,
+  Mosaic,
+  MosaicId,
   UInt64,
+  PlainMessage,
+  AggregateTransaction,
+  HashLockTransaction
 } from 'symbol-sdk';
 
-const property = require('./Property.ts');
-const initiatorKey = property.cosigner3Key;
+import { MomijiService, SymbolService } from './BlockchainService';
 
-const node = 'https://sym-test-03.opening-line.jp:3001';
+const property = require('./Property.ts');
+const symbolService = new SymbolService(property);
+const momijiService = new MomijiService(property);
+
+// Symbolを使用する場合
+let service = symbolService;
+
+// Momijiを使用する場合
+// let service = momijiService;
+
+const alicePrivateKey = service.getAlicePrivateKey();
+const bobPrivateKey = service.getBobPrivateKey();
+const node = service.getNode();
 const repo = new RepositoryFactoryHttp(node);
 const txRepo = repo.createTransactionRepository();
-const receiptHttp = repo.createReceiptRepository();
-const accountHttp = repo.createAccountRepository();
-const transactionService = new TransactionService(txRepo, receiptHttp);
+const tsRepo = repo.createTransactionStatusRepository();
 const listener = repo.createListener();
 
 const main = async () => {
@@ -34,92 +44,84 @@ const main = async () => {
     repo.getEpochAdjustment()
   );
   const generationHash = await firstValueFrom(repo.getGenerationHash());
+  const currencyMosaicId = service.getCurrencyMosaicId();
+  const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
+  const bob = Account.createFromPrivateKey(bobPrivateKey, networkType);
 
-  const initiatorAccount = Account.createFromPrivateKey(
-    initiatorKey,
-    networkType
-  );
-
-  const accountInfo = await accountHttp
-    .getAccountInfo(Address.createFromRawAddress(property.cosigner1Address))
-    .toPromise();
-
-  const cosignerPublicAccount = PublicAccount.createFromPublicKey(
-    accountInfo!.publicKey,
-    networkType
-  );
-
-  const transferTransaction1 = TransferTransaction.create(
+  const tx1 = TransferTransaction.create(
     Deadline.create(epochAdjustment),
-    Address.createFromRawAddress(cosignerPublicAccount.address.plain()),
-    [NetworkCurrencies.PUBLIC.currency.createRelative(5)],
-    EmptyMessage,
+    bob.address,
+    [],
+    PlainMessage.create("dummy"), //起案者はダミーでもTxが必要
     networkType
   );
 
-  const transferTransaction2 = TransferTransaction.create(
+  const tx2 = TransferTransaction.create(
     Deadline.create(epochAdjustment),
-    Address.createFromRawAddress(initiatorAccount.address.plain()),
-    [NetworkCurrencies.PUBLIC.currency.createRelative(1)],
-    EmptyMessage,
+    alice.address,
+    [],
+    PlainMessage.create("発送しました"),
     networkType
   );
 
-  const aggregateTransaction = AggregateTransaction.createBonded(
+  const aggregateArray = [
+    tx1.toAggregate(alice.publicAccount), //Aliceからの送信
+    tx2.toAggregate(bob.publicAccount), // Bobからの送信
+  ];
+
+  //アグリゲートボンデッドトランザクション
+  const aggregateTx = AggregateTransaction.createBonded(
     Deadline.create(epochAdjustment),
-    [
-      transferTransaction1.toAggregate(initiatorAccount.publicAccount),
-      transferTransaction2.toAggregate(cosignerPublicAccount),
-    ],
-    networkType
-  ).setMaxFeeForAggregate(100, 2);
+    aggregateArray,
+    networkType,
+    []
+  ).setMaxFeeForAggregate(100, 1);
 
-  const signedTransaction = initiatorAccount.sign(
-    aggregateTransaction,
-    generationHash
-  );
+  const signedAggregateTx = alice.sign(aggregateTx, generationHash);
 
-  const duration = UInt64.fromUint(2 * 60 * 24 * 2);
-
-  const hashLockTransaction = HashLockTransaction.create(
+  const hashLockTx = HashLockTransaction.create(
     Deadline.create(epochAdjustment),
-    NetworkCurrencies.PUBLIC.currency.createRelative(10),
-    duration,
-    signedTransaction,
+    new Mosaic(new MosaicId(currencyMosaicId), UInt64.fromUint(10000000)),
+    UInt64.fromUint(480),
+    signedAggregateTx,
     networkType
   ).setMaxFee(100);
 
-  const signedHashlockTransaction = initiatorAccount.sign(
-    hashLockTransaction,
-    generationHash
-  );
+  const signedLockTx = alice.sign(hashLockTx, generationHash);
 
-  listener.open().then(() => {
-    transactionService
-      .announceHashLockAggregateBonded(
-        signedHashlockTransaction,
-        signedTransaction,
-        listener
-      )
-      .subscribe({
-        next: (x) => {
-          console.log(x);
-          //display targetTxHash
-          console.log(
-            `以下のtargetTxHashを別ファイルの”Property.ts”に入力して保存する
-          `
-          );
-          console.log(x.transactionInfo!.hash);
-        },
-        error: (err) => {
-          console.error(err);
-          listener.close();
-        },
-        complete: () => {
-          listener.close();
-        },
-      });
+  await firstValueFrom(txRepo.announce(signedLockTx));
+  console.log("announce signedLockTx");
+
+  await listener.open();
+  await new Promise((resolve) => {
+    // 承認トランザクションの検知
+    listener.confirmed(alice.address, signedLockTx.hash).subscribe(async (confirmedTx) => {
+      setTimeout(async()=>{
+        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedLockTx.hash));
+        console.log(transactionStatus);
+        console.log(`${service.getExplorer()}/transactions/${signedLockTx.hash}`) //ブラウザで確認を追加        
+        listener.close();
+        resolve(null); // Promiseを解決  
+      }, 5000); //全てのノードに伝播されるまで5秒待つ
+    });
   });
+
+  await firstValueFrom(txRepo.announceAggregateBonded(signedAggregateTx));
+  console.log("announce signedAggregateTx");
+
+  await listener.open();
+  return new Promise((resolve) => {
+    //パーシャルトランザクションの検知
+    setTimeout(async function () {
+      console.log("partialTx");
+      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedAggregateTx.hash));
+      console.log(transactionStatus);
+      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`) //ブラウザで確認を追加        
+      listener.close();
+      resolve(null); // Promiseを解決
+    }, 1000); //タイマーを1秒に設定
+  });
+
 };
 
 main().then();

@@ -57,22 +57,22 @@ const main = async () => {
   await listener.open();
   return new Promise((resolve) => {
     // 未承認トランザクションの検知
-      listener.unconfirmedAdded(alice.address, hash).subscribe(async (unconfirmedTx) => {
-        clearTimeout(timerId);
-        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
-        console.log(transactionStatus);
-        console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
-        listener.close();
-      });
+    listener.unconfirmedAdded(alice.address, hash).subscribe(async (unconfirmedTx) => {
+      clearTimeout(timerId);
+      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
+      console.log(transactionStatus);
+      console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
+      listener.close();
+    });
 
-      //未承認トランザクションの検知ができなかった時の処理
-      const timerId = setTimeout(async function () {
-        console.log("confirmedTx");
-        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
-        console.log(transactionStatus);
-        console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
-        listener.close();
-      }, 1000); //タイマーを1秒に設定
+    //未承認トランザクションの検知ができなかった時の処理
+    const timerId = setTimeout(async function () {
+      console.log("confirmedTx");
+      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
+      console.log(transactionStatus);
+      console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
+      listener.close();
+    }, 1000); //タイマーを1秒に設定
   });
 };
 
