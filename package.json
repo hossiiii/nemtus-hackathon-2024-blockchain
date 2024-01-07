@@ -5,6 +5,7 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "js-sha3": "^0.9.3",
     "rxjs": "^7.8.0",
     "symbol-sdk": "^2.0.4",
     "ts-node": "^10.9.1",

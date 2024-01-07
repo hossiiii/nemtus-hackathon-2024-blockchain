@@ -5,8 +5,6 @@ import { firstValueFrom } from 'rxjs';
 import {
   TransferTransaction,
   Deadline,
-  Address,
-  EmptyMessage,
   Account,
   RepositoryFactoryHttp,
   TransactionStatus,
@@ -15,7 +13,9 @@ import {
   UInt64,
   PlainMessage,
   AggregateTransaction,
-  HashLockTransaction
+  HashLockTransaction,
+  CosignatureTransaction,
+  TransactionGroup
 } from 'symbol-sdk';
 
 import { MomijiService, SymbolService } from './BlockchainService';
@@ -110,7 +110,7 @@ const main = async () => {
   console.log("announce signedAggregateTx");
 
   await listener.open();
-  return new Promise((resolve) => {
+  await new Promise((resolve) => {
     //パーシャルトランザクションの検知
     setTimeout(async function () {
       console.log("partialTx");
@@ -122,6 +122,34 @@ const main = async () => {
     }, 1000); //タイマーを1秒に設定
   });
 
+  const targetTransaction = (await firstValueFrom(
+    txRepo.getTransaction(signedAggregateTx.hash, TransactionGroup.Partial)
+  )) as AggregateTransaction;
+  const cosignatureTx = CosignatureTransaction.create(targetTransaction);
+  const signedCosignatureTx = bob.signCosignatureTransaction(cosignatureTx);
+  await firstValueFrom(txRepo.announceAggregateBondedCosignature(signedCosignatureTx));
+  console.log("announce signedCosignatureTx");
+
+  await listener.open();
+  return new Promise((resolve) => {
+    // 未承認トランザクションの検知
+    listener.unconfirmedAdded(alice.address, signedAggregateTx.hash).subscribe(async (unconfirmedTx) => {
+      clearTimeout(timerId);
+      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedAggregateTx.hash));
+      console.log(transactionStatus);
+      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`) //ブラウザで確認を追加        
+      listener.close();
+    });
+
+    //未承認トランザクションの検知ができなかった時の処理
+    const timerId = setTimeout(async function () {
+      console.log("confirmedTx");
+      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedAggregateTx.hash));
+      console.log(transactionStatus);
+      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`) //ブラウザで確認を追加        
+      listener.close();
+    }, 1000); //タイマーを1秒に設定
+  });  
 };
 
 main().then();
