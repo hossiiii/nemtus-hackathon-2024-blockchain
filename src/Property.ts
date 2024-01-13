@@ -29,4 +29,4 @@ exports.symbolCurrencyMosaicId = '72C0212E67A08BCE'
 
 exports.momijiNode = 'http://66.94.121.126:3000'
 exports.momijiExplorer = 'http://66.94.121.126:90'
-exports.momijiCurrencyMosaicId = '309EF21B312BCED2'
+exports.momijiCurrencyMosaicId = '049E3DAB4B813CC2'

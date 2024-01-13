@@ -82,7 +82,7 @@ const main = async () => {
   const hashLockTx = HashLockTransaction.create(
     Deadline.create(epochAdjustment),
     new Mosaic(new MosaicId(currencyMosaicId), UInt64.fromUint(10000000)),
-    UInt64.fromUint(480),
+    UInt64.fromUint(5760),
     signedAggregateTx,
     networkType
   ).setMaxFee(100);

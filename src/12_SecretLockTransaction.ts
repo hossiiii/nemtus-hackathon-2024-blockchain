@@ -23,7 +23,7 @@ const symbolService = new SymbolService(property);
 const momijiService = new MomijiService(property);
 
 // Symbolを使用する場合
-let service = momijiService;
+let service = symbolService;
 
 // Momijiを使用する場合
 // let service = momijiService;

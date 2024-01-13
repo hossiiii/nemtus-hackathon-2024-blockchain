@@ -1,5 +1,3 @@
-//ハンズオンに必要なアカウントの作成と入金などの準備
-
 import { Account, NetworkType } from 'symbol-sdk';
 
 const main = () => {
