@@ -49,8 +49,10 @@ const main = async () => {
 
   //アカウントを暗号化したJSONデータとして表示
   const jsonSignerQR = signerQR.toJSON();
+  
   //JSONデータを文字列に変換
   const strSignerQR = JSON.stringify(jsonSignerQR);
+  console.log(strSignerQR);
 
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
 
