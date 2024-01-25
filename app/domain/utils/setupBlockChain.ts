@@ -14,6 +14,7 @@ export const setupBlockChain = async (blockChainType: BlockChainType): Promise<a
     const repo = new RepositoryFactoryHttp(node);
     const txRepo = repo.createTransactionRepository();
     const tsRepo = repo.createTransactionStatusRepository();
+    const accountRepo = repo.createAccountRepository();
     const metaRepo = repo.createMetadataRepository();
     const metaService = new MetadataTransactionService(metaRepo);    
     const listener = repo.createListener();
@@ -26,6 +27,7 @@ export const setupBlockChain = async (blockChainType: BlockChainType): Promise<a
     return {
       txRepo,
       tsRepo,
+      accountRepo,
       metaRepo,
       metaService,
       listener,

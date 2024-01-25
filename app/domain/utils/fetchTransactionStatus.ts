@@ -4,7 +4,7 @@ import {
 } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 
-export const checkTransactionStatus = async (blockChain: any, hash: string, targetAddress: string): Promise<any> => {
+export const fetchTransactionStatus = async (blockChain: any, hash: string, targetAddress: string): Promise<TransactionStatus> => {
     const targetAddressClass = Address.createFromRawAddress(targetAddress);
     return new Promise(async(resolve, reject) => {
       setTimeout(async function () {
