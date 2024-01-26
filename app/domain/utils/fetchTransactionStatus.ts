@@ -4,8 +4,8 @@ import {
 } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 
-export const fetchTransactionStatus = async (blockChain: any, hash: string, targetAddress: string): Promise<TransactionStatus> => {
-    const targetAddressClass = Address.createFromRawAddress(targetAddress);
+export const fetchTransactionStatus = async (blockChain: any, hash: string, targetRawAddress: string): Promise<TransactionStatus> => {
+    const targetAddress = Address.createFromRawAddress(targetRawAddress);
     return new Promise(async(resolve, reject) => {
       setTimeout(async function () {
         const transactionStatus: TransactionStatus = await firstValueFrom(blockChain.tsRepo.getTransactionStatus(hash));
@@ -16,12 +16,12 @@ export const fetchTransactionStatus = async (blockChain: any, hash: string, targ
             resolve(transactionStatus)
           }else{
             await blockChain.listener.open();
-            blockChain.listener.confirmed(targetAddressClass, hash).subscribe(async () => {
+            blockChain.listener.confirmed(targetAddress, hash).subscribe(async () => {
               const transactionStatus: TransactionStatus = await firstValueFrom(blockChain.tsRepo.getTransactionStatus(hash));
               blockChain.listener.close();
               resolve(transactionStatus)
             });
-            blockChain.listener.aggregateBondedAdded(targetAddressClass, hash).subscribe(async () => {
+            blockChain.listener.aggregateBondedAdded(targetAddress, hash).subscribe(async () => {
               const transactionStatus: TransactionStatus = await firstValueFrom(blockChain.tsRepo.getTransactionStatus(hash));
               blockChain.listener.close();
               resolve(transactionStatus)

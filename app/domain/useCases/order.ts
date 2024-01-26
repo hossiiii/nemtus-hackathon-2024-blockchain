@@ -7,13 +7,12 @@ import { setupBlockChain } from '../utils/setupBlockChain';
 import { transferTransactionWithEncryptMessage } from '../utils/transactions/transferTransactionWithEncryptMessage';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../utils/fetchTransactionStatus';
-import { BlockChainType } from '../entities/blockChainType/blockChainType';
 import { fetchPublicAccount } from '../utils/fetchPublicAccount';
 
-export const order = async (blockChainType:BlockChainType, srcPrivateKey: string, targetAddress: string, message: string): Promise<TransactionStatus> => {
-  const blockChain = await setupBlockChain(blockChainType);
+export const order = async (srcPrivateKey: string, momijiTargetRowAddress: string, message: string): Promise<TransactionStatus> => { //TODO本来は秘密鍵ではなくパスワードを受け取る、命名規則も
+  const blockChain = await setupBlockChain("momiji");
   const srcAccount = Account.createFromPrivateKey(srcPrivateKey, blockChain.networkType);
-  const targetPublicAccount = await fetchPublicAccount(blockChain,targetAddress);
+  const targetPublicAccount = await fetchPublicAccount(blockChain,srcPrivateKey);
 
   // 販売者に対して注文情報を暗号化して送信するTxを作成
   const orderTransaction = transferTransactionWithEncryptMessage(blockChain, message, srcAccount, targetPublicAccount);

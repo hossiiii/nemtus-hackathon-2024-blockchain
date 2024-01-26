@@ -95,7 +95,7 @@ const main = async () => {
   await listener.open();
   await new Promise((resolve) => {
     // 承認トランザクションの検知
-    listener.confirmed(alice.address, signedLockTx.hash).subscribe(async (confirmedTx) => {
+    listener.confirmed(alice.address, signedLockTx.hash).subscribe(async () => {
       setTimeout(async()=>{
         const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedLockTx.hash));
         console.log(transactionStatus);

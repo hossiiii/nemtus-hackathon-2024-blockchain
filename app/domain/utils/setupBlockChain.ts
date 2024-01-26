@@ -4,7 +4,7 @@ import {
 } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 import { connectNode } from '../../domain/utils/connectNode';
-import { momijiCurrencyMosaicId, momijiExplorer, momojiNodeList, symbolCurrencyMosaicId, symbolExplorer, symbolNodeList } from '../../domain/utils/consts';
+import { momijiCurrencyMosaicId, momijiExplorer, momojiNodeList, symbolCurrencyMosaicId, symbolExplorer, symbolNodeList } from '../../consts/consts';
 import { BlockChainType } from '../../domain/entities/blockChainType/blockChainType';
 
 export const setupBlockChain = async (blockChainType: BlockChainType): Promise<any> => {

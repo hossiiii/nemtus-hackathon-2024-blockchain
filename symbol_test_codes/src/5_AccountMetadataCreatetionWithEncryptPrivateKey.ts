@@ -46,13 +46,14 @@ const main = async () => {
   const signerQR = qr.QRCodeGenerator.createExportAccount(
     aliceMomijiPrivateKey, networkType, generationHash, password
   );
+  console.log(signerQR);
 
   //アカウントを暗号化したJSONデータとして表示
   const jsonSignerQR = signerQR.toJSON();
+  console.log(jsonSignerQR);
   
   //JSONデータを文字列に変換
   const strSignerQR = JSON.stringify(jsonSignerQR);
-  console.log(strSignerQR);
 
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
 
@@ -81,7 +82,7 @@ const main = async () => {
   await listener.open();
   return new Promise((resolve) => {
     // 未承認トランザクションの検知
-    listener.unconfirmedAdded(alice.address, hash).subscribe(async (unconfirmedTx) => {
+    listener.unconfirmedAdded(alice.address, hash).subscribe(async () => {
       clearTimeout(timerId);
       const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
       console.log(transactionStatus);

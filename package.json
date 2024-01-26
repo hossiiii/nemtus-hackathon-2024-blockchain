@@ -32,6 +32,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
     "react-timer-hook": "^3.0.7",
+    "symbol-qr-library": "^0.14.2",
     "typescript": "5.2.2"
   }
 }
