@@ -15,7 +15,7 @@ import {
   AggregateTransaction,
   HashLockTransaction,
   CosignatureTransaction,
-  TransactionGroup
+  TransactionGroup,
 } from 'symbol-sdk';
 
 import { MomijiService, SymbolService } from './BlockchainService';
@@ -40,9 +40,7 @@ const listener = repo.createListener();
 
 const main = async () => {
   const networkType = await firstValueFrom(repo.getNetworkType());
-  const epochAdjustment = await firstValueFrom(
-    repo.getEpochAdjustment()
-  );
+  const epochAdjustment = await firstValueFrom(repo.getEpochAdjustment());
   const generationHash = await firstValueFrom(repo.getGenerationHash());
   const currencyMosaicId = service.getCurrencyMosaicId();
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
@@ -52,16 +50,16 @@ const main = async () => {
     Deadline.create(epochAdjustment),
     bob.address,
     [],
-    PlainMessage.create("dummy"), //起案者はダミーでもTxが必要
-    networkType
+    PlainMessage.create('dummy'), //起案者はダミーでもTxが必要
+    networkType,
   );
 
   const tx2 = TransferTransaction.create(
     Deadline.create(epochAdjustment),
     alice.address,
     [],
-    PlainMessage.create("発送しました"),
-    networkType
+    PlainMessage.create('発送しました'),
+    networkType,
   );
 
   const aggregateArray = [
@@ -74,7 +72,7 @@ const main = async () => {
     Deadline.create(epochAdjustment),
     aggregateArray,
     networkType,
-    []
+    [],
   ).setMaxFeeForAggregate(100, 1);
 
   const signedAggregateTx = alice.sign(aggregateTx, generationHash);
@@ -84,72 +82,82 @@ const main = async () => {
     new Mosaic(new MosaicId(currencyMosaicId), UInt64.fromUint(10000000)),
     UInt64.fromUint(5760),
     signedAggregateTx,
-    networkType
+    networkType,
   ).setMaxFee(100);
 
   const signedLockTx = alice.sign(hashLockTx, generationHash);
 
   await firstValueFrom(txRepo.announce(signedLockTx));
-  console.log("announce signedLockTx");
+  console.log('announce signedLockTx');
 
   await listener.open();
   await new Promise((resolve) => {
     // 承認トランザクションの検知
     listener.confirmed(alice.address, signedLockTx.hash).subscribe(async () => {
-      setTimeout(async()=>{
-        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedLockTx.hash));
+      setTimeout(async () => {
+        const transactionStatus: TransactionStatus = await firstValueFrom(
+          tsRepo.getTransactionStatus(signedLockTx.hash),
+        );
         console.log(transactionStatus);
-        console.log(`${service.getExplorer()}/transactions/${signedLockTx.hash}`) //ブラウザで確認を追加        
+        console.log(`${service.getExplorer()}/transactions/${signedLockTx.hash}`); //ブラウザで確認を追加
         listener.close();
-        resolve(null); // Promiseを解決  
+        resolve(null); // Promiseを解決
       }, 5000); //全てのノードに伝播されるまで5秒待つ
     });
   });
 
   await firstValueFrom(txRepo.announceAggregateBonded(signedAggregateTx));
-  console.log("announce signedAggregateTx");
+  console.log('announce signedAggregateTx');
 
   await listener.open();
   await new Promise((resolve) => {
     //パーシャルトランザクションの検知
     setTimeout(async function () {
-      console.log("partialTx");
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedAggregateTx.hash));
+      console.log('partialTx');
+      const transactionStatus: TransactionStatus = await firstValueFrom(
+        tsRepo.getTransactionStatus(signedAggregateTx.hash),
+      );
       console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`) //ブラウザで確認を追加        
+      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`); //ブラウザで確認を追加
       listener.close();
       resolve(null); // Promiseを解決
     }, 1000); //タイマーを1秒に設定
   });
 
   const targetTransaction = (await firstValueFrom(
-    txRepo.getTransaction(signedAggregateTx.hash, TransactionGroup.Partial)
+    txRepo.getTransaction(signedAggregateTx.hash, TransactionGroup.Partial),
   )) as AggregateTransaction;
   const cosignatureTx = CosignatureTransaction.create(targetTransaction);
   const signedCosignatureTx = bob.signCosignatureTransaction(cosignatureTx);
   await firstValueFrom(txRepo.announceAggregateBondedCosignature(signedCosignatureTx));
-  console.log("announce signedCosignatureTx");
+  console.log('announce signedCosignatureTx');
 
   await listener.open();
   return new Promise((resolve) => {
     // 未承認トランザクションの検知
-    listener.unconfirmedAdded(alice.address, signedAggregateTx.hash).subscribe(async (unconfirmedTx) => {
-      clearTimeout(timerId);
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedAggregateTx.hash));
-      console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`) //ブラウザで確認を追加        
-      listener.close();
-    });
+    listener
+      .unconfirmedAdded(alice.address, signedAggregateTx.hash)
+      .subscribe(async (unconfirmedTx) => {
+        clearTimeout(timerId);
+        const transactionStatus: TransactionStatus = await firstValueFrom(
+          tsRepo.getTransactionStatus(signedAggregateTx.hash),
+        );
+        console.log(transactionStatus);
+        console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`); //ブラウザで確認を追加
+        listener.close();
+      });
 
     //未承認トランザクションの検知ができなかった時の処理
     const timerId = setTimeout(async function () {
-      console.log("confirmedTx");
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedAggregateTx.hash));
+      console.log('confirmedTx');
+      const transactionStatus: TransactionStatus = await firstValueFrom(
+        tsRepo.getTransactionStatus(signedAggregateTx.hash),
+      );
       console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`) //ブラウザで確認を追加        
+      console.log(`${service.getExplorer()}/transactions/${signedAggregateTx.hash}`); //ブラウザで確認を追加
       listener.close();
     }, 1000); //タイマーを1秒に設定
-  });  
+  });
 };
 
 main().then();

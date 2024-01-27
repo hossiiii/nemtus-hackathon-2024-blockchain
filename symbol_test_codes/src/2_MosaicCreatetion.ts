@@ -37,9 +37,7 @@ const listener = repo.createListener();
 
 const main = async () => {
   const networkType = await firstValueFrom(repo.getNetworkType());
-  const epochAdjustment = await firstValueFrom(
-    repo.getEpochAdjustment()
-  );
+  const epochAdjustment = await firstValueFrom(repo.getEpochAdjustment());
   const generationHash = await firstValueFrom(repo.getGenerationHash());
 
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
@@ -63,7 +61,7 @@ const main = async () => {
     MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
     divibility,
     duration,
-    networkType
+    networkType,
   );
 
   const mosaicSupplyChangeTransaction = MosaicSupplyChangeTransaction.create(
@@ -71,7 +69,7 @@ const main = async () => {
     mosaicDefinitionTransaction.mosaicId,
     MosaicSupplyChangeAction.Increase,
     supply,
-    networkType
+    networkType,
   );
 
   const aggregateTransaction = AggregateTransaction.createComplete(
@@ -81,7 +79,7 @@ const main = async () => {
       mosaicSupplyChangeTransaction.toAggregate(alice.publicAccount),
     ],
     networkType,
-    []
+    [],
   ).setMaxFeeForAggregate(100, 1);
 
   const signedTransaction = alice.sign(aggregateTransaction, generationHash);
@@ -93,18 +91,22 @@ const main = async () => {
     // 未承認トランザクションの検知
     listener.unconfirmedAdded(alice.address, hash).subscribe(async (unconfirmedTx) => {
       clearTimeout(timerId);
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
+      const transactionStatus: TransactionStatus = await firstValueFrom(
+        tsRepo.getTransactionStatus(hash),
+      );
       console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
+      console.log(`${service.getExplorer()}/transactions/${hash}`); //ブラウザで確認を追加
       listener.close();
     });
 
     //未承認トランザクションの検知ができなかった時の処理
     const timerId = setTimeout(async function () {
-      console.log("confirmedTx");
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(hash));
+      console.log('confirmedTx');
+      const transactionStatus: TransactionStatus = await firstValueFrom(
+        tsRepo.getTransactionStatus(hash),
+      );
       console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${hash}`) //ブラウザで確認を追加        
+      console.log(`${service.getExplorer()}/transactions/${hash}`); //ブラウザで確認を追加
       listener.close();
     }, 1000); //タイマーを1秒に設定
   });

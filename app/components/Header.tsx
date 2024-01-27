@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React from 'react';
 import { Box, AppBar, Toolbar, Container } from '@mui/material';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -11,7 +11,7 @@ function Header(props: {
   } = props;
 
   return (
-    <AppBar style={{ backgroundColor: 'transparent', boxShadow: 'none'}}>
+    <AppBar style={{ backgroundColor: 'transparent', boxShadow: 'none' }}>
       <Toolbar>
         <Container>
           <Box display='flex' alignItems='center' justifyContent='space-between'>
@@ -20,7 +20,9 @@ function Header(props: {
               style={{ color: 'black', marginLeft: '0' }} // MenuIconを左端に寄せる
               onClick={() => setOpenLeftDrawer(true)}
             />
-            <Box display="flex" alignItems="center" justifyContent="center" width="100%"> {/* Imageを中央に配置 */}
+            <Box display='flex' alignItems='center' justifyContent='center' width='100%'>
+              {' '}
+              {/* Imageを中央に配置 */}
               <Image
                 src='/logo.png'
                 width={500}

@@ -1,5 +1,5 @@
-import axios from "axios";
-import { NextResponse } from 'next/server'
+import axios from 'axios';
+import { NextResponse } from 'next/server';
 
 export class ApiClient {
   fetch = async (url: string, queryParams: any, headers: any): Promise<any> => {
@@ -12,9 +12,9 @@ export class ApiClient {
       const res = await axios.get(url, config);
 
       return res;
-    } catch (e:any) {
+    } catch (e: any) {
       console.log(e.response);
-      return NextResponse.json({ message: e.response }, { status: 400 })
+      return NextResponse.json({ message: e.response }, { status: 400 });
     }
   };
 
@@ -25,9 +25,9 @@ export class ApiClient {
       });
 
       return res;
-    } catch (e:any) {
+    } catch (e: any) {
       console.log(e.response);
-      return NextResponse.json({ message: e.response }, { status: 400 })
+      return NextResponse.json({ message: e.response }, { status: 400 });
     }
   };
 }

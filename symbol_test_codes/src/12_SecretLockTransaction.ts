@@ -12,9 +12,9 @@ import {
   Crypto,
   SecretLockTransaction,
   LockHashAlgorithm,
-  SecretProofTransaction
+  SecretProofTransaction,
 } from 'symbol-sdk';
-import { sha3_256 } from "js-sha3";
+import { sha3_256 } from 'js-sha3';
 
 import { MomijiService, SymbolService } from './BlockchainService';
 
@@ -38,9 +38,7 @@ const listener = repo.createListener();
 
 const main = async () => {
   const networkType = await firstValueFrom(repo.getNetworkType());
-  const epochAdjustment = await firstValueFrom(
-    repo.getEpochAdjustment()
-  );
+  const epochAdjustment = await firstValueFrom(repo.getEpochAdjustment());
   const generationHash = await firstValueFrom(repo.getGenerationHash());
   const currencyMosaicId = service.getCurrencyMosaicId();
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
@@ -49,7 +47,7 @@ const main = async () => {
   const random = Crypto.randomBytes(20);
   const hash = sha3_256.create();
   const secret = hash.update(random).hex();
-  const proof = random.toString("hex");
+  const proof = random.toString('hex');
 
   const secletLockTx = SecretLockTransaction.create(
     Deadline.create(epochAdjustment),
@@ -58,24 +56,26 @@ const main = async () => {
     LockHashAlgorithm.Op_Sha3_256,
     secret,
     bob.address,
-    networkType
+    networkType,
   ).setMaxFee(100);
 
   const signedLockTx = alice.sign(secletLockTx, generationHash);
 
   await firstValueFrom(txRepo.announce(signedLockTx));
-  console.log("announce signedLockTx");
+  console.log('announce signedLockTx');
 
   await listener.open();
   await new Promise((resolve) => {
     // 承認トランザクションの検知
     listener.confirmed(alice.address, signedLockTx.hash).subscribe(async (confirmedTx) => {
-      setTimeout(async()=>{
-        const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(signedLockTx.hash));
+      setTimeout(async () => {
+        const transactionStatus: TransactionStatus = await firstValueFrom(
+          tsRepo.getTransactionStatus(signedLockTx.hash),
+        );
         console.log(transactionStatus);
-        console.log(`${service.getExplorer()}/transactions/${signedLockTx.hash}`) //ブラウザで確認を追加        
+        console.log(`${service.getExplorer()}/transactions/${signedLockTx.hash}`); //ブラウザで確認を追加
         listener.close();
-        resolve(null); // Promiseを解決  
+        resolve(null); // Promiseを解決
       }, 5000); //全てのノードに伝播されるまで5秒待つ
     });
   });
@@ -86,33 +86,39 @@ const main = async () => {
     secret,
     bob.address,
     proof,
-    networkType!
+    networkType!,
   ).setMaxFee(100);
 
   const singedProofTx = bob.sign(proofTx, generationHash);
   await firstValueFrom(txRepo.announce(singedProofTx));
-  console.log("announce singedProofTx");
+  console.log('announce singedProofTx');
 
   await listener.open();
   return new Promise((resolve) => {
     // 未承認トランザクションの検知
-    listener.unconfirmedAdded(alice.address, singedProofTx.hash).subscribe(async (unconfirmedTx) => {
-      clearTimeout(timerId);
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(singedProofTx.hash));
-      console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${singedProofTx.hash}`) //ブラウザで確認を追加        
-      listener.close();
-    });
+    listener
+      .unconfirmedAdded(alice.address, singedProofTx.hash)
+      .subscribe(async (unconfirmedTx) => {
+        clearTimeout(timerId);
+        const transactionStatus: TransactionStatus = await firstValueFrom(
+          tsRepo.getTransactionStatus(singedProofTx.hash),
+        );
+        console.log(transactionStatus);
+        console.log(`${service.getExplorer()}/transactions/${singedProofTx.hash}`); //ブラウザで確認を追加
+        listener.close();
+      });
 
     //未承認トランザクションの検知ができなかった時の処理
     const timerId = setTimeout(async function () {
-      console.log("confirmedTx");
-      const transactionStatus:TransactionStatus = await firstValueFrom(tsRepo.getTransactionStatus(singedProofTx.hash));
+      console.log('confirmedTx');
+      const transactionStatus: TransactionStatus = await firstValueFrom(
+        tsRepo.getTransactionStatus(singedProofTx.hash),
+      );
       console.log(transactionStatus);
-      console.log(`${service.getExplorer()}/transactions/${singedProofTx.hash}`) //ブラウザで確認を追加        
+      console.log(`${service.getExplorer()}/transactions/${singedProofTx.hash}`); //ブラウザで確認を追加
       listener.close();
     }, 1000); //タイマーを1秒に設定
-  });  
+  });
 };
 
 main().then();

@@ -1,14 +1,12 @@
-'use client'
-import FlameComponent from '../components/Flame'
+'use client';
+import FlameComponent from '../components/Flame';
 
 const Settings = () => {
   return (
     <>
-      <FlameComponent>
-        this is the settings page
-      </FlameComponent>
+      <FlameComponent>this is the settings page</FlameComponent>
     </>
-  )
-}
+  );
+};
 
-export default Settings
+export default Settings;

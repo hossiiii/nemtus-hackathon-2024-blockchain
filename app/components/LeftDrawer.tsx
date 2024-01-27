@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import React from 'react';
 import {
   Box,
@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 import Home from '@mui/icons-material/Home';
 import Settings from '@mui/icons-material/Settings';
-import { useRouter } from 'next/navigation'
+import { useRouter } from 'next/navigation';
 import Image from 'next/image';
 
 function LeftDrawer(props: {
