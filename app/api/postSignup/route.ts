@@ -1,7 +1,7 @@
 // POST SAMPLE signup の実行
 
 import { NextResponse } from 'next/server';
-import { TransactionStatus } from 'symbol-sdk';
+import { Account } from 'symbol-sdk';
 import { signup } from '../../domain/useCases/signup';
 
 export const POST = async (req: Request, res: NextResponse<string | null>) => {
@@ -11,9 +11,9 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
 
     const { password }: { password: string } = await req.json();
 
-    const result: TransactionStatus = await signup(password);
+    const result: Account = await signup(password);
 
-    return NextResponse.json({ data: result }, { status: 200 });
+    return NextResponse.json({ data: result.address.plain() }, { status: 200 });
   } catch (err: any) {
     return NextResponse.json({ message: err.message }, { status: 500 });
   }

@@ -13,6 +13,11 @@
 ・publicKeyの文字列 = xxxPublicKey
 ・address = xxxRawAddress
 
+#### モザイクの命名規則
+
+・mosaicIdクラス = xxxMosaicId
+・mosaicIdの文字列 = xxxMosaicIdHex
+
 #### ブロックチェーンタイプの命名規則
 
 ・symbol、momijiを先頭につける

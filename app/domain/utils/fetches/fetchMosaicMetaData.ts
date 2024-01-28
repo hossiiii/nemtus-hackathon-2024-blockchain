@@ -1,23 +1,19 @@
-import { Address, KeyGenerator, MetadataType } from 'symbol-sdk';
+import { KeyGenerator, MetadataType, MosaicId } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 
-export const fetchAccountMetaData = async (
+export const fetchMosaicMetaData = async (
   blockChain: any,
   key: string,
-  targetAddress: Address,
+  mosaicId: MosaicId,
 ): Promise<string> => {
   const uint64keyToHex = KeyGenerator.generateUInt64Key(key).toHex();
   const res = (await firstValueFrom(
     blockChain.metaRepo.search({
-      metadataType: MetadataType.Account,
+      metadataType: MetadataType.Mosaic,
       scopedMetadataKey: uint64keyToHex,
-      targetAddress: targetAddress,
-      sourceAddress: targetAddress,
+      targetId: mosaicId,
     }),
   )) as any;
-  if (!res.data || !res.data[0] || !res.data[0].metadataEntry) {
-    throw new Error('MetadataEntry not found');
-  }
   const value = res.data[0].metadataEntry.value;
   return value;
 };

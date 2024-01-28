@@ -1,18 +1,18 @@
-// 用途：新規登録を行うビジネスロジック
+// 用途：新規登録を行う
 import {
   Account,
   AggregateTransaction,
   Deadline,
   PublicAccount,
-  TransactionStatus,
 } from 'symbol-sdk';
 import { setupBlockChain } from '../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
 import { encryptedAccount } from '../utils/accounts/encryptedAccount';
 import { accountMetaDataTransaction } from '../utils/transactions/accountMetaDataTransaction';
+import { accountMetaDataKey } from '../../consts/consts';
 
-export const signup = async (password: string): Promise<TransactionStatus> => {
+export const signup = async (password: string): Promise<Account> => {
   const momijiBlockChain = await setupBlockChain('momiji');
   const symbolBlockChain = await setupBlockChain('symbol');
 
@@ -28,10 +28,9 @@ export const signup = async (password: string): Promise<TransactionStatus> => {
   );
 
   // Symbolアカウントに対してパスフレーズで暗号化したアカウント情報をメタデータに記録するTxを作成
-  const key = 'momoji_account';
   const accountMetaDataTx = await accountMetaDataTransaction(
     symbolBlockChain,
-    key,
+    accountMetaDataKey,
     momijiStrSignerQR,
     symbolTargetPublicAccount.address,
   );
@@ -62,5 +61,9 @@ export const signup = async (password: string): Promise<TransactionStatus> => {
     symbolTargetAccount.address,
   );
 
-  return result;
+  if(result.code === "Success"){
+    return newAccount;
+  }else{
+    throw new Error(JSON.stringify(result));
+  }
 };

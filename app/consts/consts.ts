@@ -1,3 +1,9 @@
+export const serviceName = 'kojinkanbaibai';
+export const serviceVersion = 1;
+export const secletLockDuration = 480;
+
+export const accountMetaDataKey = 'momiji_account';
+
 export const symbolNodeList = [
   'https://sym-test-01.opening-line.jp:3001',
   'https://sym-test-03.opening-line.jp:3001',

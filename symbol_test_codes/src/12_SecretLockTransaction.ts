@@ -67,7 +67,7 @@ const main = async () => {
   await listener.open();
   await new Promise((resolve) => {
     // 承認トランザクションの検知
-    listener.confirmed(alice.address, signedLockTx.hash).subscribe(async (confirmedTx) => {
+    listener.confirmed(alice.address, signedLockTx.hash).subscribe(async () => {
       setTimeout(async () => {
         const transactionStatus: TransactionStatus = await firstValueFrom(
           tsRepo.getTransactionStatus(signedLockTx.hash),
@@ -98,7 +98,7 @@ const main = async () => {
     // 未承認トランザクションの検知
     listener
       .unconfirmedAdded(alice.address, singedProofTx.hash)
-      .subscribe(async (unconfirmedTx) => {
+      .subscribe(async () => {
         clearTimeout(timerId);
         const transactionStatus: TransactionStatus = await firstValueFrom(
           tsRepo.getTransactionStatus(singedProofTx.hash),

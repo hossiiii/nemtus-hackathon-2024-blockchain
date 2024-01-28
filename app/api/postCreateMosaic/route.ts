@@ -1,9 +1,9 @@
-// POST SAMPLE signup の実行
+// POST SAMPLE registration の実行
 
 import { NextResponse } from 'next/server';
-import { TransactionStatus } from 'symbol-sdk';
 import { registration } from '../../domain/useCases/registration';
 import { ProductInfo } from '../../domain/entities/productInfo/productInfo';
+import { serviceName, serviceVersion } from '../../consts/consts';
 
 export const POST = async (req: Request, res: NextResponse<string | null>) => {
   try {
@@ -27,10 +27,12 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
       category: category.split(','),
       metalIds: null,
       depositAddress: null,
-      price: price
+      price: price,
+      serviceName: serviceName,
+      servieVersion: serviceVersion,
     }
 
-    const result: TransactionStatus = await registration(password, productInfo, amount);
+    const result: string = await registration(password, productInfo, amount);
 
     return NextResponse.json({ data: result }, { status: 200 });
   } catch (err: any) {

@@ -14,7 +14,6 @@ import { BlockChainType } from '../../domain/entities/blockChainType/blockChainT
 export const setupBlockChain = async (blockChainType: BlockChainType): Promise<any> => {
   const node = await connectNode(blockChainType == 'symbol' ? symbolNodeList : momojiNodeList);
   if (node === '') return undefined;
-
   const repo = new RepositoryFactoryHttp(node);
   const txRepo = repo.createTransactionRepository();
   const tsRepo = repo.createTransactionStatusRepository();

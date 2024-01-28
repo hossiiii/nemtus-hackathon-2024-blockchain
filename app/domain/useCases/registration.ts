@@ -1,5 +1,5 @@
 // 用途：商品登録を行う
-import { AggregateTransaction, Deadline, PublicAccount, TransactionStatus } from 'symbol-sdk';
+import { AggregateTransaction, Deadline, PublicAccount } from 'symbol-sdk';
 import { setupBlockChain } from '../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
@@ -9,12 +9,13 @@ import { mosaicDefinitionTransaction } from '../utils/transactions/mosaicDefinit
 import { mosaicSupplyChangeTransaction } from '../utils/transactions/mosaicSupplyChangeTransaction';
 import { mosaicMetaDataTransaction } from '../utils/transactions/mosaicMetaDataTransaction';
 import { ProductInfo } from '../entities/productInfo/productInfo';
+import { accountMetaDataKey } from '../../consts/consts';
 
 export const registration = async (
   password: string,
   productInfo: ProductInfo,
   amount: number,
-): Promise<TransactionStatus> => {
+): Promise<string> => {
   const momijiBlockChain = await setupBlockChain('momiji');
   const symbolBlockChain = await setupBlockChain('symbol');
 
@@ -26,10 +27,9 @@ export const registration = async (
   );
 
   // プライベートチェーンのアカウントを参照
-  const key = 'momoji_account';
   const strQr = await fetchAccountMetaData(
     symbolBlockChain,
-    key,
+    accountMetaDataKey,
     symbolTargetPublicAccount.address,
   );
   const momijiTargetAccount = decryptedAccount(momijiBlockChain, strQr, password);
@@ -77,12 +77,7 @@ export const registration = async (
     [],
   ).setMaxFeeForAggregate(100, 0);
 
-  console.log(aggregateTx);
-
   const momijiSignedTx = momijiTargetAccount.sign(aggregateTx, momijiBlockChain.generationHash);
-
-  console.log(momijiSignedTx);
-  console.log(momijiTargetAccount.address);
 
   // Momijiネットワークへのアナウンス
   const momijiHash = momijiSignedTx.hash;
@@ -94,5 +89,9 @@ export const registration = async (
     momijiTargetAccount.address,
   );
 
-  return result;
+  if(result.code === "Success"){
+    return mosaicDefinitionTx.mosaicId.id.toHex();
+  }else{
+    throw new Error(JSON.stringify(result));
+  }
 };

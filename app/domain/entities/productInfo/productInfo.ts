@@ -6,4 +6,6 @@ export type ProductInfo = {
   metalIds: string[];
   depositAddress: string;
   price: number;
+  serviceName: string;
+  servieVersion: number;
 };
