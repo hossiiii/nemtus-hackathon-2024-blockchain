@@ -3,10 +3,10 @@ import { firstValueFrom } from 'rxjs';
 
 export const fetchPublicAccount = async (
   blockChain: any,
-  targetAddress: Address,
+  address: Address,
 ): Promise<PublicAccount> => {
   const accountInfo: AccountInfo = await firstValueFrom(
-    blockChain.accountRepo.getAccountInfo(targetAddress),
+    blockChain.accountRepo.getAccountInfo(address),
   );
   const targetPublicKey = accountInfo.publicKey;
   if (targetPublicKey === '0000000000000000000000000000000000000000000000000000000000000000') {

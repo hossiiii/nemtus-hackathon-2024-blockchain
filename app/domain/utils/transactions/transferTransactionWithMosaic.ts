@@ -1,25 +1,25 @@
 import {
   TransferTransaction,
   Deadline,
-  Transaction,
   Address,
   EmptyMessage,
   Mosaic,
-  MosaicId,
   UInt64,
+  MosaicId,
 } from 'symbol-sdk';
 
-export const transferTransactionWithCurrency = (
+export const transferTransactionWithMosaic = (
   blockChain: any,
   amount: number,
-  targetAddress: Address,
-): Transaction => {
+  mosaicId:MosaicId,
+  address: Address,
+): TransferTransaction => {
   const transferTx = TransferTransaction.create(
     Deadline.create(blockChain.epochAdjustment),
-    targetAddress,
-    [new Mosaic(new MosaicId(blockChain.currencyMosaicId), UInt64.fromUint(amount * 1000000))],
+    address,
+    [new Mosaic(mosaicId, UInt64.fromUint(amount))],
     EmptyMessage,
     blockChain.networkType,
-  ).setMaxFee(100);
+  ).setMaxFee(100) as TransferTransaction;
   return transferTx;
 };

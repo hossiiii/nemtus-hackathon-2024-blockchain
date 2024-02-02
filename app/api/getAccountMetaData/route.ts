@@ -5,7 +5,7 @@ import { setupBlockChain } from '../../domain/utils/setupBlockChain';
 import { fetchAccountMetaData } from '../../domain/utils/fetches/fetchAccountMetaData';
 import { decryptedAccount } from '../../domain/utils/accounts/decryptedAccount';
 import { Address } from 'symbol-sdk';
-import { accountMetaDataKey } from '../../consts/consts';
+import { symbolAccountMetaDataKey } from '../../consts/consts';
 
 export const GET = async (req: Request, res: NextResponse<string | null>) => {
   try {
@@ -19,7 +19,11 @@ export const GET = async (req: Request, res: NextResponse<string | null>) => {
     const momijiBlockChain = await setupBlockChain('momiji');
     const symbolBlockChain = await setupBlockChain('symbol');
 
-    const strQr = await fetchAccountMetaData(symbolBlockChain, accountMetaDataKey, targetAddress);
+    const strQr = await fetchAccountMetaData(
+      symbolBlockChain,
+      symbolAccountMetaDataKey,
+      targetAddress,
+    );
     const account = decryptedAccount(momijiBlockChain, strQr, password);
 
     return NextResponse.json({ data: account.address.plain() }, { status: 200 });

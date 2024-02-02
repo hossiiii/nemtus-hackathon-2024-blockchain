@@ -1,21 +1,21 @@
 import { firstValueFrom } from 'rxjs';
-import { Deadline, Address, UInt64, KeyGenerator } from 'symbol-sdk';
+import { Deadline, Address, UInt64, KeyGenerator, AccountMetadataTransaction } from 'symbol-sdk';
 
 export const accountMetaDataTransaction = async (
   blockChain: any,
   key: string,
   value: string,
-  targeAddress: Address,
-): Promise<any> => {
+  address: Address,
+): Promise<AccountMetadataTransaction> => {
   const uint64key = KeyGenerator.generateUInt64Key(key);
-  const accountMetaDataTransaction = await firstValueFrom(
+  const accountMetaDataTransaction:AccountMetadataTransaction = await firstValueFrom(
     blockChain.metaService.createAccountMetadataTransaction(
       Deadline.create(blockChain.epochAdjustment),
       blockChain.networkType,
-      targeAddress,
+      address,
       uint64key,
       value,
-      targeAddress,
+      address,
       UInt64.fromUint(0),
     ),
   );

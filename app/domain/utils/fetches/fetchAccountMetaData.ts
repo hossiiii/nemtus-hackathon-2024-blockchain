@@ -4,19 +4,19 @@ import { firstValueFrom } from 'rxjs';
 export const fetchAccountMetaData = async (
   blockChain: any,
   key: string,
-  targetAddress: Address,
-): Promise<string> => {
+  address: Address,
+): Promise<string | null> => {
   const uint64keyToHex = KeyGenerator.generateUInt64Key(key).toHex();
   const res = (await firstValueFrom(
     blockChain.metaRepo.search({
       metadataType: MetadataType.Account,
       scopedMetadataKey: uint64keyToHex,
-      targetAddress: targetAddress,
-      sourceAddress: targetAddress,
+      targetAddress: address,
+      sourceAddress: address,
     }),
   )) as any;
   if (!res.data || !res.data[0] || !res.data[0].metadataEntry) {
-    throw new Error('MetadataEntry not found');
+    return null;
   }
   const value = res.data[0].metadataEntry.value;
   return value;

@@ -1,22 +1,20 @@
 import {
-  Account,
-  PublicAccount,
   TransferTransaction,
   Deadline,
-  EncryptedMessage,
+  PlainMessage,
+  Address,
 } from 'symbol-sdk';
 
-export const transferTransactionWithEncryptMessage = (
+export const transferTransactionWithMessage = (
   blockChain: any,
   message: string,
-  srcAccount: Account,
-  targetPublicAccount: PublicAccount,
+  address: Address,
 ): TransferTransaction => {
   const transferTx = TransferTransaction.create(
     Deadline.create(blockChain.epochAdjustment),
-    targetPublicAccount.address,
+    address,
     [],
-    EncryptedMessage.create(message, targetPublicAccount, srcAccount.privateKey),
+    PlainMessage.create(message),
     blockChain.networkType,
   ).setMaxFee(100) as TransferTransaction;
   return transferTx;

@@ -1,23 +1,23 @@
 import { firstValueFrom } from 'rxjs';
-import { Deadline, Address, UInt64, KeyGenerator, MosaicId } from 'symbol-sdk';
+import { Deadline, Address, UInt64, KeyGenerator, MosaicId, MosaicMetadataTransaction } from 'symbol-sdk';
 
 export const mosaicMetaDataTransaction = async (
   blockChain: any,
   key: string,
   value: string,
   mosaicId: MosaicId,
-  targeAddress: Address,
-): Promise<any> => {
+  address: Address,
+): Promise<MosaicMetadataTransaction> => {
   const uint64key = KeyGenerator.generateUInt64Key(key);
-  const mosaicMetaDataTransaction = await firstValueFrom(
+  const mosaicMetaDataTransaction:MosaicMetadataTransaction = await firstValueFrom(
     blockChain.metaService.createMosaicMetadataTransaction(
       Deadline.create(blockChain.epochAdjustment),
       blockChain.networkType,
-      targeAddress,
+      address,
       mosaicId,
       uint64key,
       value,
-      targeAddress,
+      address,
       UInt64.fromUint(0),
     ),
   );

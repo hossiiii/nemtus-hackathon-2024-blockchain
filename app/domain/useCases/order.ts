@@ -1,35 +1,63 @@
 // 用途：注文を行うビジネスロジック
-import { Account, Address, TransactionStatus } from 'symbol-sdk';
+import { Address, AggregateTransaction, Deadline, PublicAccount } from 'symbol-sdk';
 import { setupBlockChain } from '../utils/setupBlockChain';
 import { transferTransactionWithEncryptMessage } from '../utils/transactions/transferTransactionWithEncryptMessage';
-import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
 import { fetchPublicAccount } from '../utils/fetches/fetchPublicAccount';
+import { PaymentInfo } from '../entities/paymentInfo/paymentInfo';
+import { OrderInfo } from '../entities/orderInfo/orderInfo';
+import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
+import { symbolAccountMetaDataKey } from '../../consts/consts';
+import { decryptedAccount } from '../utils/accounts/decryptedAccount';
+import { ProductInfo } from '../entities/productInfo/productInfo';
 
 export const order = async (
-  srcPrivateKey: string,
-  momijiTargetRowAddress: string,
-  message: string,
-): Promise<TransactionStatus> => {
-  //TODO本来は秘密鍵ではなくパスワードを受け取る、命名規則も
-  const blockChain = await setupBlockChain('momiji');
-  const srcAccount = Account.createFromPrivateKey(srcPrivateKey, blockChain.networkType);
-  const momijiTargetAddress = Address.createFromRawAddress(momijiTargetRowAddress);
-  const targetPublicAccount = await fetchPublicAccount(blockChain, momijiTargetAddress);
+  symbolUserPublicAccount: PublicAccount,
+  password: string,
+  productInfo: ProductInfo,
+  paymentInfo:PaymentInfo,
+  orderInfo: OrderInfo,
+): Promise<AggregateTransaction> => {
+  const momijiBlockChain = await setupBlockChain('momiji');
+  const symbolBlockChain = await setupBlockChain('symbol');
 
-  // 販売者に対して注文情報を暗号化して送信するTxを作成
-  const orderTransaction = transferTransactionWithEncryptMessage(
-    blockChain,
-    message,
-    srcAccount,
-    targetPublicAccount,
+  // プライベートチェーンのアカウントを参照
+  const strQr = await fetchAccountMetaData(
+    symbolBlockChain,
+    symbolAccountMetaDataKey,
+    symbolUserPublicAccount.address,
   );
-  // 本来はこれに加えて、管理者に対して暗号化したプルーフと、注文情報のハッシュを送信するTxをアグリゲートトランザクションにしてアナウンスする必要がある
-  const signedTransaction = srcAccount.sign(orderTransaction, blockChain.generationHash);
-  const hash = signedTransaction.hash;
-  await firstValueFrom(blockChain.txRepo.announce(signedTransaction));
+  const momijiUserAccount = decryptedAccount(momijiBlockChain, strQr, password);
 
-  const result = await fetchTransactionStatus(blockChain, hash, srcAccount.address);
+  // 販売者向けの注文情報送信用Txを作成
+  const strOrderInfo = JSON.stringify(orderInfo);
+  const momijiSellerAddress = Address.createFromRawAddress(productInfo.orderAddress);
+  const momijiSellerPublicAccount = await fetchPublicAccount(momijiBlockChain, momijiSellerAddress);
+  const orderInfoTx = transferTransactionWithEncryptMessage(
+    momijiBlockChain,
+    strOrderInfo,
+    momijiUserAccount,
+    momijiSellerPublicAccount
+  );
 
-  return result;
+  // 管理者向けの支払い情報送信用Txを作成:注文情報のhashを使うので、注文情報を作成した後に作成する
+  const strPaymentInfo = JSON.stringify(paymentInfo);
+  const momijiAdminPublicAccount = PublicAccount.createFromPublicKey(process.env.NEXT_PUBLIC_ADMIN_PUBLIC_KEY, momijiBlockChain.networkType);
+  const paymentInfoTx = transferTransactionWithEncryptMessage(
+    momijiBlockChain,
+    strPaymentInfo,
+    momijiUserAccount,
+    momijiAdminPublicAccount
+  );
+
+  const agregateTx = AggregateTransaction.createComplete(
+    Deadline.create(momijiBlockChain.epochAdjustment),
+    [
+      orderInfoTx.toAggregate(momijiUserAccount.publicAccount),
+      paymentInfoTx.toAggregate(momijiUserAccount.publicAccount)
+    ],
+    momijiBlockChain.networkType,
+    [],
+  ).setMaxFeeForAggregate(100, 0);
+
+  return agregateTx;
 };

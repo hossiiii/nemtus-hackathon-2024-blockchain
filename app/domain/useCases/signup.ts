@@ -3,67 +3,84 @@ import {
   Account,
   AggregateTransaction,
   Deadline,
+  MosaicId,
   PublicAccount,
+  SecretLockTransaction,
 } from 'symbol-sdk';
 import { setupBlockChain } from '../utils/setupBlockChain';
-import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
 import { encryptedAccount } from '../utils/accounts/encryptedAccount';
 import { accountMetaDataTransaction } from '../utils/transactions/accountMetaDataTransaction';
-import { accountMetaDataKey } from '../../consts/consts';
+import { symbolAccountMetaDataKey, initialManju, momijiAccountMetaDataKey } from '../../consts/consts';
+import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
+import { transferTransactionWithMosaic } from '../utils/transactions/transferTransactionWithMosaic';
+import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
+import { firstValueFrom } from 'rxjs';
 
-export const signup = async (password: string): Promise<Account> => {
+//オプションの引数としてsecletLockTxを受け取る（購入者が初めてアカウント登録をする場合は署名を1回にしたいため）
+export const signup = async (symbolTargetPublicAccount:PublicAccount, password: string, secletLockTx?: SecretLockTransaction ): Promise<AggregateTransaction> => {
   const momijiBlockChain = await setupBlockChain('momiji');
   const symbolBlockChain = await setupBlockChain('symbol');
 
-  // プライベートチェーンのアカウントを作成
-  const newAccount = Account.generateNewAccount(symbolBlockChain.networkType);
-  const momijiStrSignerQR = encryptedAccount(momijiBlockChain, newAccount, password);
+  // 既に登録済みの場合は上書きになってしまうのでエラーを返す
+  const res = await fetchAccountMetaData(symbolBlockChain, symbolAccountMetaDataKey, symbolTargetPublicAccount.address);
+  if (res) {
+    throw new Error('already registered momiji account');
+  }
+  // momijiのアカウントを作成
+  const momijiNewAccount = Account.generateNewAccount(momijiBlockChain.networkType);
+  const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiNewAccount, password);
 
-  // SymbolアカウントのアドレスをaLiceから取得(TODO　bobSymbolPublicKeyを使用、実際にはAPIで取得する)
-  const symbolTargetPublicKey = 'CE98705EBCAED8F6558897D0B3435A856A63B6CA8200593E3FBB33F61E86FC46';
-  const symbolTargetPublicAccount = PublicAccount.createFromPublicKey(
-    symbolTargetPublicKey,
-    symbolBlockChain.networkType,
+  // momijiにmanjuを送金しメタデータにSymbolアカウントの公開鍵を記録するTxを作成
+  const momijiAdminAccount = Account.createFromPrivateKey(
+    process.env.PRIVATE_KEY,
+    momijiBlockChain.networkType,
+  );
+  const momijiTransferTx = transferTransactionWithMosaic(momijiBlockChain,initialManju*1000000,new MosaicId(momijiBlockChain.currencyMosaicId), momijiNewAccount.address);
+  const momijiAccountMetaDataTx = await accountMetaDataTransaction(momijiBlockChain, momijiAccountMetaDataKey, symbolTargetPublicAccount.publicKey, momijiNewAccount.address)
+
+  const momijiAggregateTx = AggregateTransaction.createComplete(
+    Deadline.create(momijiBlockChain.epochAdjustment),
+    [
+      momijiTransferTx.toAggregate(momijiAdminAccount.publicAccount),
+      momijiAccountMetaDataTx.toAggregate(momijiNewAccount.publicAccount) //TODO: 必要なければ削除
+    ],
+    momijiBlockChain.networkType,
+    [],
+  ).setMaxFeeForAggregate(100, 1); //連署者の数を指定
+  
+  const momijiSignedAggregateTx = momijiAdminAccount.signTransactionWithCosignatories(momijiAggregateTx,[momijiNewAccount],momijiBlockChain.generationHash);
+  const momijiSignedAggregateTxHash = momijiSignedAggregateTx.hash;
+  const response = await firstValueFrom(momijiBlockChain.txRepo.announce(momijiSignedAggregateTx));
+  console.log(response);
+
+  await fetchTransactionStatus(
+    momijiBlockChain,
+    momijiSignedAggregateTxHash,
+    momijiAdminAccount.address,
   );
 
   // Symbolアカウントに対してパスフレーズで暗号化したアカウント情報をメタデータに記録するTxを作成
   const accountMetaDataTx = await accountMetaDataTransaction(
     symbolBlockChain,
-    accountMetaDataKey,
+    symbolAccountMetaDataKey,
     momijiStrSignerQR,
-    symbolTargetPublicAccount.address,
+    symbolTargetPublicAccount.address
   );
+
+  const aggregateArray = [accountMetaDataTx.toAggregate(symbolTargetPublicAccount)];
+
+  // 引数にsecletLockTxが指定されていたらアグリゲートTxに追加
+  if (secletLockTx) {
+    aggregateArray.push(secletLockTx.toAggregate(symbolTargetPublicAccount));
+  }
 
   // アグリゲートTxを作成
   const aggregateTx = AggregateTransaction.createComplete(
     Deadline.create(symbolBlockChain.epochAdjustment),
-    [accountMetaDataTx.toAggregate(symbolTargetPublicAccount)],
+    aggregateArray,
     symbolBlockChain.networkType,
     [],
   ).setMaxFeeForAggregate(100, 0);
 
-  // aLiceで署名(TODO bobSymbolPrivateKeyを使用、実際にはAPIで署名データを得る)
-  const symbolTargetPrivateKey = 'DC8C324505DC69F18229F344C2473F69DB069F10294F7552B806BC7FAAC91377';
-  const symbolTargetAccount = Account.createFromPrivateKey(
-    symbolTargetPrivateKey,
-    symbolBlockChain.networkType,
-  );
-  const symbolSignedTx = symbolTargetAccount.sign(aggregateTx, symbolBlockChain.generationHash);
-
-  // Symbolネットワークへのアナウンス
-  const symbolHash = symbolSignedTx.hash;
-  await firstValueFrom(symbolBlockChain.txRepo.announce(symbolSignedTx));
-
-  const result = await fetchTransactionStatus(
-    symbolBlockChain,
-    symbolHash,
-    symbolTargetAccount.address,
-  );
-
-  if(result.code === "Success"){
-    return newAccount;
-  }else{
-    throw new Error(JSON.stringify(result));
-  }
+  return aggregateTx;
 };

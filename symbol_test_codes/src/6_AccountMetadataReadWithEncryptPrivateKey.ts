@@ -1,4 +1,4 @@
-//パスフレーズで暗号化したMomojiのPrivateKeyをメタデータから読み込みMomojiアカウントの秘密鍵を復元する
+//パスフレーズで暗号化したMomijiのPrivateKeyをメタデータから読み込みMomijiアカウントの秘密鍵を復元する
 
 import { firstValueFrom } from 'rxjs';
 import { RepositoryFactoryHttp, KeyGenerator, Address } from 'symbol-sdk';
@@ -19,7 +19,7 @@ const metaRepo = repo.createMetadataRepository();
 
 const main = async () => {
   const alice = Address.createFromRawAddress(aliceAddress);
-  const key = KeyGenerator.generateUInt64Key('momoji_account').toHex();
+  const key = KeyGenerator.generateUInt64Key('momiji_account').toHex();
   const res = await firstValueFrom(
     metaRepo.search({
       scopedMetadataKey: key,

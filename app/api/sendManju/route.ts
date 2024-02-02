@@ -1,9 +1,9 @@
 // POST Manjuの送付
 
 import { NextResponse } from 'next/server';
-import { Account, Address, TransactionStatus } from 'symbol-sdk';
+import { Account, Address, MosaicId, TransactionStatus } from 'symbol-sdk';
 import { setupBlockChain } from '../../domain/utils/setupBlockChain';
-import { transferTransactionWithCurrency } from '../../domain/utils/transactions/transferTransactionWithCurrency';
+import { transferTransactionWithMosaic } from '../../domain/utils/transactions/transferTransactionWithMosaic';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../../domain/utils/fetches/fetchTransactionStatus';
 
@@ -23,9 +23,10 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
     );
     const momijiTargetAddress = Address.createFromRawAddress(targetRawAddress);
 
-    const transferTx = transferTransactionWithCurrency(
+    const transferTx = transferTransactionWithMosaic(
       momijiBlockChain,
-      amount,
+      amount*1000000,
+      new MosaicId(momijiBlockChain.currencyMosaicId),
       momijiTargetAddress,
     );
     const momijiSignedTx = momijiAdminAccount.sign(transferTx, momijiBlockChain.generationHash);

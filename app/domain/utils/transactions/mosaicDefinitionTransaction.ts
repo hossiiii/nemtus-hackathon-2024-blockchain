@@ -10,7 +10,7 @@ import {
 
 export const mosaicDefinitionTransaction = (
   blockChain: any,
-  targeAddress: Address,
+  address: Address,
 ): MosaicDefinitionTransaction => {
   const nonce = MosaicNonce.createRandom();
   const supplyMutable = true;
@@ -24,7 +24,7 @@ export const mosaicDefinitionTransaction = (
     MosaicDefinitionTransaction.create(
       Deadline.create(blockChain.epochAdjustment),
       nonce,
-      MosaicId.createFromNonce(nonce, targeAddress),
+      MosaicId.createFromNonce(nonce, address),
       MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
       divibility,
       duration,

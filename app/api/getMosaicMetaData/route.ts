@@ -11,12 +11,12 @@ export const GET = async (req: Request, res: NextResponse<string | null>) => {
 
     const { query } = parse(req.url, true);
     const mosaicIdHex: string = query.mosaicIdHex as string;
-    const targetMosaicId = new MosaicId(mosaicIdHex)
+    const targetMosaicId = new MosaicId(mosaicIdHex);
 
     const momijiBlockChain = await setupBlockChain('momiji');
 
     const key = 'productInfo';
-    const productInfoStr:string = await fetchMosaicMetaData(momijiBlockChain, key, targetMosaicId);
+    const productInfoStr: string = await fetchMosaicMetaData(momijiBlockChain, key, targetMosaicId);
     const productInfo = JSON.parse(productInfoStr);
 
     return NextResponse.json({ data: productInfo }, { status: 200 });

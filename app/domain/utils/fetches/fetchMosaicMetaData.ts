@@ -5,7 +5,7 @@ export const fetchMosaicMetaData = async (
   blockChain: any,
   key: string,
   mosaicId: MosaicId,
-): Promise<string> => {
+): Promise<string | null> => {
   const uint64keyToHex = KeyGenerator.generateUInt64Key(key).toHex();
   const res = (await firstValueFrom(
     blockChain.metaRepo.search({
@@ -14,6 +14,9 @@ export const fetchMosaicMetaData = async (
       targetId: mosaicId,
     }),
   )) as any;
+  if (!res.data || !res.data[0] || !res.data[0].metadataEntry) {
+    return null;
+  }
   const value = res.data[0].metadataEntry.value;
   return value;
 };

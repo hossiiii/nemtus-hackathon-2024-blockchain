@@ -1,4 +1,4 @@
-//Symbolのaliceアカウントにパスフレーズで暗号化したMomojiのPrivateKeyをメタデータとして設定する
+//Symbolのaliceアカウントにパスフレーズで暗号化したMomijiのPrivateKeyをメタデータとして設定する
 
 import { firstValueFrom } from 'rxjs';
 import {
@@ -58,7 +58,7 @@ const main = async () => {
 
   const alice = Account.createFromPrivateKey(alicePrivateKey, networkType);
 
-  const key = KeyGenerator.generateUInt64Key('momoji_account');
+  const key = KeyGenerator.generateUInt64Key('momiji_account');
   const value = strSignerQR; //実際にはsaltはサーバー側に保管しておいた方が良い？
 
   const accountMetadataTransaction = await firstValueFrom(

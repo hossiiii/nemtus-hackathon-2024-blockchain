@@ -18,9 +18,17 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
       category,
       price,
       amount,
-    }: { password:string; productName:string; sellerName:string; description:string; category:string; price:number; amount:number;} = await req.json();
+    }: {
+      password: string;
+      productName: string;
+      sellerName: string;
+      description: string;
+      category: string;
+      price: number;
+      amount: number;
+    } = await req.json();
 
-    const productInfo : ProductInfo = {
+    const productInfo: ProductInfo = {
       productName,
       sellerName,
       description,
@@ -30,7 +38,7 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
       price: price,
       serviceName: serviceName,
       servieVersion: serviceVersion,
-    }
+    };
 
     const result: string = await registration(password, productInfo, amount);
 

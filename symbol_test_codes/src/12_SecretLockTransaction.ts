@@ -96,17 +96,15 @@ const main = async () => {
   await listener.open();
   return new Promise((resolve) => {
     // 未承認トランザクションの検知
-    listener
-      .unconfirmedAdded(alice.address, singedProofTx.hash)
-      .subscribe(async () => {
-        clearTimeout(timerId);
-        const transactionStatus: TransactionStatus = await firstValueFrom(
-          tsRepo.getTransactionStatus(singedProofTx.hash),
-        );
-        console.log(transactionStatus);
-        console.log(`${service.getExplorer()}/transactions/${singedProofTx.hash}`); //ブラウザで確認を追加
-        listener.close();
-      });
+    listener.unconfirmedAdded(alice.address, singedProofTx.hash).subscribe(async () => {
+      clearTimeout(timerId);
+      const transactionStatus: TransactionStatus = await firstValueFrom(
+        tsRepo.getTransactionStatus(singedProofTx.hash),
+      );
+      console.log(transactionStatus);
+      console.log(`${service.getExplorer()}/transactions/${singedProofTx.hash}`); //ブラウザで確認を追加
+      listener.close();
+    });
 
     //未承認トランザクションの検知ができなかった時の処理
     const timerId = setTimeout(async function () {

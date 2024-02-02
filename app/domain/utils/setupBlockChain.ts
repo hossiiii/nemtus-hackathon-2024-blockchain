@@ -1,18 +1,31 @@
-import { RepositoryFactoryHttp, MetadataTransactionService } from 'symbol-sdk';
+import { RepositoryFactoryHttp, MetadataTransactionService, TransactionRepository, TransactionStatusRepository, AccountRepository, MetadataRepository, Listener, NetworkType, MosaicId } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 import { connectNode } from '../../domain/utils/connectNode';
 import {
   momijiCurrencyMosaicId,
   momijiExplorer,
-  momojiNodeList,
+  momijiNodeList,
   symbolCurrencyMosaicId,
   symbolExplorer,
   symbolNodeList,
 } from '../../consts/consts';
 import { BlockChainType } from '../../domain/entities/blockChainType/blockChainType';
 
-export const setupBlockChain = async (blockChainType: BlockChainType): Promise<any> => {
-  const node = await connectNode(blockChainType == 'symbol' ? symbolNodeList : momojiNodeList);
+interface BlockChainSetup {
+  txRepo: TransactionRepository;
+  tsRepo: TransactionStatusRepository;
+  accountRepo: AccountRepository;
+  metaRepo: MetadataRepository;
+  metaService: MetadataTransactionService;
+  listener: any;
+  networkType: NetworkType;
+  epochAdjustment: number;
+  generationHash: string;
+  currencyMosaicId: string;
+  explorerUrl: string;
+}
+export const setupBlockChain = async (blockChainType: BlockChainType): Promise<BlockChainSetup> => {
+  const node = await connectNode(blockChainType == 'symbol' ? symbolNodeList : momijiNodeList);
   if (node === '') return undefined;
   const repo = new RepositoryFactoryHttp(node);
   const txRepo = repo.createTransactionRepository();

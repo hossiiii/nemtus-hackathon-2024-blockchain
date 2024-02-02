@@ -7,10 +7,11 @@ import { setupBlockChain } from '../setupBlockChain';
 
 describe('encryptedAccount', () => {
   it('test', async () => {
-    const blockChain = await setupBlockChain('momiji');
-    const newAccount = Account.generateNewAccount(blockChain.networkType);
+    const momijiBlockChain = await setupBlockChain('momiji');
+    const momijiNewAccount = Account.generateNewAccount(momijiBlockChain.networkType);
     const password = 'testPassword';
-    const result = encryptedAccount(blockChain, newAccount, password);
+    const result = encryptedAccount(momijiBlockChain, momijiNewAccount, password);
     console.log(result);
-  });
+    expect(result).toContain('ciphertext');
+  }, 10000); // 10 seconds
 });

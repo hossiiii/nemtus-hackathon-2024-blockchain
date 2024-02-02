@@ -137,7 +137,7 @@ const main = async () => {
     // 未承認トランザクションの検知
     listener
       .unconfirmedAdded(alice.address, signedAggregateTx.hash)
-      .subscribe(async (unconfirmedTx) => {
+      .subscribe(async () => {
         clearTimeout(timerId);
         const transactionStatus: TransactionStatus = await firstValueFrom(
           tsRepo.getTransactionStatus(signedAggregateTx.hash),
