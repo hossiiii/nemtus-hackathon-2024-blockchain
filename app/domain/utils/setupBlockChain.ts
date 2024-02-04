@@ -1,4 +1,4 @@
-import { RepositoryFactoryHttp, MetadataTransactionService, TransactionRepository, TransactionStatusRepository, AccountRepository, MetadataRepository, Listener, NetworkType, MosaicId } from 'symbol-sdk';
+import { RepositoryFactoryHttp, MetadataTransactionService, TransactionRepository, TransactionStatusRepository, AccountRepository, MetadataRepository, NetworkType, ReceiptRepository } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 import { connectNode } from '../../domain/utils/connectNode';
 import {
@@ -16,6 +16,7 @@ interface BlockChainSetup {
   tsRepo: TransactionStatusRepository;
   accountRepo: AccountRepository;
   metaRepo: MetadataRepository;
+  receiptRepo: ReceiptRepository;
   metaService: MetadataTransactionService;
   listener: any;
   networkType: NetworkType;
@@ -32,6 +33,7 @@ export const setupBlockChain = async (blockChainType: BlockChainType): Promise<B
   const tsRepo = repo.createTransactionStatusRepository();
   const accountRepo = repo.createAccountRepository();
   const metaRepo = repo.createMetadataRepository();
+  const receiptRepo = repo.createReceiptRepository();
   const metaService = new MetadataTransactionService(metaRepo);
   const listener = repo.createListener();
   const networkType = await firstValueFrom(repo.getNetworkType());
@@ -46,6 +48,7 @@ export const setupBlockChain = async (blockChainType: BlockChainType): Promise<B
     tsRepo,
     accountRepo,
     metaRepo,
+    receiptRepo,
     metaService,
     listener,
     networkType,

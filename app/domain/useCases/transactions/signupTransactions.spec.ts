@@ -2,24 +2,24 @@ import fetch from 'node-fetch';
 global.fetch = fetch;
 
 import { Account, Address, AggregateTransaction, Crypto, MosaicId, PublicAccount, TransactionStatus } from 'symbol-sdk';
-import { signup } from './signup';
-import { setupBlockChain } from '../utils/setupBlockChain';
-import { transferTransactionWithMosaic } from '../utils/transactions/transferTransactionWithMosaic';
+import { signupTransactions } from './signupTransactions';
+import { setupBlockChain } from '../../utils/setupBlockChain';
+import { transferTransactionWithMosaic } from '../../utils/transactions/transferTransactionWithMosaic';
 import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
-import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
-import { symbolAccountMetaDataKey } from '../../consts/consts';
-import { decryptedAccount } from '../utils/accounts/decryptedAccount';
-import { secretLockTransaction } from '../utils/transactions/secretLockTransaction';
+import { fetchTransactionStatus } from '../../utils/fetches/fetchTransactionStatus';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { symbolAccountMetaDataKey } from '../../../consts/consts';
+import { decryptedAccount } from '../../utils/accounts/decryptedAccount';
+import { secretLockTransaction } from '../../utils/transactions/secretLockTransaction';
 import { sha3_256 } from 'js-sha3';
 
 
-describe('signup', () => {
+describe('signupTransactions', () => {
   it('should return a new AggegateTransaction', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolNewAccount = Account.generateNewAccount(symbolBlockChain.networkType);
     const password = 'pass';
-    const result = await signup(symbolNewAccount.publicAccount, password);
+    const result = await signupTransactions(symbolNewAccount.publicAccount, password);
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 600000); // 60 seconds
 
@@ -35,7 +35,7 @@ describe('signup', () => {
     const proof = random.toString('hex');
       
     const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSendNewAccount.address);
-    const result = await signup(symbolNewAccount.publicAccount, password, secletTx);
+    const result = await signupTransactions(symbolNewAccount.publicAccount, password, secletTx);
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 600000); // 60 seconds
 
@@ -46,12 +46,12 @@ describe('signup', () => {
       symbolBlockChain.networkType,
     );
     const password = 'pass';
-    await expect(signup(symbolPublicAccount, password)).rejects.toThrow(
+    await expect(signupTransactions(symbolPublicAccount, password)).rejects.toThrow(
       'already registered momiji account',
     );
   }, 10000); // 10 seconds
 
-  it('signup role play', async () => {
+  it('signupTransactions role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolNewAccount = Account.generateNewAccount(symbolBlockChain.networkType);
     const password = 'pass';
@@ -82,8 +82,8 @@ describe('signup', () => {
     expect(symbolTransferTxResult.code).toEqual('Success');
     expect(symbolTransferTxResult.group).toEqual('confirmed');
 
-    //signup & 署名　& 送信
-    const symbolAaggregateTx = await signup(symbolNewAccount.publicAccount, password);
+    //signupTransactions & 署名　& 送信
+    const symbolAaggregateTx = await signupTransactions(symbolNewAccount.publicAccount, password);
     const signedAggregateTx = symbolNewAccount.sign(
       symbolAaggregateTx,
       symbolBlockChain.generationHash,
@@ -113,7 +113,7 @@ describe('signup', () => {
     expect(res2).toBeInstanceOf(Account);
   }, 120000); // 120 seconds
 
-  it('signup role play with secletLockTx', async () => {
+  it('signupTransactions role play with secletLockTx', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolNewAccount = Account.generateNewAccount(symbolBlockChain.networkType);
     const password = 'pass';
@@ -156,8 +156,8 @@ describe('signup', () => {
     const symbolSellerAddress = Address.createFromRawAddress("TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ")
     const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
 
-    //signup & 署名　& 送信
-    const symbolAaggregateTx = await signup(symbolNewAccount.publicAccount, password, secletTx);
+    //signupTransactions & 署名　& 送信
+    const symbolAaggregateTx = await signupTransactions(symbolNewAccount.publicAccount, password, secletTx);
     const signedAggregateTx = symbolNewAccount.sign(
       symbolAaggregateTx,
       symbolBlockChain.generationHash,
@@ -187,7 +187,7 @@ describe('signup', () => {
     expect(res2).toBeInstanceOf(Account);
   }, 120000); // 120 seconds
 
-  test.skip('signup specific role play', async () => {
+  test.skip('signupTransactions specific role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolNewAccount = Account.createFromPrivateKey("B05D3397F7A63B7437DDA11E8390E8EFDFCC90443B336DD5FD82C39266D606B4",symbolBlockChain.networkType)
     const password = 'pass';
@@ -218,8 +218,8 @@ describe('signup', () => {
     expect(symbolTransferTxResult.code).toEqual('Success');
     expect(symbolTransferTxResult.group).toEqual('confirmed');
 
-    //signup & 署名　& 送信
-    const symbolAaggregateTx = await signup(symbolNewAccount.publicAccount, password);
+    //signupTransactions & 署名　& 送信
+    const symbolAaggregateTx = await signupTransactions(symbolNewAccount.publicAccount, password);
     const signedAggregateTx = symbolNewAccount.sign(
       symbolAaggregateTx,
       symbolBlockChain.generationHash,

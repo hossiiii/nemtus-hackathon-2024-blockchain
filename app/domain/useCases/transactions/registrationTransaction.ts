@@ -1,15 +1,15 @@
 // 用途：商品登録を行う
 import { AggregateTransaction, Deadline, PublicAccount } from 'symbol-sdk';
-import { setupBlockChain } from '../utils/setupBlockChain';
-import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
-import { decryptedAccount } from '../utils/accounts/decryptedAccount';
-import { mosaicDefinitionTransaction } from '../utils/transactions/mosaicDefinitionTransaction';
-import { mosaicSupplyChangeTransaction } from '../utils/transactions/mosaicSupplyChangeTransaction';
-import { mosaicMetaDataTransaction } from '../utils/transactions/mosaicMetaDataTransaction';
-import { ProductInfo } from '../entities/productInfo/productInfo';
-import { symbolAccountMetaDataKey } from '../../consts/consts';
+import { setupBlockChain } from '../../utils/setupBlockChain';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { decryptedAccount } from '../../utils/accounts/decryptedAccount';
+import { mosaicDefinitionTransaction } from '../../utils/transactions/mosaicDefinitionTransaction';
+import { mosaicSupplyChangeTransaction } from '../../utils/transactions/mosaicSupplyChangeTransaction';
+import { mosaicMetaDataTransaction } from '../../utils/transactions/mosaicMetaDataTransaction';
+import { ProductInfo } from '../../entities/productInfo/productInfo';
+import { symbolAccountMetaDataKey } from '../../../consts/consts';
 
-export const registration = async (
+export const registrationTransaction = async (
   symbolSellerPublicAccount: PublicAccount,
   password: string,
   productInfo: ProductInfo,

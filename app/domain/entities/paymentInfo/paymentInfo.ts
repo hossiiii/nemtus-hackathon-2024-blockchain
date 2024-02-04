@@ -3,6 +3,7 @@ export type PaymentInfo = {
   mosaicId: string;
   amount: number;
   secletLockTxHash: string;
+  secletLockTxSeclet: string;
   serviceName: string;
   servieVersion: number;
 };

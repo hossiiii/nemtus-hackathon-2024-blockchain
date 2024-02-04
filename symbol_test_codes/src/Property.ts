@@ -20,5 +20,5 @@ exports.symbolExplorer = 'https://testnet.symbol.fyi';
 exports.symbolCurrencyMosaicId = '72C0212E67A08BCE';
 
 exports.momijiNode = 'http://66.94.121.126:3000';
-exports.momijiExplorer = 'http://66.94.121.126:90';
+exports.momijiExplorer = 'https://ishidad2.github.io/momiji-exprorer/#';
 exports.momijiCurrencyMosaicId = '049E3DAB4B813CC2';

@@ -7,17 +7,17 @@ import {
   PublicAccount,
   SecretLockTransaction,
 } from 'symbol-sdk';
-import { setupBlockChain } from '../utils/setupBlockChain';
-import { encryptedAccount } from '../utils/accounts/encryptedAccount';
-import { accountMetaDataTransaction } from '../utils/transactions/accountMetaDataTransaction';
-import { symbolAccountMetaDataKey, initialManju, momijiAccountMetaDataKey } from '../../consts/consts';
-import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
-import { transferTransactionWithMosaic } from '../utils/transactions/transferTransactionWithMosaic';
-import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
+import { setupBlockChain } from '../../utils/setupBlockChain';
+import { encryptedAccount } from '../../utils/accounts/encryptedAccount';
+import { accountMetaDataTransaction } from '../../utils/transactions/accountMetaDataTransaction';
+import { symbolAccountMetaDataKey, initialManju, momijiAccountMetaDataKey } from '../../../consts/consts';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { transferTransactionWithMosaic } from '../../utils/transactions/transferTransactionWithMosaic';
+import { fetchTransactionStatus } from '../../utils/fetches/fetchTransactionStatus';
 import { firstValueFrom } from 'rxjs';
 
 //オプションの引数としてsecletLockTxを受け取る（購入者が初めてアカウント登録をする場合は署名を1回にしたいため）
-export const signup = async (symbolTargetPublicAccount:PublicAccount, password: string, secletLockTx?: SecretLockTransaction ): Promise<AggregateTransaction> => {
+export const signupTransactions = async (symbolTargetPublicAccount:PublicAccount, password: string, secletLockTx?: SecretLockTransaction ): Promise<AggregateTransaction> => {
   const momijiBlockChain = await setupBlockChain('momiji');
   const symbolBlockChain = await setupBlockChain('symbol');
 

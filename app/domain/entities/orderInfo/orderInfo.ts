@@ -5,7 +5,6 @@ export type OrderInfo = {
   mosaicId: string;
   amount: number;
   notes: string;
-  secletLockTxHash: string;
   serviceName: string;
   servieVersion: number;
 };

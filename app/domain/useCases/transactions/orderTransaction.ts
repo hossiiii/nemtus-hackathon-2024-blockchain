@@ -1,16 +1,16 @@
 // 用途：注文を行うビジネスロジック
 import { Address, AggregateTransaction, Deadline, PublicAccount } from 'symbol-sdk';
-import { setupBlockChain } from '../utils/setupBlockChain';
-import { transferTransactionWithEncryptMessage } from '../utils/transactions/transferTransactionWithEncryptMessage';
-import { fetchPublicAccount } from '../utils/fetches/fetchPublicAccount';
-import { PaymentInfo } from '../entities/paymentInfo/paymentInfo';
-import { OrderInfo } from '../entities/orderInfo/orderInfo';
-import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
-import { symbolAccountMetaDataKey } from '../../consts/consts';
-import { decryptedAccount } from '../utils/accounts/decryptedAccount';
-import { ProductInfo } from '../entities/productInfo/productInfo';
+import { setupBlockChain } from '../../utils/setupBlockChain';
+import { transferTransactionWithEncryptMessage } from '../../utils/transactions/transferTransactionWithEncryptMessage';
+import { fetchPublicAccount } from '../../utils/fetches/fetchPublicAccount';
+import { PaymentInfo } from '../../entities/paymentInfo/paymentInfo';
+import { OrderInfo } from '../../entities/orderInfo/orderInfo';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { symbolAccountMetaDataKey } from '../../../consts/consts';
+import { decryptedAccount } from '../../utils/accounts/decryptedAccount';
+import { ProductInfo } from '../../entities/productInfo/productInfo';
 
-export const order = async (
+export const orderTransaction = async (
   symbolUserPublicAccount: PublicAccount,
   password: string,
   productInfo: ProductInfo,

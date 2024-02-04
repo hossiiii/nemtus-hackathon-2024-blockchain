@@ -2,16 +2,16 @@ import fetch from 'node-fetch';
 global.fetch = fetch;
 
 import { AggregateTransaction, PublicAccount, TransactionStatus } from 'symbol-sdk';
-import { setupBlockChain } from '../utils/setupBlockChain';
+import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
-import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
-import { symbolAccountMetaDataKey, serviceName, serviceVersion } from '../../consts/consts';
-import { registration } from './registration';
-import { ProductInfo } from '../entities/productInfo/productInfo';
-import { decryptedAccount } from '../utils/accounts/decryptedAccount';
+import { fetchTransactionStatus } from '../../utils/fetches/fetchTransactionStatus';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { symbolAccountMetaDataKey, serviceName, serviceVersion } from '../../../consts/consts';
+import { registrationTransaction } from './registrationTransaction';
+import { ProductInfo } from '../../entities/productInfo/productInfo';
+import { decryptedAccount } from '../../utils/accounts/decryptedAccount';
 
-describe('registration', () => {
+describe('registrationTransaction', () => {
   it('should return a new AggegateTransaction', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(
@@ -32,11 +32,11 @@ describe('registration', () => {
       servieVersion: serviceVersion,
     };
     const amount = 100;
-    const result = await registration(symbolSellerPublicAccount, password, productInfo, amount);
+    const result = await registrationTransaction(symbolSellerPublicAccount, password, productInfo, amount);
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 10000); // 10 seconds
 
-  it('registration role play', async () => {
+  it('registrationTransaction role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolSellerPublicAccount = PublicAccount.createFromPublicKey('2CADE9448E21329DEB84D1A3D61DCAC0A061E27054007F52F8CEEEDA0044817D',symbolBlockChain.networkType);
     const password = 'pass';
@@ -53,7 +53,7 @@ describe('registration', () => {
       servieVersion: serviceVersion,
     }
     const amount = 100;
-    const momijiAggregateTx = await registration(symbolSellerPublicAccount,password,productInfo,amount);
+    const momijiAggregateTx = await registrationTransaction(symbolSellerPublicAccount,password,productInfo,amount);
 
     // momijiアカウントの作成
     const momijiBlockChain = await setupBlockChain('momiji');

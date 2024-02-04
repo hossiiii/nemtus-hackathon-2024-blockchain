@@ -2,20 +2,20 @@ import fetch from 'node-fetch';
 global.fetch = fetch;
 
 import { Account, Address, AggregateTransaction, Crypto, PublicAccount, TransactionGroup, TransactionStatus, TransferTransaction } from 'symbol-sdk';
-import { setupBlockChain } from '../utils/setupBlockChain';
+import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../utils/fetches/fetchTransactionStatus';
-import { fetchAccountMetaData } from '../utils/fetches/fetchAccountMetaData';
-import { symbolAccountMetaDataKey, serviceName, serviceVersion } from '../../consts/consts';
-import { ProductInfo } from '../entities/productInfo/productInfo';
-import { decryptedAccount } from '../utils/accounts/decryptedAccount';
-import { PaymentInfo } from '../entities/paymentInfo/paymentInfo';
-import { OrderInfo } from '../entities/orderInfo/orderInfo';
-import { order } from './order';
+import { fetchTransactionStatus } from '../../utils/fetches/fetchTransactionStatus';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { symbolAccountMetaDataKey, serviceName, serviceVersion } from '../../../consts/consts';
+import { ProductInfo } from '../../entities/productInfo/productInfo';
+import { decryptedAccount } from '../../utils/accounts/decryptedAccount';
+import { PaymentInfo } from '../../entities/paymentInfo/paymentInfo';
+import { OrderInfo } from '../../entities/orderInfo/orderInfo';
+import { orderTransaction } from './orderTransaction';
 import { sha3_256 } from 'js-sha3';
-import { secretLockTransaction } from '../utils/transactions/secretLockTransaction';
+import { secretLockTransaction } from '../../utils/transactions/secretLockTransaction';
 
-describe('order', () => {
+describe('orderTransaction', () => {
   it('should return a new Transactions', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolUserPublicAccount = PublicAccount.createFromPublicKey(
@@ -40,26 +40,26 @@ describe('order', () => {
       mosaicId: "mosaicId",
       amount: 2,
       secletLockTxHash: "secletLockTxHash",
+      secletLockTxSeclet: "",
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };
-    const orderInfo: OrderInfo = {
+    const orderTransactionInfo: OrderInfo = {
       name: 'productName',
       tel: '080-1234-5678',
       address: "住所情報",
       mosaicId: "mosaicId",
       amount: 2,
       notes: "備考",
-      secletLockTxHash: "secletLockTxHash",
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };
 
-    const result = await order(symbolUserPublicAccount, password, productInfo, paymentInfo, orderInfo);
+    const result = await orderTransaction(symbolUserPublicAccount, password, productInfo, paymentInfo, orderTransactionInfo);
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 10000); // 10 seconds
 
-  it('order role play', async () => {
+  it('orderTransaction role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
 
     //secletLockTx作成
@@ -82,7 +82,7 @@ describe('order', () => {
     );
     const symbolSignedSecletLockTxHash = symbolSignedSecletLockTx.hash;
     await firstValueFrom(symbolBlockChain.txRepo.announce(symbolSignedSecletLockTx));
-    await fetchTransactionStatus(
+    const symbolSignedSecletLockTxResult = await fetchTransactionStatus(
       symbolBlockChain,
       symbolSignedSecletLockTxHash,
       symbolUserAccount.address,
@@ -106,23 +106,23 @@ describe('order', () => {
       mosaicId: "60CF4EF5A7133B40",
       amount: 2,
       secletLockTxHash: symbolSignedSecletLockTxHash,
+      secletLockTxSeclet: secret,
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };
-    const orderInfo: OrderInfo = {
+    const orderTransactionInfo: OrderInfo = {
       name: 'productName',
       tel: '080-1234-5678',
       address: "住所情報",
       mosaicId: "60CF4EF5A7133B40",
       amount: 2,
       notes: "備考",
-      secletLockTxHash: symbolSignedSecletLockTxHash,
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };
 
     const password = 'pass';
-    const momijiAggregateTx = await order(symbolUserAccount.publicAccount, password, productInfo, paymentInfo, orderInfo);
+    const momijiAggregateTx = await orderTransaction(symbolUserAccount.publicAccount, password, productInfo, paymentInfo, orderTransactionInfo);
 
     // momijiアカウントの作成
     const momijiBlockChain = await setupBlockChain('momiji');
