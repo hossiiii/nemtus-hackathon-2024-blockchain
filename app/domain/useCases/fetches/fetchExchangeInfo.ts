@@ -35,6 +35,9 @@ export const fetchExchangeInfo = async (
   const userToSellerTx = momijiAggregateBondedTxInfo.innerTransactions[1] as TransferTransaction;
   const adminToAdminTx = momijiAggregateBondedTxInfo.innerTransactions[2] as TransferTransaction;
 
+  // ブロック高の取得
+  const momijiAggregateBondedTxHeight = momijiAggregateBondedTxInfo.transactionInfo.height.compact();
+
   // publicAccountの取得
   const sellerPublicAccount = sellerToUserTx.signer;
   const userPublicAccount = userToSellerTx.signer;
@@ -80,7 +83,7 @@ export const fetchExchangeInfo = async (
   }
 
   // 取引状態の確認
-  const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount)
+  const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount,exchangeOverview.secletLockTxTargetAddress,momijiAggregateBondedTxHeight)
 
   // ExchangeInfoの生成
   const exchangeInfo: ExchangeInfo = {

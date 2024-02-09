@@ -12,7 +12,7 @@ describe('exchangeTransaction', () => {
     const momijiBlockChain = await setupBlockChain('momiji');
     const momijiUserPublicAccount = PublicAccount.createFromPublicKey("92170DAAEEA63B9FF90376E5511C65402C26E10877672DB0B7C0DE3B8F484A86", momijiBlockChain.networkType);
     const momijiSellerPublicAccount = PublicAccount.createFromPublicKey("9A1FE164BEFFB1C26526DAC582E1AB41C19695BF14902FDDD0478C47AAEED88E", momijiBlockChain.networkType);
-    const momijiAggregateTxHash = "D1B22C93CE7EA5AF03882EC854DB6FA330EDB2F1F2C4418FB2D458819CD4A4B6";
+    const momijiAggregateTxHash = "5AA3C9E0859E783A5AD9BC6F57BDB31868B93D84C14B23C9BD9138A688B08E1D";
     const result = await exchangeTransaction(momijiUserPublicAccount, momijiSellerPublicAccount, momijiAggregateTxHash);
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 10000); // 10 seconds
@@ -21,7 +21,7 @@ describe('exchangeTransaction', () => {
     const momijiBlockChain = await setupBlockChain('momiji');
     const momijiUserPublicAccount = PublicAccount.createFromPublicKey("92170DAAEEA63B9FF90376E5511C65402C26E10877672DB0B7C0DE3B8F484A86", momijiBlockChain.networkType);
     const momijiSellerPublicAccount = PublicAccount.createFromPublicKey("9A1FE164BEFFB1C26526DAC582E1AB41C19695BF14902FDDD0478C47AAEED88E", momijiBlockChain.networkType);
-    const momijiAggregateTxHash = "D1B22C93CE7EA5AF03882EC854DB6FA330EDB2F1F2C4418FB2D458819CD4A4B6";
+    const momijiAggregateTxHash = "5AA3C9E0859E783A5AD9BC6F57BDB31868B93D84C14B23C9BD9138A688B08E1D";
     const momijiAggregateBondedTx = await exchangeTransaction(momijiUserPublicAccount, momijiSellerPublicAccount, momijiAggregateTxHash);
 
     const momijiAdminAccount = Account.createFromPrivateKey(process.env.PRIVATE_KEY, momijiBlockChain.networkType);

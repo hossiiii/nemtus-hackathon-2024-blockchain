@@ -14,6 +14,7 @@ export type ExchangeOverview = {
   price: number;
   secletLockTxHash: string;
   secletLockTxSeclet: string;
+  secletLockTxTargetAddress: string;
   createTimestamp: string;
 };
 
@@ -26,5 +27,6 @@ export function isExchangeOverview(obj: any): obj is ExchangeOverview {
           'price' in obj &&
           'secletLockTxHash' in obj &&
           'secletLockTxSeclet' in obj &&
+          'secletLockTxTargetAddress' in obj &&
           'createTimestamp' in obj;
 }

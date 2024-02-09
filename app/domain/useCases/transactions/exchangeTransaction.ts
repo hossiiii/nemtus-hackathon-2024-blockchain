@@ -50,6 +50,7 @@ export const exchangeTransaction = async (
     price: price,
     secletLockTxHash: secletLockTxHash,
     secletLockTxSeclet: secletLockTxSeclet,
+    secletLockTxTargetAddress: productInfo.depositAddress,
     createTimestamp: createTimestamp,
   };
 
