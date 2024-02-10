@@ -1,18 +1,18 @@
 import { Account, AggregateTransaction, MosaicId, ReceiptType, TransactionGroup, TransactionStatement, TransferTransaction, UInt64 } from 'symbol-sdk';
-import { ExchangeInfo, ExchangeStatus } from '../../entities/exchangeInfo/exchangeInfo';
+import { ExchangeInfo } from '../../entities/exchangeInfo/exchangeInfo';
 import { firstValueFrom } from 'rxjs';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { fetchProductInfo } from './fetchProductInfo';
 import { parseOrderTx } from '../parse/parseOrderTx';
 import { parsePaymentTx } from '../parse/parsePaymentTx';
 import { ZoneOffset } from '@js-joda/core';
-import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeHistoryInfo';
 import { determineExchangeStatus } from '../determineExchangeStatus';
+import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
+import { UserType } from '../../entities/userType/userType';
 
 export const fetchExchangeInfo = async (
   exchangeTxHash: string,
   account: Account,
-  type: 'user' | 'seller' | 'admin',
 ): Promise<ExchangeInfo> => {
   const momijiBlockChain = await setupBlockChain('momiji');
   let momijiAggregateBondedTxInfo: AggregateTransaction;
@@ -34,6 +34,17 @@ export const fetchExchangeInfo = async (
   const sellerToUserTx = momijiAggregateBondedTxInfo.innerTransactions[0] as TransferTransaction;
   const userToSellerTx = momijiAggregateBondedTxInfo.innerTransactions[1] as TransferTransaction;
   const adminToAdminTx = momijiAggregateBondedTxInfo.innerTransactions[2] as TransferTransaction;
+
+  let type : UserType;
+  if (sellerToUserTx.signer.address.equals(account.address)) {
+    type = 'seller';
+  } else if (userToSellerTx.signer.address.equals(account.address)) {
+    type = 'user';
+  } else if (adminToAdminTx.signer.address.equals(account.address)) {
+    type = 'admin';
+  } else {
+    throw new Error('Failed to determine user type');
+  }
 
   // ブロック高の取得
   const momijiAggregateBondedTxHeight = momijiAggregateBondedTxInfo.transactionInfo.height.compact();

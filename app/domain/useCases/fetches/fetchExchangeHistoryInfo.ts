@@ -1,10 +1,10 @@
 import { Account, AggregateTransaction, Order, TransactionGroup, TransactionType, TransferTransaction } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
 import { setupBlockChain } from '../../utils/setupBlockChain';
-import { ExchangeHistoryInfo, ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeHistoryInfo';
+import { ExchangeHistoryInfo } from '../../entities/exchangeHistoryInfo/exchangeHistoryInfo';
 import { ZoneOffset } from '@js-joda/core';
-import { ExchangeStatus } from '../../entities/exchangeInfo/exchangeInfo';
 import { determineExchangeStatus } from '../determineExchangeStatus';
+import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
 
 export const fetchExchangeHistoryInfo = async (
   account: Account

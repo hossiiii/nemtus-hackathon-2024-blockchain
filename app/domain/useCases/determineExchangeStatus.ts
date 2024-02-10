@@ -1,7 +1,7 @@
 import { Address, PublicAccount } from "symbol-sdk";
-import { ExchangeStatus } from "../entities/exchangeInfo/exchangeInfo";
 import { fetchReceiptInfo } from "../utils/fetches/fetchReceiptInfo";
 import { setupBlockChain } from "../utils/setupBlockChain";
+import { ExchangeStatus } from "../entities/exchangeInfo/exchangeStatus";
 
 export const determineExchangeStatus = async (
   expiredAt: number, cosignaturePublicKeys: string[], sellerPublicAccount: PublicAccount, secletLockTxTargetAddress: string, momijiAggregateBondedTxHash: number

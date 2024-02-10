@@ -6,7 +6,7 @@ import { parsePaymentTx } from '../parse/parsePaymentTx';
 import { transferTransactionWithMosaic } from '../../utils/transactions/transferTransactionWithMosaic';
 import { transferTransactionWithMessage } from '../../utils/transactions/transferTransactionWithMessage';
 import { fetchProductInfo } from '../fetches/fetchProductInfo';
-import { ExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeHistoryInfo';
+import { ExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
 
 export const exchangeTransaction = async (
   momijiUserPublicAccount: PublicAccount,

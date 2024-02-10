@@ -1,8 +1,7 @@
 import { OrderInfo } from "../orderInfo/orderInfo";
 import { PaymentInfo } from "../paymentInfo/paymentInfo";
 import { ProductInfo } from "../productInfo/productInfo";
-
-export type ExchangeStatus =  '注文済み' | '配送済み' | '受取済み' | '決済完了' | '有効期限切れ' | 'エラー';
+import { ExchangeStatus } from "./exchangeStatus";
 
 export type ExchangeInfo = {
   oerderPaymentTxHash: string;
