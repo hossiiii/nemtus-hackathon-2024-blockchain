@@ -19,7 +19,7 @@ describe('orderTransaction', () => {
   it('should return a new Transactions', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolUserPublicAccount = PublicAccount.createFromPublicKey(
-      '11BA500388574AA0376CE911EA43DA0EBFDC788869E81BB1CA2496F781F99B8A',
+      'AA16B49128A49D323C91D2BFE1EEDC9C7CE8C39BC5B1F2C74EB059AE5539625A',
       symbolBlockChain.networkType,
     );
     const password = 'pass';
@@ -29,8 +29,8 @@ describe('orderTransaction', () => {
       description: 'description',
       category: ['category1', 'category2'],
       metalIds: ['metalId1', 'metalId2'],
-      orderAddress: "TCC6FHMRFBI75XSH7QMVR64UQLM2CQIQGPVKNEQ",
-      depositAddress: "TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ",
+      orderAddress: "TATBCPOTCYDG6YJD66YCZ765GGPUQ67VR54HSXY",
+      depositAddress: "TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY",
       price: 200,
       serviceName: serviceName,
       servieVersion: serviceVersion,
@@ -71,8 +71,8 @@ describe('orderTransaction', () => {
     console.log(secret);
     console.log(proof);
 
-    const symbolUserAccount = Account.createFromPrivateKey("B05D3397F7A63B7437DDA11E8390E8EFDFCC90443B336DD5FD82C39266D606B4",symbolBlockChain.networkType)
-    const symbolSellerAddress = Address.createFromRawAddress("TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ");
+    const symbolUserAccount = Account.createFromPrivateKey("FF83D96E7AFC2E18115A46389633506DCFA1E749AAD95DED8FACD184FB53689B",symbolBlockChain.networkType)
+    const symbolSellerAddress = Address.createFromRawAddress("TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY");
     const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
 
     //署名　& 送信
@@ -95,15 +95,15 @@ describe('orderTransaction', () => {
       description: 'description',
       category: ['category1', 'category2'],
       metalIds: ['metalId1', 'metalId2'],
-      orderAddress: "TCC6FHMRFBI75XSH7QMVR64UQLM2CQIQGPVKNEQ",
-      depositAddress: "TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ",
+      orderAddress: "TATBCPOTCYDG6YJD66YCZ765GGPUQ67VR54HSXY",
+      depositAddress: "TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY",
       price: 200,
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };
     const paymentInfo: PaymentInfo = {
       proof: proof,
-      mosaicId: "60CF4EF5A7133B40",
+      mosaicId: "3EF678B48A785AF0",
       amount: 2,
       secletLockTxHash: symbolSignedSecletLockTxHash,
       secletLockTxSeclet: secret,
@@ -114,7 +114,7 @@ describe('orderTransaction', () => {
       name: 'productName',
       tel: '080-1234-5678',
       address: "住所情報",
-      mosaicId: "60CF4EF5A7133B40",
+      mosaicId: "3EF678B48A785AF0",
       amount: 2,
       notes: "備考",
       serviceName: serviceName,

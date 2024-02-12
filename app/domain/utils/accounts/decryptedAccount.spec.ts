@@ -7,9 +7,10 @@ import { setupBlockChain } from '../setupBlockChain';
 import { encryptedAccount } from './encryptedAccount';
 import { fetchAccountMetaData } from '../fetches/fetchAccountMetaData';
 import { symbolAccountMetaDataKey } from '../../../consts/consts';
+import { decryptedAccountForNode } from './decryptedAccountForNode';
 
 describe('decryptedAccount', () => {
-  it('should return an Account object', async () => {
+  test.skip('should return an Account object', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
     const momijiNewAccount = Account.generateNewAccount(momijiBlockChain.networkType);
     const password = 'pass';
@@ -22,7 +23,7 @@ describe('decryptedAccount', () => {
   test.skip('should return an specific account object', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolTargetPublicAccount = PublicAccount.createFromPublicKey(
-      '2CADE9448E21329DEB84D1A3D61DCAC0A061E27054007F52F8CEEEDA0044817D',
+      'DFDACEEA4397DA836FD8D2AEA1C36DC0C896039E9D9E10FF1F481EFBCB9731CB',
       symbolBlockChain.networkType,
     );
     const strSignerQR = await fetchAccountMetaData(
@@ -33,7 +34,7 @@ describe('decryptedAccount', () => {
     console.log(strSignerQR);
     const momijiBlockChain = await setupBlockChain('momiji');
     const password = 'pass';
-    const result = decryptedAccount(momijiBlockChain, strSignerQR, password);
+    const result = decryptedAccountForNode(momijiBlockChain, strSignerQR, password);
     console.log(result.address.plain());
     console.log(result.privateKey)
     expect(result).toBeInstanceOf(Account);

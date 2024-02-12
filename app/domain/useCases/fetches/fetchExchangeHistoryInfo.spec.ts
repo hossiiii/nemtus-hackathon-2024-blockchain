@@ -8,13 +8,13 @@ import { fetchExchangeHistoryInfo } from './fetchExchangeHistoryInfo';
 describe('fetchExchangeHistoryInfo', () => {
   it('should return a exchangeHistoryInfo from user', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
-    const momijiUserAccount = Account.createFromPrivateKey('85425CE250D4CFB863B2DC24327C7736F57AE8BB0FCD7E56D3FC504D97FBE556', momijiBlockChain.networkType);
+    const momijiUserAccount = Account.createFromPrivateKey('D8A03500647C68D715FD2B9C043D6E20EEADE2D4FE7B88DA5F84C240B00C7DC2', momijiBlockChain.networkType);
     const result = await fetchExchangeHistoryInfo(momijiUserAccount);
     console.log(result);
   }, 10000); // 10 seconds
   it('should return a exchangeHistoryInfo from seller', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
-    const momijiSellerAccount = Account.createFromPrivateKey('C894D31AFAB1C35E909524040C78F1E7A7FE1F32797B35E52BD498EDFDADD9E8', momijiBlockChain.networkType);
+    const momijiSellerAccount = Account.createFromPrivateKey('ACE601DF0DE67888FC67FD7D800A3995AC3005C93F057D9BFFCDD94C5BF48F89', momijiBlockChain.networkType);
     const result = await fetchExchangeHistoryInfo(momijiSellerAccount);
     console.log(result);
   }, 10000); // 10 seconds

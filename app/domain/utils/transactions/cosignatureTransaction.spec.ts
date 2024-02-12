@@ -23,7 +23,7 @@ describe('cosignatureTransaction.spec', () => {
   test.skip('cosignatureTransaction cosign role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolAddress = Address.createFromRawAddress(
-      'TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ',
+      'TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY',
     );
     const password = 'pass';
 

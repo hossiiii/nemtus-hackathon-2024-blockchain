@@ -1,8 +1,7 @@
 // 用途：商品登録を行う
-import { AggregateTransaction, Deadline, PublicAccount } from 'symbol-sdk';
+import { Account, AggregateTransaction, Deadline } from 'symbol-sdk';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
-import { decryptedAccount } from '../../utils/accounts/decryptedAccount';
 import { mosaicDefinitionTransaction } from '../../utils/transactions/mosaicDefinitionTransaction';
 import { mosaicSupplyChangeTransaction } from '../../utils/transactions/mosaicSupplyChangeTransaction';
 import { mosaicMetaDataTransaction } from '../../utils/transactions/mosaicMetaDataTransaction';
@@ -10,27 +9,25 @@ import { ProductInfo } from '../../entities/productInfo/productInfo';
 import { symbolAccountMetaDataKey } from '../../../consts/consts';
 
 export const registrationTransaction = async (
-  symbolSellerPublicAccount: PublicAccount,
-  password: string,
+  momijiSellerAccount: Account,
   productInfo: ProductInfo,
   amount: number,
 ): Promise<AggregateTransaction> => {
   const momijiBlockChain = await setupBlockChain('momiji');
-  const symbolBlockChain = await setupBlockChain('symbol');
 
-  // プライベートチェーンのアカウントを参照
-  const strQr = await fetchAccountMetaData(
-    symbolBlockChain,
-    symbolAccountMetaDataKey,
-    symbolSellerPublicAccount.address,
-  );
-  const momijiSellerAccount = decryptedAccount(momijiBlockChain, strQr, password);
   // Metalトランザクションの作成 TODO
   const metalIds = ['astasdfasdfads', 'dftrgdgfdsfgsdfg', 'ddafadsfasdfda'];
 
+  // momijiアカウントのメタデータ情報からSymbolのアドレスを取得
+  const symbolSellerRawAddress = await fetchAccountMetaData(
+    momijiBlockChain,
+    symbolAccountMetaDataKey,
+    momijiSellerAccount.address,
+  );
+
   // 商品情報を修正
   productInfo.orderAddress = momijiSellerAccount.address.plain();
-  productInfo.depositAddress = symbolSellerPublicAccount.address.plain();
+  productInfo.depositAddress = symbolSellerRawAddress;
   productInfo.metalIds = metalIds;
 
   const strProductInfo = JSON.stringify(productInfo);

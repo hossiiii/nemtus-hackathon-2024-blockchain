@@ -9,7 +9,7 @@ describe('secretProofTransaction.spec', () => {
   it('should create symbol seclet transaction', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolAddress = Address.createFromRawAddress(
-      'TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ',
+      'TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY',
     );
 
     const secret = '552c7746241aa7c3ea93f4162e930d41192ad547177b550fc8a5a431a1a25c6f';

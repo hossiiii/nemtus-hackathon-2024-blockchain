@@ -11,6 +11,7 @@ import {
   ListItemText,
 } from '@mui/material';
 import Home from '@mui/icons-material/Home';
+import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import Settings from '@mui/icons-material/Settings';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -56,6 +57,21 @@ function LeftDrawer(props: {
               </ListItemButton>
             </ListItem>
           </List>
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  router.push('/registration');
+                  setOpenLeftDrawer(false);
+                }}
+              >
+                <ListItemIcon>
+                  <AppRegistrationIcon />
+                </ListItemIcon>
+                <ListItemText primary={'商品登録'} />
+              </ListItemButton>
+            </ListItem>
+          </List>          
           <List>
             <ListItem disablePadding>
               <ListItemButton

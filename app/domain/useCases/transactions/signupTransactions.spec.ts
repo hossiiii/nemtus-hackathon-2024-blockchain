@@ -153,7 +153,7 @@ describe('signupTransactions', () => {
     console.log(secret);
     console.log(proof);
 
-    const symbolSellerAddress = Address.createFromRawAddress("TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ")
+    const symbolSellerAddress = Address.createFromRawAddress("TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY")
     const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
 
     //signupTransactions & 署名　& 送信
@@ -189,7 +189,7 @@ describe('signupTransactions', () => {
 
   test.skip('signupTransactions specific role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
-    const symbolNewAccount = Account.createFromPrivateKey("B05D3397F7A63B7437DDA11E8390E8EFDFCC90443B336DD5FD82C39266D606B4",symbolBlockChain.networkType)
+    const symbolNewAccount = Account.createFromPrivateKey("FF83D96E7AFC2E18115A46389633506DCFA1E749AAD95DED8FACD184FB53689B",symbolBlockChain.networkType)
     const password = 'pass';
 
     //手数料入金処理(事前作業)

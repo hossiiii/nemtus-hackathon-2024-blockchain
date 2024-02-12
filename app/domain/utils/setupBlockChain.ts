@@ -28,7 +28,10 @@ interface BlockChainSetup {
 export const setupBlockChain = async (blockChainType: BlockChainType): Promise<BlockChainSetup> => {
   const node = await connectNode(blockChainType == 'symbol' ? symbolNodeList : momijiNodeList);
   if (node === '') return undefined;
-  const repo = new RepositoryFactoryHttp(node);
+  const repo = new RepositoryFactoryHttp(node, {
+    websocketUrl: node.replace('http', 'ws') + '/ws',
+    websocketInjected: WebSocket,
+  });
   const txRepo = repo.createTransactionRepository();
   const tsRepo = repo.createTransactionStatusRepository();
   const accountRepo = repo.createAccountRepository();

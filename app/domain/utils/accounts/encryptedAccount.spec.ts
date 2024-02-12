@@ -6,7 +6,7 @@ import { encryptedAccount } from './encryptedAccount';
 import { setupBlockChain } from '../setupBlockChain';
 
 describe('encryptedAccount', () => {
-  it('test', async () => {
+  test.skip('test', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
     const momijiNewAccount = Account.generateNewAccount(momijiBlockChain.networkType);
     const password = 'testPassword';

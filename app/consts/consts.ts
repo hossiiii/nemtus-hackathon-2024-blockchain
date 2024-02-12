@@ -21,3 +21,5 @@ export const momijiNodeList = ['http://66.94.121.126:3000'];
 
 export const momijiExplorer = 'https://ishidad2.github.io/momiji-exprorer/#';
 export const momijiCurrencyMosaicId = '049E3DAB4B813CC2';
+
+export const categories = ['カテゴリ1', 'カテゴリ2', 'カテゴリ3', 'カテゴリ4'];

@@ -52,7 +52,7 @@ const main = async () => {
     Deadline.create(epochAdjustment),
     LockHashAlgorithm.Op_Sha3_256,
     secret,
-    Address.createFromRawAddress("TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ"),
+    Address.createFromRawAddress("TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY"),
     proof,
     networkType!,
   ).setMaxFee(100);

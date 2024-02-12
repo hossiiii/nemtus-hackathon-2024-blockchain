@@ -18,7 +18,7 @@ describe('fetchPublicAccount', () => {
   it('should throw an error if targetAddressの公開鍵が0000', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
     const momijiAddress = Address.createFromRawAddress(
-      'TAOLQGT43Q4VYTFOWDUFHR3DY2ZAVO6NI24HBMQ',
+      'TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY',
     );
     await expect(fetchPublicAccount(momijiBlockChain, momijiAddress)).rejects.toThrow(
       'targetAddressの公開鍵が0000..であるためPublicAccountをfetchできません',

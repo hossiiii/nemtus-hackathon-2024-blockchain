@@ -5,9 +5,13 @@ export const encryptedAccount = (
   newAccount: Account,
   password: string,
 ): string => {
-  const qr = require('symbol-qr-library');
+  let QRCodeGenerator;
+  if (typeof window !== 'undefined') {
+    // ブラウザ環境でのみインポート
+    QRCodeGenerator = require('symbol-qr-library').QRCodeGenerator;
+  }
   //パスフレーズでロックされたアカウント生成
-  const signerQR = qr.QRCodeGenerator.createExportAccount(
+  const signerQR = QRCodeGenerator.createExportAccount(
     newAccount.privateKey,
     blockChain.networkType,
     blockChain.generationHash,
