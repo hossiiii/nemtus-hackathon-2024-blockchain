@@ -1,7 +1,7 @@
 'use client';
 import { Typography } from '@mui/material';
 import FlameComponent from '../components/Flame';
-import { RegistrationForm } from '../components/registrationForm';
+import { RegistrationForm } from '../components/RegistrationForm';
 
 const Registration = () => {
   return (

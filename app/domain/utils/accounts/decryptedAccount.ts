@@ -1,22 +1,30 @@
 import { Account } from 'symbol-sdk';
-import { AccountQR } from '../../entities/accountQR/accountQR';
 
 export const decryptedAccount = (
   blockChain: any,
   strSignerQR: string,
   password: string,
 ): Account => {
-  let arrQr;
+  let AccountQR;
   if (typeof window !== 'undefined') {
     // ブラウザ環境でのみインポート
-    arrQr = require('symbol-qr-library').AccountQR;
+    AccountQR = require('symbol-qr-library').AccountQR;
+  } else {
+    throw new Error("この機能はブラウザ環境でのみ利用可能です。");
   }
-  //JSONデータをQRコードに変換
-  const jsonStrSignerQR = JSON.parse(strSignerQR);
-  const signerQR = arrQr.fromJSON(jsonStrSignerQR, password);
-  const targetAccount = Account.createFromPrivateKey(
-    signerQR.accountPrivateKey,
-    blockChain.networkType,
-  );
-  return targetAccount;
+
+  try {
+    // 文字列データをJSONデータに変換し、QRコードからアカウント情報を復号
+    const jsonStrSignerQR = JSON.parse(strSignerQR);
+    const signerQR = AccountQR.fromJSON(jsonStrSignerQR, password);
+
+    // 復号されたアカウント情報からAccountオブジェクトを生成
+    return Account.createFromPrivateKey(
+      signerQR.accountPrivateKey,
+      blockChain.networkType,
+    );
+  } catch (error) {
+    // パスワードが間違っている場合やその他のエラーをキャッチ
+    throw new Error("アカウントの復号に失敗しました。パスワードが正しいか確認してください。");
+  }
 };

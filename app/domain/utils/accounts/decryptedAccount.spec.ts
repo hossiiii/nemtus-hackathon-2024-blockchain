@@ -20,10 +20,10 @@ describe('decryptedAccount', () => {
     expect(result).toBeInstanceOf(Account);
   }, 10000); // 10 seconds
 
-  test.skip('should return an specific account object', async () => {
+  test.only('should return an specific account object', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolTargetPublicAccount = PublicAccount.createFromPublicKey(
-      'DFDACEEA4397DA836FD8D2AEA1C36DC0C896039E9D9E10FF1F481EFBCB9731CB',
+      '16014A1DD59BDE1720D0F9C37290A2A7C4FB074662D31510DDEE4EC91FD3BF43',
       symbolBlockChain.networkType,
     );
     const strSignerQR = await fetchAccountMetaData(

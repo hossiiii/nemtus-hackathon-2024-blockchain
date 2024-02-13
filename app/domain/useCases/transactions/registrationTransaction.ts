@@ -1,12 +1,10 @@
 // 用途：商品登録を行う
-import { Account, AggregateTransaction, Deadline } from 'symbol-sdk';
+import { Account, Address, AggregateTransaction, Deadline } from 'symbol-sdk';
 import { setupBlockChain } from '../../utils/setupBlockChain';
-import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
 import { mosaicDefinitionTransaction } from '../../utils/transactions/mosaicDefinitionTransaction';
 import { mosaicSupplyChangeTransaction } from '../../utils/transactions/mosaicSupplyChangeTransaction';
 import { mosaicMetaDataTransaction } from '../../utils/transactions/mosaicMetaDataTransaction';
 import { ProductInfo } from '../../entities/productInfo/productInfo';
-import { symbolAccountMetaDataKey } from '../../../consts/consts';
 
 export const registrationTransaction = async (
   momijiSellerAccount: Account,
@@ -15,24 +13,7 @@ export const registrationTransaction = async (
 ): Promise<AggregateTransaction> => {
   const momijiBlockChain = await setupBlockChain('momiji');
 
-  // Metalトランザクションの作成 TODO
-  const metalIds = ['astasdfasdfads', 'dftrgdgfdsfgsdfg', 'ddafadsfasdfda'];
-
-  // momijiアカウントのメタデータ情報からSymbolのアドレスを取得
-  const symbolSellerRawAddress = await fetchAccountMetaData(
-    momijiBlockChain,
-    symbolAccountMetaDataKey,
-    momijiSellerAccount.address,
-  );
-
-  // 商品情報を修正
-  productInfo.orderAddress = momijiSellerAccount.address.plain();
-  productInfo.depositAddress = symbolSellerRawAddress;
-  productInfo.metalIds = metalIds;
-
-  const strProductInfo = JSON.stringify(productInfo);
-
-  // 商品用モザイクの作成
+  // 商品用モザイクを作成するトランザクション
   const mosaicDefinitionTx = mosaicDefinitionTransaction(
     momijiBlockChain,
     momijiSellerAccount.address,
@@ -42,6 +23,13 @@ export const registrationTransaction = async (
     amount,
     mosaicDefinitionTx.mosaicId,
   );
+
+  // 商品情報を修正
+  productInfo.mosaicId = mosaicDefinitionTx.mosaicId.toHex();
+  productInfo.ownerAddress = momijiSellerAccount.address.plain();
+  const strProductInfo = JSON.stringify(productInfo);
+
+  // 商品情報をメタデータに書き込むトランザクション  
   const mosaicMetaDataTx = await mosaicMetaDataTransaction(
     momijiBlockChain,
     'productInfo',

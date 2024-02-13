@@ -30,7 +30,7 @@ export const orderTransaction = async (
 
   // 販売者向けの注文情報送信用Txを作成
   const strOrderInfo = JSON.stringify(orderInfo);
-  const momijiSellerAddress = Address.createFromRawAddress(productInfo.orderAddress);
+  const momijiSellerAddress = Address.createFromRawAddress(productInfo.ownerAddress);
   const momijiSellerPublicAccount = await fetchPublicAccount(momijiBlockChain, momijiSellerAddress);
   const orderInfoTx = transferTransactionWithEncryptMessage(
     momijiBlockChain,

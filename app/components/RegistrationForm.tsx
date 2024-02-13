@@ -1,10 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
-import { useForm, Controller, SubmitHandler } from 'react-hook-form';
+import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress } from '@mui/material';
 import { categories, initialManju, serviceName, serviceVersion, symbolAccountMetaDataKey } from '../consts/consts';
-import { Account } from 'symbol-sdk';
+import { Account, Address, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import InputDialog from './InputDialog';
@@ -53,24 +53,30 @@ export const RegistrationForm = () => {
   const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //未登録アカウントのパスワード入力ダイアログの設定
 
   const [symbolSellerAccount, setSymbolSellerAccount] = useState<Account | null>(null); //symbolのアカウント
+  const [symbolSellerPublicAccount, setSymbolSellerPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
 
   const [symbolAccountMetaData, setSymbolAccountMetaData] = useState<string | null>(null); //momijiの暗号化アカウント
 
   const [inputData, setInputData] = useState<any>(null); //サービス名
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
+    setProgress(true); //ローディング開始
     //商品情報の登録
     setInputData(data);
     console.log(data)
-
-    //アカウントのチェック
+    //TODO；あとでaLiceに置き換え パブリックアカウントの作成
     const symbolSellerAccount = Account.createFromPrivateKey(data.symbolPrivateKey, symbolBlockChain.networkType)
     setSymbolSellerAccount(symbolSellerAccount);
+    const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(symbolSellerAccount.publicKey, symbolBlockChain.networkType);
+    setSymbolSellerPublicAccount(symbolSellerPublicAccount);
+
+    localStorage.setItem('symbolSellerPublicKey', symbolSellerAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
     
+    //アカウントのチェック    
     const symbolAccountMetaData = await fetchAccountMetaData(
       symbolBlockChain,
       symbolAccountMetaDataKey,
-      symbolSellerAccount.address,
+      symbolSellerPublicAccount.address,
     );
 
     setSymbolAccountMetaData(symbolAccountMetaData);
@@ -86,7 +92,6 @@ export const RegistrationForm = () => {
       setDialogMessage('サービス利用のためのパスワードを入力してください');
       setOpenInputDialog(true);
     }
-
   };
 
   const handlePasswordInput = async (inputPassword: string | null) => {
@@ -112,12 +117,14 @@ export const RegistrationForm = () => {
           setSnackbarSeverity('error');
           setSnackbarMessage('管理者から手数料分のmanjuを送れませんでした');
           setOpenSnackbar(true);
+          setProgress(false);
           return
         }
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
         console.log(momijiStrSignerQR)
-        const symbolAaggregateTx = await signupTransactions(symbolSellerAccount.publicAccount, momijiSellerAccount, momijiStrSignerQR);
+        const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR);
 
+        //TODO: aLiceの署名に置き換え
         const signedAggregateTx = symbolSellerAccount.sign(
           symbolAaggregateTx,
           symbolBlockChain.generationHash,
@@ -128,7 +135,7 @@ export const RegistrationForm = () => {
         const result = await fetchTransactionStatus(
           symbolBlockChain,
           hash,
-          symbolSellerAccount.address,
+          symbolSellerPublicAccount.address,
         );
         if(result.code === 'Success'){
           setSnackbarSeverity('success');
@@ -138,21 +145,39 @@ export const RegistrationForm = () => {
           setSnackbarSeverity('error');
           setSnackbarMessage('アカウント登録に失敗しました');
           setOpenSnackbar(true);
+          setProgress(false);
+          return
         }
       }else{
-        momijiSellerAccount = decryptedAccount(momijiBlockChain, symbolAccountMetaData, inputPassword);
+        try {
+          momijiSellerAccount = decryptedAccount(momijiBlockChain, symbolAccountMetaData, inputPassword);
+        } catch (error) {
+          setSnackbarSeverity('error');
+          setSnackbarMessage('パスワードが間違っています');
+          setOpenSnackbar(true);
+          setProgress(false);
+          return
+        }
       }
 
-      await registrationProduct(momijiSellerAccount);
+      localStorage.setItem('momijiSellerPublicKey', momijiSellerAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
+
+      await registrationProduct(momijiSellerAccount, symbolSellerPublicAccount.address);
 
     }else{
       setSnackbarSeverity('error');
       setSnackbarMessage('パスワードが入力されていません');
       setOpenSnackbar(true);
+      setProgress(false);
+      return
     }  
   };
 
-  const registrationProduct = async (momijiSellerAccount:Account) => {
+  const registrationProduct = async (momijiSellerAccount:Account, symbolSellerAddress:Address) => {
+    console.log("registrationProduct")
+    console.log(symbolSellerAddress)
+    console.log(symbolSellerAddress.plain())
+
     //商品情報の登録処理
     const productInfo:ProductInfo = {
       productName: inputData.productName,
@@ -161,13 +186,14 @@ export const RegistrationForm = () => {
       category: inputData.category,
       metalIds: [inputData.metalIds],
       price: inputData.price,
-      orderAddress: momijiSellerAccount.address.plain(),
-      depositAddress: symbolSellerAccount.address.plain(),
+      mosaicId: null,
+      ownerAddress: momijiSellerAccount.address.plain(),
+      depositAddress: symbolSellerAddress.plain(),
       serviceName: serviceName,
       servieVersion: serviceVersion,
     }
 
-    const momijiAggregateTx = await registrationTransaction(momijiSellerAccount,productInfo,inputData.amount);
+    const momijiAggregateTx = await registrationTransaction(momijiSellerAccount, productInfo,inputData.amount);
     //署名　& 送信
     const momijiSignedTx = momijiSellerAccount.sign(momijiAggregateTx, momijiBlockChain.generationHash);
     const momijiHash = momijiSignedTx.hash;
@@ -183,10 +209,14 @@ export const RegistrationForm = () => {
       setSnackbarSeverity('success');
       setSnackbarMessage('商品情報の登録に成功しました');
       setOpenSnackbar(true);
+      setProgress(false);
+      return
     }else{
       setSnackbarSeverity('error');
       setSnackbarMessage('商品情報の登録に失敗しました');
       setOpenSnackbar(true);
+      setProgress(false);
+      return
     }
   }
   

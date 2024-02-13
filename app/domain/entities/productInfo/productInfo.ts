@@ -5,8 +5,9 @@ export type ProductInfo = {
   category: string[];
   metalIds: string[];
   depositAddress: string; //販売者Symbolのアドレス
-  orderAddress: string; //販売者Momijiのアドレス
+  ownerAddress: string; //販売者Momijiのアドレス
   price: number;
+  mosaicId:string;
   serviceName: string;
   servieVersion: number;
 };
