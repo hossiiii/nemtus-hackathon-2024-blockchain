@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import FlameComponent from '../components/Flame';
 import { ProductList } from '../components/ProductList';
 
-const Product = () => {
+const ProductPage = () => {
   return (
     <>
       <FlameComponent>
@@ -14,4 +14,4 @@ const Product = () => {
   );
 };
 
-export default Product;
+export default ProductPage;

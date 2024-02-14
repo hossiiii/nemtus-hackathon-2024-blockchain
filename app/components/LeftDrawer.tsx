@@ -13,6 +13,7 @@ import {
 import Home from '@mui/icons-material/Home';
 import AppRegistrationIcon from '@mui/icons-material/AppRegistration';
 import AppsIcon from '@mui/icons-material/Apps';
+import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Settings from '@mui/icons-material/Settings';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
@@ -87,7 +88,22 @@ function LeftDrawer(props: {
                 <ListItemText primary={'登録商品一覧'} />
               </ListItemButton>
             </ListItem>
-          </List>                    
+          </List>
+          <List>
+            <ListItem disablePadding>
+              <ListItemButton
+                onClick={() => {
+                  router.push('/orderHistory');
+                  setOpenLeftDrawer(false);
+                }}
+              >
+                <ListItemIcon>
+                  <ShoppingCartIcon />
+                </ListItemIcon>
+                <ListItemText primary={'注文履歴'} />
+              </ListItemButton>
+            </ListItem>
+          </List>          
           <List>
             <ListItem disablePadding>
               <ListItemButton

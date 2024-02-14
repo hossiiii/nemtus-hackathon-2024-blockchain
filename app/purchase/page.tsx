@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import FlameComponent from '../components/Flame';
 import { PurchaseForm } from '../components/PurchaseForm';
 
-const Purchase = () => {
+const PurchasePage = () => {
   return (
     <>
       <FlameComponent>
@@ -14,4 +14,4 @@ const Purchase = () => {
   );
 };
 
-export default Purchase;
+export default PurchasePage;

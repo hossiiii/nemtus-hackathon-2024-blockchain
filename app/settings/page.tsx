@@ -1,7 +1,7 @@
 'use client';
 import FlameComponent from '../components/Flame';
 
-const Settings = () => {
+const SettingsPage = () => {
   return (
     <>
       <FlameComponent>this is the settings page</FlameComponent>
@@ -9,4 +9,4 @@ const Settings = () => {
   );
 };
 
-export default Settings;
+export default SettingsPage;

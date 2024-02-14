@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { Box, Card, CardContent, Typography, Grid, Backdrop, CircularProgress, Chip } from '@mui/material';
-import { Account, PublicAccount } from 'symbol-sdk';
+import { PublicAccount } from 'symbol-sdk';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import AlertsSnackbar from './AlertsSnackbar';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
@@ -30,12 +30,12 @@ export const ProductList = () => {
         return
       }
       const momijiSellerPublicAccount = PublicAccount.createFromPublicKey(momijiSellerPublicKey,momijiBlockChain.networkType);
-      const fetchProductList = async () => {
+      const func = async () => {
         const productInfoList = await fetchSellerProductInfo(momijiSellerPublicAccount.address);
         setProductList(productInfoList)
         setProgress(false)
       };
-      fetchProductList();
+      func();
     }
   }
   , [momijiBlockChain]);

@@ -3,7 +3,7 @@ import { Typography } from '@mui/material';
 import FlameComponent from '../components/Flame';
 import { RegistrationForm } from '../components/RegistrationForm';
 
-const Registration = () => {
+const RegistrationPage = () => {
   return (
     <>
       <FlameComponent>
@@ -14,4 +14,4 @@ const Registration = () => {
   );
 };
 
-export default Registration;
+export default RegistrationPage;
