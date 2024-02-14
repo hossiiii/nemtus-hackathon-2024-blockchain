@@ -7,11 +7,11 @@ import { mosaicMetaDataTransaction } from '../../utils/transactions/mosaicMetaDa
 import { ProductInfo } from '../../entities/productInfo/productInfo';
 
 export const registrationTransaction = async (
+  momijiBlockChain: any,
   momijiSellerAccount: Account,
   productInfo: ProductInfo,
   amount: number,
 ): Promise<AggregateTransaction> => {
-  const momijiBlockChain = await setupBlockChain('momiji');
 
   // 商品用モザイクを作成するトランザクション
   const mosaicDefinitionTx = mosaicDefinitionTransaction(

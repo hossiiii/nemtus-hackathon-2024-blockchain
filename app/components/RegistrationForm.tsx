@@ -57,7 +57,7 @@ export const RegistrationForm = () => {
 
   const [symbolAccountMetaData, setSymbolAccountMetaData] = useState<string | null>(null); //momijiの暗号化アカウント
 
-  const [inputData, setInputData] = useState<any>(null); //サービス名
+  const [inputData, setInputData] = useState<Inputs>(null); //インプットデータ
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
@@ -121,7 +121,6 @@ export const RegistrationForm = () => {
           return
         }
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
-        console.log(momijiStrSignerQR)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR);
 
         //TODO: aLiceの署名に置き換え
@@ -174,10 +173,6 @@ export const RegistrationForm = () => {
   };
 
   const registrationProduct = async (momijiSellerAccount:Account, symbolSellerAddress:Address) => {
-    console.log("registrationProduct")
-    console.log(symbolSellerAddress)
-    console.log(symbolSellerAddress.plain())
-
     //商品情報の登録処理
     const productInfo:ProductInfo = {
       productName: inputData.productName,
@@ -193,7 +188,7 @@ export const RegistrationForm = () => {
       servieVersion: serviceVersion,
     }
 
-    const momijiAggregateTx = await registrationTransaction(momijiSellerAccount, productInfo,inputData.amount);
+    const momijiAggregateTx = await registrationTransaction(momijiBlockChain, momijiSellerAccount, productInfo,inputData.amount);
     //署名　& 送信
     const momijiSignedTx = momijiSellerAccount.sign(momijiAggregateTx, momijiBlockChain.generationHash);
     const momijiHash = momijiSignedTx.hash;
@@ -233,6 +228,7 @@ export const RegistrationForm = () => {
         openDialog={openInputDialog}
         setOpenDialog={setOpenInputDialog}
         handleAgreeClick={handlePasswordInput} // パスワード入力処理関数を渡す
+        setProgress={setProgress}
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
       />      

@@ -12,8 +12,7 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
     if (req.method !== 'POST')
       return NextResponse.json({ message: 'Bad Request' }, { status: 405 });
 
-    const { targetRawAddress, amount }: { targetRawAddress: string; amount: number } =
-      await req.json();
+    const { targetRawAddress, amount }: { targetRawAddress: string; amount: number } = await req.json();
 
     const momijiBlockChain = await setupBlockChain('momiji');
     const momijiAdminPrivateKey = process.env.PRIVATE_KEY;

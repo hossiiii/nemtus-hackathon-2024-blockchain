@@ -1,5 +1,5 @@
 // 用途：管理者からの取引用トランザクションを作成する
-import { Account, AggregateTransaction, Deadline, MosaicId, PublicAccount, TransactionGroup } from 'symbol-sdk';
+import { Account, Address, AggregateTransaction, Deadline, MosaicId, PublicAccount, TransactionGroup, TransferTransaction } from 'symbol-sdk';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 import { parsePaymentTx } from '../parse/parsePaymentTx';
@@ -7,21 +7,25 @@ import { transferTransactionWithMosaic } from '../../utils/transactions/transfer
 import { transferTransactionWithMessage } from '../../utils/transactions/transferTransactionWithMessage';
 import { fetchProductInfo } from '../fetches/fetchProductInfo';
 import { ExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
+import { fetchPublicAccount } from '../../utils/fetches/fetchPublicAccount';
 
 export const exchangeTransaction = async (
-  momijiUserPublicAccount: PublicAccount,
-  momijiSellerPublicAccount: PublicAccount,
-  momijiAggregateTxHash: string,
+  momijiBlockChain: any,
+  orderTxHash: string,
 ): Promise<AggregateTransaction> => { //TODO: 返り値の型を修正
-  const momijiBlockChain = await setupBlockChain('momiji');
   const momijiAdminAccount = Account.createFromPrivateKey(process.env.PRIVATE_KEY, momijiBlockChain.networkType);
-  const momijiAggregateTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(momijiAggregateTxHash,TransactionGroup.Confirmed)) as AggregateTransaction;
+  const orderTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(orderTxHash,TransactionGroup.Confirmed)) as AggregateTransaction;
 
-  const paymentInfo = await parsePaymentTx(momijiAggregateTxInfo, momijiAdminAccount, momijiUserPublicAccount); //TODO 複合の仕方を要調査
+  //パブリックアカウントの取得
+  const orderTxInnerTxInfo = orderTxInfo.innerTransactions[0] as TransferTransaction; //0番目=販売者への注文情報送信用Tx, 1番目=管理者への支払い情報送信用Tx
+  const momijiUserPublicAccount = await fetchPublicAccount(momijiBlockChain, orderTxInnerTxInfo.signer.address);
+  const momijiSellerRawAddress = orderTxInnerTxInfo.recipientAddress.plain();
+  const momijiSellerAddress = Address.createFromRawAddress(momijiSellerRawAddress);
+  const momijiSellerPublicAccount = await fetchPublicAccount(momijiBlockChain, momijiSellerAddress); //UnresolvedAddressのため一旦Addressに変換してからPublicAccountを取得
+  
+  const paymentInfo = await parsePaymentTx(orderTxInfo, momijiAdminAccount, momijiUserPublicAccount);
   const mosaicId = paymentInfo.mosaicId;
   const amount = paymentInfo.amount;
-  const secletLockTxHash = paymentInfo.secletLockTxHash;
-  const secletLockTxSeclet = paymentInfo.secletLockTxSeclet;
 
   const sellerToUserTx = transferTransactionWithMosaic(
     momijiBlockChain,
@@ -44,13 +48,11 @@ export const exchangeTransaction = async (
   const price = productInfo.price;
 
   const exchangeOverview:ExchangeOverview = {
-    oerderPaymentTxHash: momijiAggregateTxHash,
+    orderTxHash: orderTxHash,
     productName: productName,
     amount: amount,
     price: price,
-    secletLockTxHash: secletLockTxHash,
-    secletLockTxSeclet: secletLockTxSeclet,
-    secletLockTxTargetAddress: productInfo.depositAddress,
+    depositAddress: productInfo.depositAddress,
     createTimestamp: createTimestamp,
   };
 

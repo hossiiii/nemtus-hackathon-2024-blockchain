@@ -4,14 +4,12 @@ import { ProductInfo } from "../productInfo/productInfo";
 import { ExchangeStatus } from "./exchangeStatus";
 
 export type ExchangeInfo = {
-  oerderPaymentTxHash: string;
+  orderTxHash: string;
   status: ExchangeStatus;
   cosignaturePublicKeys: string[]; //この状態で購入状況を確認する
   orderInfo?: OrderInfo; //みれるのは販売者と購入者のみ
   paymentInfo?: PaymentInfo; //みれるのは管理者のと購入者のみ
   productInfo: ProductInfo; //全員がみれる mosaicIdから取得
-  secletLockTxHash: string;
-  secletLockTxSeclet: string;
   createTimestamp: string;
   expiredAt: number;
 };

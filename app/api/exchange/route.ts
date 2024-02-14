@@ -1,26 +1,26 @@
-import fetch from 'node-fetch';
-global.fetch = fetch;
+// POST 交換用アグリゲートトランザクションの署名とアナウンス
 
-import { Account, AggregateTransaction, Deadline, HashLockTransaction, Mosaic, MosaicId, PublicAccount, TransactionStatus, UInt64 } from 'symbol-sdk';
-import { setupBlockChain } from '../../utils/setupBlockChain';
+import { NextResponse } from 'next/server';
+import { Account, Deadline, HashLockTransaction, Mosaic, MosaicId, TransactionStatus, UInt64 } from 'symbol-sdk';
+import { setupBlockChain } from '../../domain/utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../../utils/fetches/fetchTransactionStatus';
-import { exchangeTransaction } from './exchangeTransaction';
+import { fetchTransactionStatus } from '../../domain/utils/fetches/fetchTransactionStatus';
+import { exchangeTransaction } from '../../domain/useCases/transactions/exchangeTransaction';
 
-describe('exchangeTransaction', () => {
-  it('should return a new Transactions', async () => {
-    const momijiBlockChain = await setupBlockChain('momiji');
-    const orderTxHash = "3DF0FE358BE645761879BBEBC1551E2518542C5EC1D2318841C87E2936437B58";
-    const result = await exchangeTransaction(momijiBlockChain, orderTxHash);
-    expect(result).toBeInstanceOf(AggregateTransaction);
-  }, 10000); // 10 seconds
+export const POST = async (req: Request, res: NextResponse<string | null>) => {
+  try {
+    if (req.method !== 'POST')
+      return NextResponse.json({ message: 'Bad Request' }, { status: 405 });
 
-  it('exchangeTransaction role play', async () => {
+    const { orderTxHash }: { orderTxHash: string} = await req.json();
+
     const momijiBlockChain = await setupBlockChain('momiji');
-    const orderTxHash = "3DF0FE358BE645761879BBEBC1551E2518542C5EC1D2318841C87E2936437B58";
+    const momijiAdminPrivateKey = process.env.PRIVATE_KEY;
+    const momijiAdminAccount = Account.createFromPrivateKey(
+      momijiAdminPrivateKey,
+      momijiBlockChain.networkType,
+    );
     const momijiAggregateBondedTx = await exchangeTransaction(momijiBlockChain, orderTxHash);
-
-    const momijiAdminAccount = Account.createFromPrivateKey(process.env.PRIVATE_KEY, momijiBlockChain.networkType);
 
     //アグリゲートボンデッドトランザクションの署名
     const momijiSignedAggregateBondedTx = momijiAdminAccount.sign(momijiAggregateBondedTx, momijiBlockChain.generationHash);
@@ -50,15 +50,14 @@ describe('exchangeTransaction', () => {
 
     await firstValueFrom(momijiBlockChain.txRepo.announceAggregateBonded(momijiSignedAggregateBondedTx));
 
-    const res2 = await fetchTransactionStatus(
+    const result: TransactionStatus = await fetchTransactionStatus(
       momijiBlockChain,
       momijiSignedAggregateBondedTxHash,
       momijiAdminAccount.address,
     );
 
-    expect(res2).toBeInstanceOf(TransactionStatus);
-    expect(res2.code).toEqual('Success');
-    expect(res2.group).toEqual('partial');  
-  
-  }, 120000); // 120 seconds
-});
+    return NextResponse.json({ data: result }, { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json({ message: err.message }, { status: 500 });
+  }
+};

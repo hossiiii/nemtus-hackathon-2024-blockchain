@@ -1,27 +1,27 @@
 import fetch from 'node-fetch';
 global.fetch = fetch;
 
-import { Account } from 'symbol-sdk';
+import { Address } from 'symbol-sdk';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { fetchExchangeHistoryInfo } from './fetchExchangeHistoryInfo';
 
 describe('fetchExchangeHistoryInfo', () => {
   it('should return a exchangeHistoryInfo from user', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
-    const momijiUserAccount = Account.createFromPrivateKey('D8A03500647C68D715FD2B9C043D6E20EEADE2D4FE7B88DA5F84C240B00C7DC2', momijiBlockChain.networkType);
-    const result = await fetchExchangeHistoryInfo(momijiUserAccount);
+    const momijiUserAddress = Address.createFromRawAddress('TBBELSFSZAZYCUBKH3NXNP24M5LLHXVD7TIHUYY');
+    const result = await fetchExchangeHistoryInfo(momijiBlockChain, momijiUserAddress);
     console.log(result);
   }, 10000); // 10 seconds
   it('should return a exchangeHistoryInfo from seller', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
-    const momijiSellerAccount = Account.createFromPrivateKey('ACE601DF0DE67888FC67FD7D800A3995AC3005C93F057D9BFFCDD94C5BF48F89', momijiBlockChain.networkType);
-    const result = await fetchExchangeHistoryInfo(momijiSellerAccount);
+    const momijiSellerAddress = Address.createFromRawAddress('TAF7SZWMAH72CVMKPNGLDZHGLLPST3ULSKI47VQ');
+    const result = await fetchExchangeHistoryInfo(momijiBlockChain, momijiSellerAddress);
     console.log(result);
   }, 10000); // 10 seconds
   it('should return a exchangeHistoryInfo from admin', async () => {
     const momijiBlockChain = await setupBlockChain('momiji');
-    const momijiAdminAccount = Account.createFromPrivateKey('6EF158AF3D10FEAC84FFAF81991F10E19A3C9F709227FC222D70E3F5E83FD230', momijiBlockChain.networkType);
-    const result = await fetchExchangeHistoryInfo(momijiAdminAccount);
+    const momijiAdminAddress = Address.createFromRawAddress('TAQ34WZSBWWOEEEKZD23HMJCT5WIL6LPH44PO5A');
+    const result = await fetchExchangeHistoryInfo(momijiBlockChain, momijiAdminAddress);
     console.log(result);
   }, 10000); // 10 seconds
 

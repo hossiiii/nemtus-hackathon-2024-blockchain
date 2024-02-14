@@ -23,7 +23,7 @@ describe('decryptedAccount', () => {
   test.only('should return an specific account object', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolTargetPublicAccount = PublicAccount.createFromPublicKey(
-      '16014A1DD59BDE1720D0F9C37290A2A7C4FB074662D31510DDEE4EC91FD3BF43',
+      '7B4588AEF0D8AD9DF3AADD7F1B587E32DB03EF3D98F2C9C58A98018C40E512CC',
       symbolBlockChain.networkType,
     );
     const strSignerQR = await fetchAccountMetaData(

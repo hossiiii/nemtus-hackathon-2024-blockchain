@@ -57,7 +57,7 @@ export const ProductList = () => {
         <Box component="section" sx={{ p: 2 }}>
           <Grid container spacing={4}>
             {productList?.map((product, index) => (
-              <Grid item xs={12} sm={6} md={6} key={index}>
+              <Grid item key={index}>
                 <Card
                   onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
                   <CardContent>

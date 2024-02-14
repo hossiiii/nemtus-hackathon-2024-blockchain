@@ -1,7 +1,6 @@
-import { Account, AggregateTransaction, MosaicId, ReceiptType, TransactionGroup, TransactionStatement, TransferTransaction, UInt64 } from 'symbol-sdk';
+import { Account, AggregateTransaction, MosaicId, TransactionGroup, TransferTransaction } from 'symbol-sdk';
 import { ExchangeInfo } from '../../entities/exchangeInfo/exchangeInfo';
 import { firstValueFrom } from 'rxjs';
-import { setupBlockChain } from '../../utils/setupBlockChain';
 import { fetchProductInfo } from './fetchProductInfo';
 import { parseOrderTx } from '../parse/parseOrderTx';
 import { parsePaymentTx } from '../parse/parsePaymentTx';
@@ -11,12 +10,11 @@ import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHis
 import { UserType } from '../../entities/userType/userType';
 
 export const fetchExchangeInfo = async (
+  momijiBlockChain: any,
   exchangeTxHash: string,
   account: Account,
 ): Promise<ExchangeInfo> => {
-  const momijiBlockChain = await setupBlockChain('momiji');
   let momijiAggregateBondedTxInfo: AggregateTransaction;
-
   try {
     // 最初にPartialトランザクションを試みます
     momijiAggregateBondedTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(exchangeTxHash, TransactionGroup.Partial)) as AggregateTransaction;
@@ -78,7 +76,7 @@ export const fetchExchangeInfo = async (
   const productInfo = await fetchProductInfo(mosaicId);
 
   // adminToAdminTxからorderInfoTxとpaymentInfoTxを取得
-  const orderPaymentInfoTxHash = exchangeOverview.oerderPaymentTxHash;
+  const orderPaymentInfoTxHash = exchangeOverview.orderTxHash;
   const momijiAggregateTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(orderPaymentInfoTxHash,TransactionGroup.Confirmed)) as AggregateTransaction;
 
   // orderInfoの取得
@@ -94,18 +92,16 @@ export const fetchExchangeInfo = async (
   }
 
   // 取引状態の確認
-  const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount,exchangeOverview.secletLockTxTargetAddress,momijiAggregateBondedTxHeight)
+  const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount,exchangeOverview.depositAddress,momijiAggregateBondedTxHeight)
 
   // ExchangeInfoの生成
   const exchangeInfo: ExchangeInfo = {
-    oerderPaymentTxHash: exchangeOverview.oerderPaymentTxHash,
+    orderTxHash: exchangeOverview.orderTxHash,
     status: status,
     cosignaturePublicKeys: cosignaturePublicKeys,
     orderInfo: orderInfo,
     paymentInfo: paymentInfo,
     productInfo: productInfo,
-    secletLockTxHash: exchangeOverview.secletLockTxHash,
-    secletLockTxSeclet: exchangeOverview.secletLockTxSeclet,
     createTimestamp: exchangeOverview.createTimestamp,
     expiredAt: expiredAt,
   };

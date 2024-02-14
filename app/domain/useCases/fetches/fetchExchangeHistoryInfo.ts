@@ -1,15 +1,14 @@
-import { Account, AggregateTransaction, Order, TransactionGroup, TransactionType, TransferTransaction } from 'symbol-sdk';
+import { Address, AggregateTransaction, Order, TransactionGroup, TransactionType, TransferTransaction } from 'symbol-sdk';
 import { firstValueFrom } from 'rxjs';
-import { setupBlockChain } from '../../utils/setupBlockChain';
 import { ExchangeHistoryInfo } from '../../entities/exchangeHistoryInfo/exchangeHistoryInfo';
 import { ZoneOffset } from '@js-joda/core';
 import { determineExchangeStatus } from '../determineExchangeStatus';
 import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
 
 export const fetchExchangeHistoryInfo = async (
-  account: Account
+  momijiBlockChain: any,
+  address: Address
 ): Promise<ExchangeHistoryInfo[]> => {
-  const momijiBlockChain = await setupBlockChain('momiji');
   const exchangeHistoryInfoList : ExchangeHistoryInfo[] = [];
 
   for (const transactionGroup of [TransactionGroup.Partial, TransactionGroup.Confirmed, TransactionGroup.Unconfirmed]) {
@@ -17,13 +16,13 @@ export const fetchExchangeHistoryInfo = async (
       momijiBlockChain.txRepo.search({
         type: [TransactionType.AGGREGATE_BONDED],
         group: transactionGroup as TransactionGroup,
-        address: account.address,
+        address: address,
         order: Order.Desc,
         pageSize: 100,
       })
     );
   
-    for (const tx of resultSearch.data) {
+    for (const tx of (resultSearch as any).data) {
       let exchangeHistoryInfo: ExchangeHistoryInfo;
       let exchangeOverview: ExchangeOverview;
       const momijiAggregateBondedTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(tx.transactionInfo.hash, transactionGroup as TransactionGroup)) as AggregateTransaction;
@@ -55,7 +54,7 @@ export const fetchExchangeHistoryInfo = async (
         }
 
         // 取引状態の確認
-        const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount, exchangeOverview.secletLockTxTargetAddress, momijiAggregateBondedTxHeight)
+        const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount, exchangeOverview.depositAddress, momijiAggregateBondedTxHeight)
 
         exchangeHistoryInfo = {
           status: status,
