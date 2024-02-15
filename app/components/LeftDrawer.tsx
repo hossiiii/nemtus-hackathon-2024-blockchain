@@ -93,7 +93,7 @@ function LeftDrawer(props: {
             <ListItem disablePadding>
               <ListItemButton
                 onClick={() => {
-                  router.push('/orderHistory');
+                  router.push('/order');
                   setOpenLeftDrawer(false);
                 }}
               >

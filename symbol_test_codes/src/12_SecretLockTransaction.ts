@@ -49,7 +49,7 @@ const main = async () => {
   const secret = hash.update(random).hex();
   const proof = random.toString('hex');
 
-  const secletLockTx = SecretLockTransaction.create(
+  const secretLockTx = SecretLockTransaction.create(
     Deadline.create(epochAdjustment),
     new Mosaic(new MosaicId(currencyMosaicId), UInt64.fromUint(1000000)),
     UInt64.fromUint(480),
@@ -59,7 +59,7 @@ const main = async () => {
     networkType,
   ).setMaxFee(100);
 
-  const signedLockTx = alice.sign(secletLockTx, generationHash);
+  const signedLockTx = alice.sign(secretLockTx, generationHash);
 
   await firstValueFrom(txRepo.announce(signedLockTx));
   console.log('announce signedLockTx');

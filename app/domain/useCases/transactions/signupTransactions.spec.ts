@@ -23,7 +23,7 @@ describe('signupTransactions', () => {
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 600000); // 60 seconds
 
-  it('should return a new AggegateTransaction with SecletLockTransactions', async () => {
+  it('should return a new AggegateTransaction with SecretLockTransactions', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolNewAccount = Account.generateNewAccount(symbolBlockChain.networkType);
     const symbolSendNewAccount = Account.generateNewAccount(symbolBlockChain.networkType);
@@ -34,8 +34,8 @@ describe('signupTransactions', () => {
     const secret = hash.update(random).hex();
     const proof = random.toString('hex');
       
-    const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSendNewAccount.address);
-    const result = await signupTransactions(symbolNewAccount.publicAccount, password, secletTx);
+    const secretTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSendNewAccount.address);
+    const result = await signupTransactions(symbolNewAccount.publicAccount, password, secretTx);
     expect(result).toBeInstanceOf(AggregateTransaction);
   }, 600000); // 60 seconds
 
@@ -113,7 +113,7 @@ describe('signupTransactions', () => {
     expect(res2).toBeInstanceOf(Account);
   }, 120000); // 120 seconds
 
-  it('signupTransactions role play with secletLockTx', async () => {
+  it('signupTransactions role play with secretLockTx', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolNewAccount = Account.generateNewAccount(symbolBlockChain.networkType);
     const password = 'pass';
@@ -144,7 +144,7 @@ describe('signupTransactions', () => {
     expect(symbolTransferTxResult.code).toEqual('Success');
     expect(symbolTransferTxResult.group).toEqual('confirmed');
 
-    //secletLockTx作成
+    //secretLockTx作成
     const random = Crypto.randomBytes(20);
     const secretHash = sha3_256.create();
     const secret = secretHash.update(random).hex();
@@ -154,10 +154,10 @@ describe('signupTransactions', () => {
     console.log(proof);
 
     const symbolSellerAddress = Address.createFromRawAddress("TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY")
-    const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
+    const secretTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
 
     //signupTransactions & 署名　& 送信
-    const symbolAaggregateTx = await signupTransactions(symbolNewAccount.publicAccount, password, secletTx);
+    const symbolAaggregateTx = await signupTransactions(symbolNewAccount.publicAccount, password, secretTx);
     const signedAggregateTx = symbolNewAccount.sign(
       symbolAaggregateTx,
       symbolBlockChain.generationHash,

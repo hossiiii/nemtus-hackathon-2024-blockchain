@@ -6,7 +6,7 @@ import { setupBlockChain } from '../setupBlockChain';
 import { secretProofTransaction } from './secretProofTransaction';
 
 describe('secretProofTransaction.spec', () => {
-  it('should create symbol seclet transaction', async () => {
+  it('should create symbol secret transaction', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolAddress = Address.createFromRawAddress(
       'TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY',

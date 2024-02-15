@@ -9,6 +9,7 @@ import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { useRouter } from 'next/navigation';
 import { fetchExchangeHistoryInfo } from '../domain/useCases/fetches/fetchExchangeHistoryInfo';
 import { ExchangeHistoryInfo } from '../domain/entities/exchangeHistoryInfo/exchangeHistoryInfo';
+import { symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from '../consts/consts';
 
 export const OrderHistory = () => {
   const router = useRouter();
@@ -23,8 +24,8 @@ export const OrderHistory = () => {
 
   useEffect(() => {
     if (momijiBlockChain) {
-      const momijiSellerPublicKey = localStorage.getItem('momijiSellerPublicKey')
-      const momijiUserPublicKey = localStorage.getItem('momijiUserPublicKey')
+      const momijiSellerPublicKey = localStorage.getItem(symbolSellerAccountMetaDataKey)
+      const momijiUserPublicKey = localStorage.getItem(symbolUserAccountMetaDataKey)
       if (!momijiSellerPublicKey && !momijiUserPublicKey) {
         setSnackbarSeverity('error');
         setSnackbarMessage('アカウントが登録されていないため表示できません');
@@ -72,7 +73,7 @@ export const OrderHistory = () => {
               <Grid container spacing={4}>
                 {sellerExchangeHistoryInfo?.map((info, index) => (
                   <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card>
+                    <Card onClick={() => router.push(`/order/detail?userType=seller&exchangeTxHash=${info.exchangeTxHash}`)} style={{ cursor: 'pointer' }}> {/* 販売者のフラグをつけて遷移 */}
                       <CardContent>
                         <Typography color="textSecondary" gutterBottom>
                           取引ステータス: {info.status}
@@ -105,7 +106,7 @@ export const OrderHistory = () => {
               <Grid container spacing={4}>
                 {userExchangeHistoryInfo?.map((info, index) => (
                   <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card>
+                    <Card onClick={() => router.push(`/order/detail?userType=user&exchangeTxHash=${info.exchangeTxHash}`)} style={{ cursor: 'pointer' }}> {/* 購入者のフラグをつけて遷移 */}
                       <CardContent>
                         <Typography color="textSecondary" gutterBottom>
                           取引ステータス: {info.status}

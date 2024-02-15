@@ -8,6 +8,7 @@ import AlertsSnackbar from './AlertsSnackbar';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { useRouter } from 'next/navigation';
 import { fetchSellerProductInfo } from '../domain/useCases/fetches/fetchSellerProductInfo';
+import { symbolSellerAccountMetaDataKey } from '../consts/consts';
 
 export const ProductList = () => {
   const router = useRouter();
@@ -21,10 +22,10 @@ export const ProductList = () => {
 
   useEffect(() => {
     if (momijiBlockChain) {
-      const momijiSellerPublicKey = localStorage.getItem('momijiSellerPublicKey')
+      const momijiSellerPublicKey = localStorage.getItem(symbolSellerAccountMetaDataKey)
       if (!momijiSellerPublicKey) {
         setSnackbarSeverity('error');
-        setSnackbarMessage('アカウントが登録されていません。先に商品を登録しアカウント登録を行なって下さい');
+        setSnackbarMessage('購入者アカウントが登録されていません。先に商品を登録し購入者アカウント登録を行なって下さい');
         setOpenSnackbar(true);
         setProgress(false);
         return
@@ -58,8 +59,7 @@ export const ProductList = () => {
           <Grid container spacing={4}>
             {productList?.map((product, index) => (
               <Grid item key={index}>
-                <Card
-                  onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
+                <Card onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
                   <CardContent>
                     <Typography gutterBottom variant="h5" component="div">
                       {product.productName}

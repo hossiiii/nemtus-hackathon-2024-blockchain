@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { Box, Button, TextField, Backdrop, CircularProgress } from '@mui/material';
-import { initialManju, serviceName, serviceVersion, symbolAccountMetaDataKey } from '../consts/consts';
+import { initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolUserAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, Crypto, MosaicId, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
@@ -55,7 +55,7 @@ export const PurchaseForm = () => {
   const [dialogTitle, setDialogTitle] = useState<string | null>(null);
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
 
-  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //未登録アカウントのパスワード入力ダイアログの設定
+  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
   const [symbolUserAccount, setSymbolUserAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolUserPublicAccount, setSymbolUserPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
@@ -66,7 +66,6 @@ export const PurchaseForm = () => {
 
   const [productInfo, setProductInfo] = useState<ProductInfo | null>(null); //productInfo
   const [productStockAmount, setProductStockAmount] = useState<number | null>(null)
-  const [productStockTotal, setProductStockTotal] = useState<number | null>(null)
 
   useEffect(() => {
     if (momijiBlockChain) {
@@ -77,7 +76,6 @@ export const PurchaseForm = () => {
         const momijiSellerAddress = Address.createFromRawAddress(productInfo.ownerAddress)
         const productStock = await fetchProductStock(momijiSellerAddress, mosaicId)
         setProductStockAmount(productStock.amount)
-        setProductStockTotal(productStock.total)
         setProgress(false)
       };
       func();
@@ -89,18 +87,19 @@ export const PurchaseForm = () => {
     //注文情報の登録
     setInputData(data);
     console.log(data)
+
     //TODO；あとでaLiceに置き換え パブリックアカウントの作成
     const symbolUserAccount = Account.createFromPrivateKey(data.symbolPrivateKey, symbolBlockChain.networkType)
     setSymbolUserAccount(symbolUserAccount);
+    localStorage.setItem(momijiAccountMetaDataKey, symbolUserAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
+
     const symbolUserPublicAccount = PublicAccount.createFromPublicKey(symbolUserAccount.publicKey, symbolBlockChain.networkType);
     setSymbolUserPublicAccount(symbolUserPublicAccount);
 
-    localStorage.setItem('symbolUserPublicKey', symbolUserAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
-    
     //アカウントのチェック    
     const symbolAccountMetaData = await fetchAccountMetaData(
       symbolBlockChain,
-      symbolAccountMetaDataKey,
+      symbolUserAccountMetaDataKey,
       symbolUserPublicAccount.address,
     );
 
@@ -108,13 +107,13 @@ export const PurchaseForm = () => {
     
     if (symbolAccountMetaData === null) {
       //未登録アカウントの場合
-      setDialogTitle('アカウント登録');
-      setDialogMessage('アカウントが未登録です。サービス利用のためパスワードを登録してください');
+      setDialogTitle('購入者アカウント登録');
+      setDialogMessage('購入者アカウントが未登録です。サービス利用のためパスワードを登録してください');
       setOpenInputDialog(true);
     }else{
       //TODO 登録済みアカウントの場合
       setDialogTitle('パスワード入力');
-      setDialogMessage('サービス利用のためのパスワードを入力してください');
+      setDialogMessage('サービス利用のための購入者用パスワードを入力してください');
       setOpenInputDialog(true);
     }
   };
@@ -132,7 +131,7 @@ export const PurchaseForm = () => {
       const secret = secretHash.update(random).hex();
       const proof = random.toString('hex');
       const symbolSellerAddress = Address.createFromRawAddress(productInfo.depositAddress)
-      const secletTx = secretLockTransaction(symbolBlockChain, totalPrice, secret, symbolSellerAddress);
+      const secretTx = secretLockTransaction(symbolBlockChain, totalPrice, secret, symbolSellerAddress);
       
       if(symbolAccountMetaData === null){
         // momijiのアカウントを作成
@@ -155,7 +154,7 @@ export const PurchaseForm = () => {
           return
         }
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiUserAccount, inputPassword)
-        const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolUserPublicAccount, momijiUserAccount, momijiStrSignerQR, secletTx); //アカウント登録に合わせてシークレットロックトランザクションを追加
+        const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolUserPublicAccount, momijiUserAccount, momijiStrSignerQR, symbolUserAccountMetaDataKey, secretTx); //アカウント登録に合わせてシークレットロックトランザクションを追加
 
         //TODO: aLiceの署名に置き換え
         const signedAggregateTx = symbolUserAccount.sign(
@@ -193,9 +192,9 @@ export const PurchaseForm = () => {
         }
 
         //TODO: aLiceの署名に置き換え
-        const signedSecletTx = symbolUserAccount.sign(secletTx,symbolBlockChain.generationHash);
-        const hash = signedSecletTx.hash;
-        await firstValueFrom(symbolBlockChain.txRepo.announce(signedSecletTx));
+        const signedSecretTx = symbolUserAccount.sign(secretTx,symbolBlockChain.generationHash);
+        const hash = signedSecretTx.hash;
+        await firstValueFrom(symbolBlockChain.txRepo.announce(signedSecretTx));
         const result = await fetchTransactionStatus(
           symbolBlockChain,
           hash,
@@ -214,9 +213,9 @@ export const PurchaseForm = () => {
         }        
       }
 
-      localStorage.setItem('momijiUserPublicKey', momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
+      localStorage.setItem(symbolUserAccountMetaDataKey, momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
 
-      await order(momijiUserAccount, proof);
+      await order(momijiUserAccount, secret, proof);
 
     }else{
       setSnackbarSeverity('error');
@@ -227,7 +226,7 @@ export const PurchaseForm = () => {
     }  
   };
 
-  const order = async (momijiUserAccount:Account ,proof:string) => {
+  const order = async (momijiUserAccount:Account, secret:string, proof:string) => {
 
     //注文情報の登録
     const orderInfo : OrderInfo = {
@@ -242,6 +241,7 @@ export const PurchaseForm = () => {
     }
     //支払い情報の登録
     const paymentInfo:PaymentInfo = {
+      secret: secret,
       proof: proof,
       mosaicId: productInfo.mosaicId,
       amount: inputData.amount,  

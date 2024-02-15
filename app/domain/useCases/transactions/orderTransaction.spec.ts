@@ -39,8 +39,8 @@ describe('orderTransaction', () => {
       proof: "proof",
       mosaicId: "mosaicId",
       amount: 2,
-      secletLockTxHash: "secletLockTxHash",
-      secletLockTxSeclet: "",
+      secretLockTxHash: "secretLockTxHash",
+      secretLockTxSecret: "",
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };
@@ -62,7 +62,7 @@ describe('orderTransaction', () => {
   it('orderTransaction role play', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
 
-    //secletLockTx作成
+    //secretLockTx作成
     const random = Crypto.randomBytes(20);
     const secretHash = sha3_256.create();
     const secret = secretHash.update(random).hex();
@@ -73,18 +73,18 @@ describe('orderTransaction', () => {
 
     const symbolUserAccount = Account.createFromPrivateKey("FF83D96E7AFC2E18115A46389633506DCFA1E749AAD95DED8FACD184FB53689B",symbolBlockChain.networkType)
     const symbolSellerAddress = Address.createFromRawAddress("TB22KPDYEOWXK2BSSEC7MATPBPVX4SLDR5SMMDY");
-    const secletTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
+    const secretTx = secretLockTransaction(symbolBlockChain, 1, secret, symbolSellerAddress);
 
     //署名　& 送信
-    const symbolSignedSecletLockTx = symbolUserAccount.sign(
-      secletTx,
+    const symbolSignedSecretLockTx = symbolUserAccount.sign(
+      secretTx,
       symbolBlockChain.generationHash,
     );
-    const symbolSignedSecletLockTxHash = symbolSignedSecletLockTx.hash;
-    await firstValueFrom(symbolBlockChain.txRepo.announce(symbolSignedSecletLockTx));
-    const symbolSignedSecletLockTxResult = await fetchTransactionStatus(
+    const symbolSignedSecretLockTxHash = symbolSignedSecretLockTx.hash;
+    await firstValueFrom(symbolBlockChain.txRepo.announce(symbolSignedSecretLockTx));
+    const symbolSignedSecretLockTxResult = await fetchTransactionStatus(
       symbolBlockChain,
-      symbolSignedSecletLockTxHash,
+      symbolSignedSecretLockTxHash,
       symbolUserAccount.address,
     );
 
@@ -105,8 +105,8 @@ describe('orderTransaction', () => {
       proof: proof,
       mosaicId: "3EF678B48A785AF0",
       amount: 2,
-      secletLockTxHash: symbolSignedSecletLockTxHash,
-      secletLockTxSeclet: secret,
+      secretLockTxHash: symbolSignedSecretLockTxHash,
+      secretLockTxSecret: secret,
       serviceName: serviceName,
       servieVersion: serviceVersion,
     };

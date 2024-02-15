@@ -7,7 +7,7 @@ import {
   SecretLockTransaction,
   LockHashAlgorithm,
 } from 'symbol-sdk';
-import { secletLockDuration } from '../../../consts/consts';
+import { secretLockDuration } from '../../../consts/consts';
 
 export const secretLockTransaction = (
   blockChain: any,
@@ -15,15 +15,15 @@ export const secretLockTransaction = (
   secret: string, //ここで指定するsecretは、ハッシュ化されたものを指定する
   address: Address,
 ): SecretLockTransaction => {
-  const secletLockTx = SecretLockTransaction.create(
+  const secretLockTx = SecretLockTransaction.create(
     Deadline.create(blockChain.epochAdjustment),
     new Mosaic(new MosaicId(blockChain.currencyMosaicId), UInt64.fromUint(amount * 1000000)),
-    UInt64.fromUint(secletLockDuration),
+    UInt64.fromUint(secretLockDuration),
     LockHashAlgorithm.Op_Sha3_256,
     secret,
     address,
     blockChain.networkType,
   ).setMaxFee(100) as SecretLockTransaction;
 
-  return secletLockTx;
+  return secretLockTx;
 };

@@ -9,6 +9,7 @@ import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchProductInfo } from '../domain/useCases/fetches/fetchProductInfo';
 import { fetchProductStock } from '../domain/useCases/fetches/fetchProductStock';
+import { symbolSellerAccountMetaDataKey } from '../consts/consts';
 
 export const ProductDetail = () => {
 
@@ -27,7 +28,7 @@ export const ProductDetail = () => {
 
   useEffect(() => {
     if (momijiBlockChain) {
-      const momijiSellerPublicKey = localStorage.getItem('momijiSellerPublicKey')
+      const momijiSellerPublicKey = localStorage.getItem(symbolSellerAccountMetaDataKey)
       setMomijiSellerPublicKey(momijiSellerPublicKey)
       const func = async () => {
         const mosaicId = new MosaicId(searchParams.get('mosaicId'))

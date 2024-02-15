@@ -7,7 +7,7 @@ import { secretLockTransaction } from './secretLockTransaction';
 import { sha3_256 } from 'js-sha3';
 
 describe('secretLockTransaction.spec', () => {
-  it('should create symbol seclet transaction', async () => {
+  it('should create symbol secret transaction', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolAddress = Address.createFromRawAddress(
       'TCCICCG6YKZZWAM2XDNXAJM2PNE6MWBU2GDIJ2A',

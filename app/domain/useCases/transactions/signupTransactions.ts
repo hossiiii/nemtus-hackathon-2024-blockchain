@@ -7,12 +7,12 @@ import {
   SecretLockTransaction,
 } from 'symbol-sdk';
 import { accountMetaDataTransaction } from '../../utils/transactions/accountMetaDataTransaction';
-import { symbolAccountMetaDataKey, momijiAccountMetaDataKey } from '../../../consts/consts';
+import { momijiAccountMetaDataKey } from '../../../consts/consts';
 import { fetchTransactionStatus } from '../../utils/fetches/fetchTransactionStatus';
 import { firstValueFrom } from 'rxjs';
 
-//オプションの引数としてsecletLockTxを受け取る（購入者が初めてアカウント登録をする場合は署名を1回にしたいため）
-export const signupTransactions = async (momijiBlockChain:any, symbolBlockChain:any, symbolTargetPublicAccount:PublicAccount, momijiNewAccount: Account, momijiStrSignerQR: string, secletLockTx?: SecretLockTransaction ): Promise<AggregateTransaction> => {
+//オプションの引数としてsecretLockTxを受け取る（購入者が初めてアカウント登録をする場合は署名を1回にしたいため）
+export const signupTransactions = async (momijiBlockChain:any, symbolBlockChain:any, symbolTargetPublicAccount:PublicAccount, momijiNewAccount: Account, momijiStrSignerQR: string, key: string, secretLockTx?: SecretLockTransaction ): Promise<AggregateTransaction> => {
 
   const momijiAccountMetaDataTx = await accountMetaDataTransaction(momijiBlockChain, momijiAccountMetaDataKey, symbolTargetPublicAccount.publicKey, momijiNewAccount.address)
 
@@ -39,16 +39,16 @@ export const signupTransactions = async (momijiBlockChain:any, symbolBlockChain:
   // Symbolアカウントに対してパスフレーズで暗号化したアカウント情報をメタデータに記録するTxを作成
   const accountMetaDataTx = await accountMetaDataTransaction(
     symbolBlockChain,
-    symbolAccountMetaDataKey,
+    key,
     momijiStrSignerQR,
     symbolTargetPublicAccount.address
   );
 
   const aggregateArray = [accountMetaDataTx.toAggregate(symbolTargetPublicAccount)];
 
-  // 引数にsecletLockTxが指定されていたらアグリゲートTxに追加
-  if (secletLockTx) {
-    aggregateArray.push(secletLockTx.toAggregate(symbolTargetPublicAccount));
+  // 引数にsecretLockTxが指定されていたらアグリゲートTxに追加
+  if (secretLockTx) {
+    aggregateArray.push(secretLockTx.toAggregate(symbolTargetPublicAccount));
   }
 
   // アグリゲートTxを作成

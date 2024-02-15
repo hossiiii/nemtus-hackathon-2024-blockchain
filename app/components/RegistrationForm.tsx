@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress } from '@mui/material';
-import { categories, initialManju, serviceName, serviceVersion, symbolAccountMetaDataKey } from '../consts/consts';
+import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
@@ -50,7 +50,7 @@ export const RegistrationForm = () => {
   const [dialogTitle, setDialogTitle] = useState<string | null>(null);
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
 
-  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //未登録アカウントのパスワード入力ダイアログの設定
+  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
   const [symbolSellerAccount, setSymbolSellerAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolSellerPublicAccount, setSymbolSellerPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
@@ -64,18 +64,19 @@ export const RegistrationForm = () => {
     //商品情報の登録
     setInputData(data);
     console.log(data)
+
     //TODO；あとでaLiceに置き換え パブリックアカウントの作成
     const symbolSellerAccount = Account.createFromPrivateKey(data.symbolPrivateKey, symbolBlockChain.networkType)
     setSymbolSellerAccount(symbolSellerAccount);
+    localStorage.setItem(momijiAccountMetaDataKey, symbolSellerAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
+
     const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(symbolSellerAccount.publicKey, symbolBlockChain.networkType);
     setSymbolSellerPublicAccount(symbolSellerPublicAccount);
-
-    localStorage.setItem('symbolSellerPublicKey', symbolSellerAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
     
     //アカウントのチェック    
     const symbolAccountMetaData = await fetchAccountMetaData(
       symbolBlockChain,
-      symbolAccountMetaDataKey,
+      symbolSellerAccountMetaDataKey,
       symbolSellerPublicAccount.address,
     );
 
@@ -83,13 +84,13 @@ export const RegistrationForm = () => {
     
     if (symbolAccountMetaData === null) {
       //未登録アカウントの場合
-      setDialogTitle('アカウント登録');
-      setDialogMessage('アカウントが未登録です。サービス利用のためパスワードを登録してください');
+      setDialogTitle('販売アカウント登録');
+      setDialogMessage('販売アカウントが未登録です。サービス利用のためパスワードを登録してください');
       setOpenInputDialog(true);
     }else{
       //TODO 登録済みアカウントの場合
       setDialogTitle('パスワード入力');
-      setDialogMessage('サービス利用のためのパスワードを入力してください');
+      setDialogMessage('サービス利用のための販売アカウントのパスワードを入力してください');
       setOpenInputDialog(true);
     }
   };
@@ -121,7 +122,7 @@ export const RegistrationForm = () => {
           return
         }
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
-        const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR);
+        const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
 
         //TODO: aLiceの署名に置き換え
         const signedAggregateTx = symbolSellerAccount.sign(
@@ -159,7 +160,7 @@ export const RegistrationForm = () => {
         }
       }
 
-      localStorage.setItem('momijiSellerPublicKey', momijiSellerAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
+      localStorage.setItem(symbolSellerAccountMetaDataKey, momijiSellerAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
 
       await registrationProduct(momijiSellerAccount, symbolSellerPublicAccount.address);
 

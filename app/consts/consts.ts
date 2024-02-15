@@ -1,8 +1,9 @@
 export const serviceName = 'kojinkanbaibai';
 export const serviceVersion = 1;
-export const secletLockDuration = 480;
+export const secretLockDuration = 480;
 
-export const symbolAccountMetaDataKey = 'momiji_account';
+export const symbolSellerAccountMetaDataKey = 'momiji_seller_account';
+export const symbolUserAccountMetaDataKey = 'momiji_user_account';
 export const momijiAccountMetaDataKey = 'symbol_publickey';
 
 export const initialManju = 500;
