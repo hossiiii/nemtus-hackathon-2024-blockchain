@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Chip, Grid, CircularProgress, Backdrop, Button } from '@mui/material';
+import { Box, Typography, Chip, Grid, CircularProgress, Backdrop, Button, List, ListItem, ListItemText } from '@mui/material';
 import { Address, MosaicId, PublicAccount } from 'symbol-sdk';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import AlertsSnackbar from './AlertsSnackbar';
@@ -33,6 +33,7 @@ export const ProductDetail = () => {
       const func = async () => {
         const mosaicId = new MosaicId(searchParams.get('mosaicId'))
         const productInfo = await fetchProductInfo(mosaicId)
+        console.log(productInfo)
         setProductInfo(productInfo)
         const momijiSellerAddress = Address.createFromRawAddress(productInfo.ownerAddress)
         const productStock = await fetchProductStock(momijiSellerAddress, mosaicId)
@@ -60,36 +61,47 @@ export const ProductDetail = () => {
         </Backdrop>
       ) : (
         <Box sx={{ p: 3 }}>
-        <Grid container spacing={2}>
-          <Grid item>
-            {/* 画像セクションを想定 */}
-          </Grid>
-          <Grid item>
-            <Typography gutterBottom variant="h4" component="div">
-              {productInfo?.productName}
-            </Typography>
-            <Typography variant="subtitle1" gutterBottom>
-              販売者: {productInfo?.sellerName}
-            </Typography>
-            <Typography variant="body1" gutterBottom>
-              {productInfo?.description}
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              価格: {productInfo?.price}xym
-            </Typography>
-            <Typography variant="body2" gutterBottom>
-              在庫: {productStockAmount} / {productStockTotal}
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-              {productInfo?.category.map((category, index) => (
-                <Chip key={index} label={category} variant="outlined" />
-              ))}
-            </Box>
-          </Grid>
-        </Grid>
+          <List>
+            {/* exchangeInfo */}
+            <ListItem>
+              <ListItemText primary="商品名" secondary={productInfo?.productName} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="販売者" secondary={productInfo?.sellerName} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="商品説明" secondary={
+                productInfo?.description.split('\n').map((line, index, array) => (
+                  <React.Fragment key={index}>
+                    {line} {/* 行のテキスト */}
+                    {index !== array.length - 1 && <br />} {/* 最後の行以外には改行を挿入 */}
+                  </React.Fragment>
+                ))
+              } />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="価格" secondary={`${productInfo?.price}xym`} />
+            </ListItem>
+            <ListItem>
+              <ListItemText primary="在庫" secondary={`${productStockAmount} / ${productStockTotal}`} />
+            </ListItem>
+            <ListItem>
+              <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+                {productInfo?.category.map((category, index) => (
+                  <Chip key={index} label={category} variant="outlined" />
+                ))}
+              </Box>
+            </ListItem>
+          </List>
         {momijiSellerPublicKey && PublicAccount.createFromPublicKey(momijiSellerPublicKey,momijiBlockChain.networkType).address.plain() == productInfo.ownerAddress  ? //商品のownerAddressと自分のSellerアカウントが同一であれば戻るボタンを表示させる
         <>
-        <Box mt={2}>
+        <Box
+          mt={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}
+        >
           <Button
             variant="contained"
             color="primary"

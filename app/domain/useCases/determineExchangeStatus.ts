@@ -7,7 +7,7 @@ export const determineExchangeStatus = async (
   expiredAt: number, cosignaturePublicKeys: string[], sellerPublicAccount: PublicAccount, depositAddress: string, momijiAggregateBondedTxHash: number
 ): Promise<ExchangeStatus> => {
   let status : ExchangeStatus;
-  if (expiredAt < Date.now()) {
+  if (expiredAt < Date.now() && cosignaturePublicKeys.length < 2) {
     status = '有効期限切れ';
   }
   else if (cosignaturePublicKeys.length === 0){ //連署者なし

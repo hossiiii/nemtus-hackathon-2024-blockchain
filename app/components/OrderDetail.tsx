@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Backdrop, CircularProgress, Button, Paper, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Backdrop, CircularProgress, Button, Paper, List, ListItem, ListItemText, Stepper, Step, StepLabel } from '@mui/material';
 import { Account, PublicAccount } from 'symbol-sdk';
 import AlertsSnackbar from './AlertsSnackbar';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
@@ -19,10 +19,19 @@ import { set } from 'react-hook-form';
 import { cosignatureTransaction } from '../domain/utils/transactions/cosignatureTransaction';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../domain/utils/fetches/fetchTransactionStatus';
+import { ExchangeStatus } from '../domain/entities/exchangeInfo/exchangeStatus';
 
 type ButtonText = '発送完了報告を行う' | '発送されるのを待っています' | '受け取り確認を待っています' | '受け取り完了報告を行う' | '決済が完了するのを待っています' | '決済が完了しています' | '取引有効期限が切れています' | "確認中";
 
 export const OrderDetail = () => {
+
+  const steps : ExchangeStatus[] = [
+    '注文済み',
+    '配送済み',
+    '受取済み',
+    '決済完了',
+  ];
+
   const searchParams = useSearchParams()
   const router = useRouter();
 
@@ -68,6 +77,7 @@ export const OrderDetail = () => {
 
   const handlePasswordInput = async (inputPassword: string | null) => {
     setOpenInputDialog(false); // ダイアログを閉じる
+    setProgress(true);
     
     if (inputPassword) {
       try {
@@ -113,12 +123,14 @@ export const OrderDetail = () => {
           default:
             break;
         }
+        setProgress(false);
 
       } catch (error) {
         setSnackbarSeverity('error');
         setSnackbarMessage('パスワードが間違っています');
         setOpenSnackbar(true);
         setProgress(false);
+        router.push('/order');
         return
       }
 
@@ -127,6 +139,7 @@ export const OrderDetail = () => {
       setSnackbarMessage('パスワードが入力されていません');
       setOpenSnackbar(true);
       setProgress(false);
+      router.push('/order');
       return
     }
   };
@@ -199,7 +212,7 @@ export const OrderDetail = () => {
           const data = await response.json();
           if (data.data.code == 'Success') {
             setSnackbarSeverity('success');
-            setSnackbarMessage('管理者にてロックの解除が完了しました');
+            setSnackbarMessage('受け取りと決済が完了しました');
             setOpenSnackbar(true);
             setButtonText('決済が完了しています');
           }else{
@@ -249,96 +262,137 @@ export const OrderDetail = () => {
         dialogMessage={dialogMessage}
       />
             
-      {progress ? (
+      {progress ? 
         <Backdrop open={progress}>
           <CircularProgress color='inherit' />
         </Backdrop>
-      ) : exchangeInfo && ( // exchangeInfoがnullでない場合にのみ表示
-        <Box component="section" sx={{ p: 2 }}>
-          <List>
-            {/* exchangeInfo */}
-            <ListItem>
-              <ListItemText primary="注文ID" secondary={exchangeTxHash} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="注文日時" secondary={exchangeInfo.createTimestamp} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="取引期限" secondary={Utils.formatDateToYmdHms(new Date(exchangeInfo.expiredAt))} />
-            </ListItem>
-            <ListItem>
-              <ListItemText primary="取引状況" secondary={exchangeInfo.status} />
-            </ListItem>
-            {/* productInfo */}
-            <ListItem>
-              <ListItemText primary="商品名" secondary={exchangeInfo.productInfo.productName} />
-            </ListItem>
-            {/* orderInfo */}
-            {exchangeInfo.orderInfo && ( // orderInfoが存在する場合のみ表示
-              <>
-                <ListItem>
-                  <ListItemText primary="注文数" secondary={exchangeInfo.orderInfo.amount} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="購入金額" secondary={`${exchangeInfo.orderInfo.amount * exchangeInfo.productInfo.price} xym`} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="購入者" secondary={exchangeInfo.orderInfo.name} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="購入者電話番号" secondary={exchangeInfo.orderInfo.tel} />
-                </ListItem>
-                <ListItem>
-                  <ListItemText primary="購入者住所" secondary={exchangeInfo.orderInfo.address} />
-                </ListItem>
-              </>
-            )}
-          </List>
-          {/* 注文状況とuseTypeに応じて確認ボタンの表示やディセーブル */}
-          <Box mt={2}>
-            {(buttonText == "発送完了報告を行う") ? 
-              <Button
-                  variant="contained"
-                  color="error"
-                  onClick={()=>{
-                    setDialogTitle('発送確認');
-                    setDialogMessage('発送完了の記録を行いますか');  
-                    setOpenDialog(true);
-                  }}
-                >
-                  {buttonText}
-              </Button>
-              :(buttonText == "受け取り完了報告を行う")?
-              <Button
-                  variant="contained"
-                  color="error"
-                  onClick={()=>{
-                    setDialogTitle('受け取り確認');
-                    setDialogMessage('商品受け取りの記録を行いますか');  
-                    setOpenDialog(true);
-                  }}
-                >
-                  {buttonText}
-              </Button>
-              :
-              <></>
-            } 
-          </Box>
-          
-        </Box>
-      )}
-      <Box mt={2}>
-        <Button
-          variant="contained"
-          color="primary"
-          onClick={() => {
-            router.push('/order')
+      :(exchangeInfo)?
+        <>
+          <Box sx={{ p: 2 }}>
+            <Stepper activeStep={steps.indexOf(exchangeInfo.status)} alternativeLabel>
+              {steps.map((label) => (
+                <Step key={label}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            {
+              (exchangeInfo.status == '有効期限切れ')?
+              <Paper
+                sx={{
+                  p: 2,
+                  mt: 2,
+                  backgroundColor: 'error.main',
+                  color: 'white',
+                }}
+              >
+                <Box>
+                  <Box>
+                    <Box sx={{ fontWeight: 'bold' }}>取引有効期限が切れています</Box>
+                    <Box>この取引は有効期限が切れています</Box>
+                  </Box>
+                </Box>
+              </Paper>
+              :<></>
+            }
+            <List>
+              {/* exchangeInfo */}
+              <ListItem>
+                <ListItemText primary="注文ID" secondary={exchangeTxHash} />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="注文日時" secondary={exchangeInfo.createTimestamp} />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="取引期限" secondary={Utils.formatDateToYmdHms(new Date(exchangeInfo.expiredAt))} />
+              </ListItem>
+              <ListItem>
+                <ListItemText primary="取引状況" secondary={exchangeInfo.status} />
+              </ListItem>
+              {/* productInfo */}
+              <ListItem>
+                <ListItemText primary="商品名" secondary={exchangeInfo.productInfo.productName} />
+              </ListItem>
+              {/* orderInfo */}
+              {exchangeInfo.orderInfo && ( // orderInfoが存在する場合のみ表示
+                <>
+                  <ListItem>
+                    <ListItemText primary="注文数" secondary={exchangeInfo.orderInfo.amount} />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="購入金額" secondary={`${exchangeInfo.orderInfo.amount * exchangeInfo.productInfo.price} xym`} />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="購入者" secondary={exchangeInfo.orderInfo.name} />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="購入者電話番号" secondary={exchangeInfo.orderInfo.tel} />
+                  </ListItem>
+                  <ListItem>
+                    <ListItemText primary="購入者住所" secondary={exchangeInfo.orderInfo.address} />
+                  </ListItem>
+                </>
+              )}
+            </List>
+            {/* 注文状況とuseTypeに応じて確認ボタンの表示やディセーブル */}
+            <Box
+              mt={2}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+              }}
+            >
+              {(buttonText == "発送完了報告を行う") ? 
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={()=>{
+                      setDialogTitle('発送確認');
+                      setDialogMessage('発送完了の記録を行いますか');  
+                      setOpenDialog(true);
+                    }}
+                  >
+                    {buttonText}
+                </Button>
+                :(buttonText == "受け取り完了報告を行う")?
+                <Button
+                    variant="contained"
+                    color="error"
+                    onClick={()=>{
+                      setDialogTitle('受け取り確認');
+                      setDialogMessage('商品受け取りの記録を行いますか');  
+                      setOpenDialog(true);
+                    }}
+                  >
+                    {buttonText}
+                </Button>
+                :
+                <></>
+              } 
+            </Box>          
+          </Box>        
+        </>
+        :
+        <>
+        </>
+      }
+        <Box
+          mt={2}
+          sx={{
+            display: 'flex',
+            justifyContent: 'center',
           }}
         >
-          注文一覧に戻る
-        </Button>   
-      </Box>
-    </>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={() => {
+              router.push('/order')
+            }}
+          >
+            注文一覧に戻る
+          </Button>   
+        </Box>        
+      </>
   );
-
 };
