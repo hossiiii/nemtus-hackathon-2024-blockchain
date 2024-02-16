@@ -298,7 +298,10 @@ export const OrderDetail = () => {
             <List>
               {/* exchangeInfo */}
               <ListItem>
-                <ListItemText primary="注文ID" secondary={exchangeTxHash} />
+                <ListItemText primary="注文ID" secondary={
+                  <span style={{ wordBreak: 'break-all' }}>{exchangeTxHash}</span>
+                  }
+                />
               </ListItem>
               <ListItem>
                 <ListItemText primary="注文日時" secondary={exchangeInfo.createTimestamp} />

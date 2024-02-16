@@ -325,7 +325,7 @@ export const PurchaseForm = () => {
           <CircularProgress color='inherit' />
         </Backdrop>
       ) : (
-      <Box component="section" sx={{ p: 2 }}>
+      <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ mb: 2 }}>
             <TextField
@@ -417,10 +417,18 @@ export const PurchaseForm = () => {
               helperText={errors.notes?.message}
               {...register("notes")}
             />
-          </Box>          
-          <Button type="submit" variant="contained" color="primary">
-            注文情報の確認
-          </Button>
+          </Box>
+          <Box
+            mt={2}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button type="submit" variant="contained" color="primary">
+              注文情報の確認
+            </Button>
+          </Box>
         </form>
       </Box>
       )}

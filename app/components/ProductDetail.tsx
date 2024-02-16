@@ -115,15 +115,21 @@ export const ProductDetail = () => {
         </>
         :
         <>
-        <Box mt={2}>
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => router.push(`/purchase?mosaicId=${searchParams.get('mosaicId')}`)}
+          <Box
+            mt={2}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
           >
-            商品購入へ進む
-          </Button>
-        </Box>        
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => router.push(`/purchase?mosaicId=${searchParams.get('mosaicId')}`)}
+            >
+              商品購入へ進む
+            </Button>
+          </Box>        
         </>
         }
       </Box>

@@ -23,6 +23,7 @@ export const determineExchangeStatus = async (
     const receiptInfo = await fetchReceiptInfo(symbolBlockChain,symbolSellerAddress, momijiAggregateBondedTxHash);
     if(receiptInfo.length > 0){
       status = '決済完了';
+      console.log(receiptInfo);
     }else {
       status = '受取済み';
     }

@@ -7,7 +7,7 @@ const RegistrationPage = () => {
   return (
     <>
       <FlameComponent>
-        <Typography variant='h5'>商品登録</Typography>
+        <Typography variant='h6'>商品登録</Typography>
         <RegistrationForm/>
       </FlameComponent>
     </>

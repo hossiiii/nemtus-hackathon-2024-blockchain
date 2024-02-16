@@ -2,14 +2,21 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Card, CardContent, Typography, Grid, Backdrop, CircularProgress, Chip } from '@mui/material';
+import {
+  Backdrop,
+  Box,
+  CircularProgress,
+  Typography,
+} from "@mui/material";
 import { PublicAccount } from 'symbol-sdk';
 import AlertsSnackbar from './AlertsSnackbar';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { useRouter } from 'next/navigation';
 import { fetchExchangeHistoryInfo } from '../domain/useCases/fetches/fetchExchangeHistoryInfo';
-import { ExchangeHistoryInfo } from '../domain/entities/exchangeHistoryInfo/exchangeHistoryInfo';
+import { ExchangeHistoryInfo, ExchangeHistoryInfoFlat } from '../domain/entities/exchangeHistoryInfo/exchangeHistoryInfo';
 import { symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from '../consts/consts';
+import OrderTable from './OrderTable';
+import { Utils } from '../domain/utils/utils';
 
 export const OrderHistory = () => {
   const router = useRouter();
@@ -21,6 +28,9 @@ export const OrderHistory = () => {
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
   const [sellerExchangeHistoryInfo, setSellerExchangeHistoryInfo] = useState<ExchangeHistoryInfo[] | null>(null)
   const [userExchangeHistoryInfo, setUserExchangeHistoryInfo] = useState<ExchangeHistoryInfo[] | null>(null)
+
+  const [sellerExchangeHistoryInfoFlat, setSellerExchangeHistoryInfoFlat] = useState<ExchangeHistoryInfoFlat[] | null>(null)
+  const [userExchangeHistoryInfoFlat, setUserExchangeHistoryInfoFlat] = useState<ExchangeHistoryInfoFlat[] | null>(null)
 
   useEffect(() => {
     if (momijiBlockChain) {
@@ -38,11 +48,41 @@ export const OrderHistory = () => {
           const momijiSellerPublicAccount = PublicAccount.createFromPublicKey(momijiSellerPublicKey,momijiBlockChain.networkType);
           const sellerExchangeHistoryInfo = await fetchExchangeHistoryInfo(momijiBlockChain, momijiSellerPublicAccount.address);
           setSellerExchangeHistoryInfo(sellerExchangeHistoryInfo)
+          setSellerExchangeHistoryInfoFlat(
+            sellerExchangeHistoryInfo.map((info) => {
+              return {
+                status: info.status,
+                exchangeTxHash: info.exchangeTxHash,
+                orderTxHash: info.exchangeOverview.orderTxHash,
+                productName: info.exchangeOverview.productName,
+                amount: info.exchangeOverview.amount,
+                price: info.exchangeOverview.price,
+                depositAddress: info.exchangeOverview.depositAddress,
+                createTimestamp: info.exchangeOverview.createTimestamp,
+                expiredAt: Utils.formatDateToYmdHms(new Date(info.expiredAt))
+              }
+            })
+          )
         }
         if (momijiUserPublicKey) {
           const momijiUserPublicAccount = PublicAccount.createFromPublicKey(momijiUserPublicKey,momijiBlockChain.networkType);
           const userExchangeHistoryInfo = await fetchExchangeHistoryInfo(momijiBlockChain, momijiUserPublicAccount.address);
           setUserExchangeHistoryInfo(userExchangeHistoryInfo)
+          setUserExchangeHistoryInfoFlat(
+            userExchangeHistoryInfo.map((info) => {
+              return {
+                status: info.status,
+                exchangeTxHash: info.exchangeTxHash,
+                orderTxHash: info.exchangeOverview.orderTxHash,
+                productName: info.exchangeOverview.productName,
+                amount: info.exchangeOverview.amount,
+                price: info.exchangeOverview.price,
+                depositAddress: info.exchangeOverview.depositAddress,
+                createTimestamp: info.exchangeOverview.createTimestamp,
+                expiredAt: Utils.formatDateToYmdHms(new Date(info.expiredAt))
+              }
+            })
+          )
         }
         setProgress(false)
       };
@@ -69,32 +109,12 @@ export const OrderHistory = () => {
           {
             sellerExchangeHistoryInfo ? 
             <>
-              <Typography variant="h5" sx={{ mb: 2 }}>販売者の取引履歴</Typography>
-              <Grid container spacing={4}>
-                {sellerExchangeHistoryInfo?.map((info, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card onClick={() => router.push(`/order/detail?userType=seller&exchangeTxHash=${info.exchangeTxHash}`)} style={{ cursor: 'pointer' }}> {/* 販売者のフラグをつけて遷移 */}
-                      <CardContent>
-                        <Typography color="textSecondary" gutterBottom>
-                          取引ステータス: {info.status}
-                        </Typography>
-                        <Typography variant="h5" component="h2">
-                          商品名: {info.exchangeOverview.productName}
-                        </Typography>
-                        <Typography color="textSecondary">
-                          取引量: {info.exchangeOverview.amount}
-                        </Typography>
-                        <Typography component="p">
-                          取引価格: {info.exchangeOverview.price*info.exchangeOverview.amount}xym
-                        </Typography>
-                        <Typography component="p">
-                          作成日時: {info.exchangeOverview.createTimestamp}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>            
+              <Typography variant="body1" sx={{ mb: 2 }}>販売者の取引履歴</Typography>
+              <OrderTable
+                exchangeHistoryInfoFlat={sellerExchangeHistoryInfoFlat}
+                headerColorCode='#3874CB'
+                userType='seller'
+              />
             </>
             :
             <></>          
@@ -102,32 +122,12 @@ export const OrderHistory = () => {
           {
             userExchangeHistoryInfo ? 
             <>
-              <Typography variant="h5" sx={{ mb: 2, mt: 4 }}>ユーザーの取引履歴</Typography>
-              <Grid container spacing={4}>
-                {userExchangeHistoryInfo?.map((info, index) => (
-                  <Grid item xs={12} sm={6} md={4} key={index}>
-                    <Card onClick={() => router.push(`/order/detail?userType=user&exchangeTxHash=${info.exchangeTxHash}`)} style={{ cursor: 'pointer' }}> {/* 購入者のフラグをつけて遷移 */}
-                      <CardContent>
-                        <Typography color="textSecondary" gutterBottom>
-                          取引ステータス: {info.status}
-                        </Typography>
-                        <Typography variant="h5" component="h2">
-                          商品名: {info.exchangeOverview.productName}
-                        </Typography>
-                        <Typography color="textSecondary">
-                          取引量: {info.exchangeOverview.amount}
-                        </Typography>
-                        <Typography component="p">
-                          取引価格: {info.exchangeOverview.price*info.exchangeOverview.amount}xym
-                        </Typography>
-                        <Typography component="p">
-                          作成日時: {info.exchangeOverview.createTimestamp}
-                        </Typography>
-                      </CardContent>
-                    </Card>
-                  </Grid>
-                ))}
-              </Grid>            
+              <Typography variant="body1" sx={{ mb: 2, mt: 4 }}>ユーザーの取引履歴</Typography>
+              <OrderTable
+                exchangeHistoryInfoFlat={userExchangeHistoryInfoFlat}
+                headerColorCode='#E25C39'
+                userType='user'
+              />     
             </>
             :
             <></>          

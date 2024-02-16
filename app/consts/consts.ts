@@ -1,6 +1,7 @@
 export const serviceName = 'kojinkanbaibai';
 export const serviceVersion = 1;
-export const secretLockDuration = 480;
+export const secretLockDuration = 480; // block(per 15s) 
+export const hashLockHour = 2; // 時間
 
 export const symbolSellerAccountMetaDataKey = 'momiji_seller_account';
 export const symbolUserAccountMetaDataKey = 'momiji_user_account';

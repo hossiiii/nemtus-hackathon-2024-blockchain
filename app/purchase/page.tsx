@@ -7,7 +7,7 @@ const PurchasePage = () => {
   return (
     <>
       <FlameComponent>
-        <Typography variant='h5'>注文情報の入力</Typography>
+        <Typography variant='h6'>注文情報の入力</Typography>
         <PurchaseForm/>
       </FlameComponent>
     </>

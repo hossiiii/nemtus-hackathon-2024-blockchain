@@ -238,7 +238,7 @@ export const RegistrationForm = () => {
           <CircularProgress color='inherit' />
         </Backdrop>
       ) : (
-      <Box component="section" sx={{ p: 2 }}>
+      <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ mb: 2 }}>
             <TextField
@@ -356,10 +356,18 @@ export const RegistrationForm = () => {
                 }
               })}
             />
+          </Box>
+          <Box
+            mt={2}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button type="submit" variant="contained" color="primary">
+              登録する
+            </Button>
           </Box>          
-          <Button type="submit" variant="contained" color="primary">
-            送信
-          </Button>
         </form>
       </Box>
       )}

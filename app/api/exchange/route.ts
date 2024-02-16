@@ -6,6 +6,7 @@ import { setupBlockChain } from '../../domain/utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../../domain/utils/fetches/fetchTransactionStatus';
 import { exchangeTransaction } from '../../domain/useCases/transactions/exchangeTransaction';
+import { hashLockHour } from '../../consts/consts';
 
 export const POST = async (req: Request, res: NextResponse<string | null>) => {
   try {
@@ -28,7 +29,7 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
 
     //ハッシュロックトランザクションの作成
     const momijiHashLockTx = HashLockTransaction.create(
-      Deadline.create(momijiBlockChain.epochAdjustment),
+      Deadline.create(momijiBlockChain.epochAdjustment,hashLockHour),
       new Mosaic(new MosaicId(momijiBlockChain.currencyMosaicId), UInt64.fromUint(10000000)),
       UInt64.fromUint(480),
       momijiSignedAggregateBondedTx,

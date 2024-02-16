@@ -7,7 +7,7 @@ const ProductDetailPage = () => {
   return (
     <>
       <FlameComponent>
-        <Typography variant='h5'>商品詳細</Typography>
+        <Typography variant='h6'>商品詳細</Typography>
         <ProductDetail/>
       </FlameComponent>
     </>

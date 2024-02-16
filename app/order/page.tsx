@@ -7,7 +7,7 @@ const OrderHistoryPage = () => {
   return (
     <>
       <FlameComponent>
-        <Typography variant='h5'>注文履歴</Typography>
+        <Typography variant='h6'>注文履歴</Typography>
         <OrderHistory/>
       </FlameComponent>
     </>
