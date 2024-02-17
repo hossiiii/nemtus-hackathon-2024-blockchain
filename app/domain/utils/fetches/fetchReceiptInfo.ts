@@ -9,7 +9,7 @@ export const fetchReceiptInfo = async (
   const receipts = await firstValueFrom(
     blockChain.receiptRepo.searchReceipts({
       targetAddress: address,
-      fromHeight: height,
+      height: height,
       receiptTypes: [ReceiptType.LockSecret_Completed],  
     }),
   ) as any;

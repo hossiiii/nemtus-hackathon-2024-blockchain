@@ -47,11 +47,11 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
       momijiAdminAccount.address,
     );
 
-    await new Promise(resolve => setTimeout(resolve, 5000)); // 全ノードに伝播するまで5秒待機
+    await new Promise(resolve => setTimeout(resolve, 1000)); // 全ノードに伝播するまで1秒待機(momijiは２台だけなので)
 
     await firstValueFrom(momijiBlockChain.txRepo.announceAggregateBonded(momijiSignedAggregateBondedTx));
 
-    const result: TransactionStatus = await fetchTransactionStatus(
+    const result: TransactionStatus = await fetchTransactionStatus( //ここはパーシャルの検知なのでfetchTransactionStatusが必要
       momijiBlockChain,
       momijiSignedAggregateBondedTxHash,
       momijiAdminAccount.address,

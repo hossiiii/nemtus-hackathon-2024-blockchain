@@ -1,10 +1,10 @@
-import { Address, PublicAccount } from "symbol-sdk";
+import { Address, BalanceChangeReceipt, PublicAccount, TransactionStatement } from "symbol-sdk";
 import { fetchReceiptInfo } from "../utils/fetches/fetchReceiptInfo";
 import { setupBlockChain } from "../utils/setupBlockChain";
 import { ExchangeStatus } from "../entities/exchangeInfo/exchangeStatus";
 
 export const determineExchangeStatus = async (
-  expiredAt: number, cosignaturePublicKeys: string[], sellerPublicAccount: PublicAccount, depositAddress: string, momijiAggregateBondedTxHash: number
+  expiredAt: number, cosignaturePublicKeys: string[], sellerPublicAccount: PublicAccount, depositAddress: string, proofTxHeight: string | null, totalPrice: number
 ): Promise<ExchangeStatus> => {
   let status : ExchangeStatus;
   if (expiredAt < Date.now() && cosignaturePublicKeys.length < 2) {
@@ -17,14 +17,24 @@ export const determineExchangeStatus = async (
     status = '配送済み';
   }
   else if (cosignaturePublicKeys.length === 2){ //userとsellerの連署
-    //　ここでレシートの検証を行い、受取済みかどうかを判断する
-    const symbolBlockChain = await setupBlockChain('symbol');
-    const symbolSellerAddress = Address.createFromRawAddress(depositAddress);
-    const receiptInfo = await fetchReceiptInfo(symbolBlockChain,symbolSellerAddress, momijiAggregateBondedTxHash);
-    if(receiptInfo.length > 0){
-      status = '決済完了';
-      console.log(receiptInfo);
-    }else {
+    if(proofTxHeight){ //proofTxHeightがある場合
+      //レシートの検証
+      const symbolBlockChain = await setupBlockChain('symbol');
+      const symbolSellerAddress = Address.createFromRawAddress(depositAddress);
+      const receiptInfoList = await fetchReceiptInfo(symbolBlockChain,symbolSellerAddress, Number(proofTxHeight));
+      const receiptInfo: TransactionStatement = receiptInfoList[0];
+      const balanceChangeReceipt = receiptInfo.receipts[0] as BalanceChangeReceipt;
+
+      //宛先及び金額のチェック
+      if(balanceChangeReceipt.targetAddress.equals(symbolSellerAddress) //宛先が正しい
+        && balanceChangeReceipt.amount.compact() === totalPrice*1000000 // 数量が正しい
+        && balanceChangeReceipt.mosaicId.toHex() === symbolBlockChain.currencyMosaicId) // モザイクIDが正しい
+      {
+        status = '決済完了'; //正しいレシートがある
+      }else{
+        status = 'エラー'; //レシートの内容が正しくない
+      }
+    }else{
       status = '受取済み';
     }
   }else {

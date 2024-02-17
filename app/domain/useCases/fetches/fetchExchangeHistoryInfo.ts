@@ -4,6 +4,7 @@ import { ExchangeHistoryInfo } from '../../entities/exchangeHistoryInfo/exchange
 import { ZoneOffset } from '@js-joda/core';
 import { determineExchangeStatus } from '../determineExchangeStatus';
 import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
 
 export const fetchExchangeHistoryInfo = async (
   momijiBlockChain: any,
@@ -25,13 +26,12 @@ export const fetchExchangeHistoryInfo = async (
     for (const tx of (resultSearch as any).data) {
       let exchangeHistoryInfo: ExchangeHistoryInfo;
       let exchangeOverview: ExchangeOverview;
-      const momijiAggregateBondedTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(tx.transactionInfo.hash, transactionGroup as TransactionGroup)) as AggregateTransaction;
+
+      const exchangeTxHash = tx.transactionInfo.hash;
+      const momijiAggregateBondedTxInfo = await firstValueFrom(momijiBlockChain.txRepo.getTransaction(exchangeTxHash, transactionGroup as TransactionGroup)) as AggregateTransaction;
       const sellerToUserTx = momijiAggregateBondedTxInfo.innerTransactions[0] as TransferTransaction;
       const userToSellerTx = momijiAggregateBondedTxInfo.innerTransactions[1] as TransferTransaction;
       const adminToAdminTx = momijiAggregateBondedTxInfo.innerTransactions[2] as TransferTransaction;
-
-      // ブロック高の取得
-      const momijiAggregateBondedTxHeight = momijiAggregateBondedTxInfo.transactionInfo.height.compact();
       
       // publicAccountの取得
       const sellerPublicAccount = sellerToUserTx.signer;
@@ -45,7 +45,10 @@ export const fetchExchangeHistoryInfo = async (
       const deadline = momijiAggregateBondedTxInfo.deadline;
       const offset = ZoneOffset.of('+9'); // あなたの時間帯に合わせて調整してください
       const expiredAt = deadline.toLocalDateTime(momijiBlockChain.epochAdjustment).toEpochSecond(offset)*1000;
-    
+
+      // 管理者のメタデータからproof記録時のheightを取得
+      const proofTxHeight = await fetchAccountMetaData(momijiBlockChain, exchangeTxHash, adminPublicAccount.address);
+
       try {
         // exchangeOverviewの取得
         exchangeOverview = JSON.parse(adminToAdminTx.message.payload);
@@ -54,7 +57,7 @@ export const fetchExchangeHistoryInfo = async (
         }
 
         // 取引状態の確認
-        const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount, exchangeOverview.depositAddress, momijiAggregateBondedTxHeight)
+        const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount, exchangeOverview.depositAddress, proofTxHeight, exchangeOverview.price*exchangeOverview.amount)
 
         exchangeHistoryInfo = {
           status: status,

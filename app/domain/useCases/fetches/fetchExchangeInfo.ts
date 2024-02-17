@@ -8,6 +8,7 @@ import { ZoneOffset } from '@js-joda/core';
 import { determineExchangeStatus } from '../determineExchangeStatus';
 import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
 import { UserType } from '../../entities/userType/userType';
+import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
 
 export const fetchExchangeInfo = async (
   momijiBlockChain: any,
@@ -43,9 +44,6 @@ export const fetchExchangeInfo = async (
   } else {
     throw new Error('Failed to determine user type');
   }
-
-  // ブロック高の取得
-  const momijiAggregateBondedTxHeight = momijiAggregateBondedTxInfo.transactionInfo.height.compact();
 
   // publicAccountの取得
   const sellerPublicAccount = sellerToUserTx.signer;
@@ -91,8 +89,11 @@ export const fetchExchangeInfo = async (
     paymentInfo = await parsePaymentTx(momijiAggregateTxInfo, account, (type==='user') ? adminPublicAccount : userPublicAccount);
   }
 
+  // 管理者のメタデータからproof記録時のheightを取得
+  const proofTxHeight = await fetchAccountMetaData(momijiBlockChain, exchangeTxHash, adminPublicAccount.address);
+  
   // 取引状態の確認
-  const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount,exchangeOverview.depositAddress,momijiAggregateBondedTxHeight)
+  const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount,exchangeOverview.depositAddress,proofTxHeight,exchangeOverview.price*exchangeOverview.amount)
 
   // ExchangeInfoの生成
   const exchangeInfo: ExchangeInfo = {
