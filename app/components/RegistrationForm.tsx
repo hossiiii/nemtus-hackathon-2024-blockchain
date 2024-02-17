@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
-import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress } from '@mui/material';
+import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete } from '@mui/material';
 import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
@@ -283,34 +283,34 @@ export const RegistrationForm = () => {
               {...register("description", { required: "商品の説明を入力してください" })}
             />
           </Box>
+
           <Box sx={{ mb: 2 }}>
             <FormControl fullWidth error={!!errors.category}>
-              <InputLabel id="category-label">カテゴリ</InputLabel>
               <Controller
                 name="category"
                 control={control}
                 rules={{ required: "カテゴリを選択してください" }}
                 render={({ field }) => (
-                  <Select
-                    {...field}
-                    labelId="category-label"
+                  <Autocomplete
                     multiple
-                    input={<OutlinedInput label="カテゴリ" />}
+                    options={categories} // 利用可能なカテゴリの配列
+                    getOptionLabel={(option) => option}
                     value={field.value || []} // field.value が undefined の場合は空の配列を使用
-                    renderValue={(selected) => Array.isArray(selected) ? selected.join(', ') : ''}
-                  >
-                    {categories.map((category) => (
-                      <MenuItem key={category} value={category}>
-                        {category}
-                      </MenuItem>
-                    ))}
-                  </Select>
+                    onChange={(event, newValue) => field.onChange(newValue)}
+                    renderInput={(params) => (
+                      <TextField
+                        {...params}
+                        variant="outlined"
+                        label="カテゴリ"
+                        error={!!errors.category}
+                      />
+                    )}
+                  />
                 )}
               />
               {errors.category && <Typography color="error" variant="caption">{errors.category.message}</Typography>}
             </FormControl>
           </Box>
-
 
           <Box sx={{ mb: 2 }}>
             <TextField
