@@ -1,4 +1,4 @@
-import { AccountInfo, Address, KeyGenerator, MetadataType } from 'symbol-sdk';
+import { AccountInfo, Address, KeyGenerator, MetadataType, MosaicInfo, Page } from 'symbol-sdk';
 import { ProductInfo } from '../../entities/productInfo/productInfo';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
@@ -9,13 +9,15 @@ export const fetchSellerProductInfo = async (
   const momijiBlockChain = await setupBlockChain('momiji');
   const key = 'productInfo';
 
-  const accountInfo: AccountInfo = await firstValueFrom(
-    momijiBlockChain.accountRepo.getAccountInfo(address),
-  );
-  
+  const mosaics :Page<MosaicInfo> = await firstValueFrom(
+    momijiBlockChain.mosaicRepo.search({
+      ownerAddress: address,
+    }),
+  ) as any;
+
   let productInfoList: ProductInfo[] = [];
 
-  for (const mosaic of accountInfo.mosaics) {
+  for (const mosaic of mosaics.data) {
     const mosaicId = mosaic.id;
     const uint64keyToHex = KeyGenerator.generateUInt64Key(key).toHex();
     const res = await firstValueFrom(
