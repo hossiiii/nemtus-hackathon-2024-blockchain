@@ -1,4 +1,4 @@
-import { AccountInfo, Address, MosaicId, MosaicInfo } from 'symbol-sdk';
+import { AccountInfo, Address, MosaicId, MosaicInfo, Order, TransactionGroup, TransferTransaction } from 'symbol-sdk';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 
@@ -16,13 +16,24 @@ export const fetchProductStock = async (
   const accountInfo: AccountInfo = await firstValueFrom(
     momijiBlockChain.accountRepo.getAccountInfo(address),
   );
+  let amount = accountInfo.mosaics.find((mosaic) => mosaic.id.equals(mosaicId))?.amount.compact() || 0;
 
-  let amount = 0
-  for (const mosaic of accountInfo.mosaics) {
-    if(mosaic.id.toHex() == mosaicId.toHex()){
-      amount = mosaic.amount.compact()
-    }
-  }
+  //　現在注文が入っている部分の取得
+  let amoutPartial = 0;
+  const transactions = await firstValueFrom(momijiBlockChain.txRepo.search({
+    group: TransactionGroup.Partial,
+    transferMosaicId: mosaicId,
+    embedded: true,
+    order:Order.Desc,
+    pageSize:30
+  }));
+  
+  transactions.data.forEach((tx:TransferTransaction) => {
+    amoutPartial = amoutPartial + tx.mosaics[0].amount.compact()
+    console.log(amoutPartial)
+  });
 
-  return {amount,total};
+  amount = amount - amoutPartial;
+
+  return {amount ,total};
 };
