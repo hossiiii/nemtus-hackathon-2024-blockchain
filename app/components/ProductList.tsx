@@ -21,9 +21,7 @@ export const ProductList = () => {
   const [productList, setProductList] = useState<ProductInfo[] | null>(null); //productList
 
   useEffect(() => {
-    console.log('ProductList useEffect')
     if (momijiBlockChain) {
-      console.log('ProductList useEffect momijiBlockChain')
       const momijiSellerPublicKey = localStorage.getItem(symbolSellerAccountMetaDataKey)
       if (!momijiSellerPublicKey) {
         setSnackbarSeverity('error');

@@ -2,8 +2,8 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { useForm, SubmitHandler } from 'react-hook-form';
-import { Box, Button, TextField, Backdrop, CircularProgress } from '@mui/material';
+import { useForm, SubmitHandler, set } from 'react-hook-form';
+import { Box, Button, TextField, Backdrop, CircularProgress, Dialog, DialogTitle, DialogActions, Typography, DialogContentText, DialogContent } from '@mui/material';
 import { initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolUserAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, Crypto, MosaicId, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
@@ -25,6 +25,8 @@ import { OrderInfo } from '../domain/entities/orderInfo/orderInfo';
 import { orderTransaction } from '../domain/useCases/transactions/orderTransaction';
 import { PaymentInfo } from '../domain/entities/paymentInfo/paymentInfo';
 import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
+import AlertsDialog from './AlertsDialog';
+import { fetchAccountBalance } from '../domain/utils/fetches/fetchAccountBalance';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -57,6 +59,7 @@ export const PurchaseForm = () => {
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
 
   const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+  const [openDialog, setOpenDialog] = useState<boolean>(false); //AlertsDialogの設定(個別)
 
   const [symbolUserAccount, setSymbolUserAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolUserPublicAccount, setSymbolUserPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
@@ -85,12 +88,14 @@ export const PurchaseForm = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
-    //注文情報の登録
     setInputData(data);
     console.log(data)
+    setOpenDialog(true);
+  };
 
+  const handleCheckAccount = async () => {
     //TODO；あとでaLiceに置き換え パブリックアカウントの作成
-    const symbolUserAccount = Account.createFromPrivateKey(data.symbolPrivateKey, symbolBlockChain.networkType)
+    const symbolUserAccount = Account.createFromPrivateKey(inputData.symbolPrivateKey, symbolBlockChain.networkType)
     setSymbolUserAccount(symbolUserAccount);
     localStorage.setItem(momijiAccountMetaDataKey, symbolUserAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
 
@@ -104,17 +109,27 @@ export const PurchaseForm = () => {
       symbolUserPublicAccount.address,
     );
 
+    //アカウントの残高チェック
+    const balance = await fetchAccountBalance(symbolBlockChain, symbolUserPublicAccount.address, new MosaicId(symbolBlockChain.currencyMosaicId));
+    if(balance < productInfo.price * inputData.amount){
+      setSnackbarSeverity('error');
+      setSnackbarMessage('残高(xym)が不足しています。現在のアカウントの残高は' + balance + 'xymです');
+      setOpenSnackbar(true);
+      setProgress(false);
+      return
+    }
+
     setSymbolAccountMetaData(symbolAccountMetaData);
     
     if (symbolAccountMetaData === null) {
       //未登録アカウントの場合
       setDialogTitle('購入者アカウント登録');
-      setDialogMessage('購入者アカウントが未登録です。サービス利用のためパスワードを登録してください');
+      setDialogMessage('購入者アカウントが未登録です。購入時のパスワードを登録してください');
       setOpenInputDialog(true);
     }else{
       //TODO 登録済みアカウントの場合
       setDialogTitle('パスワード入力');
-      setDialogMessage('サービス利用のための購入者用パスワードを入力してください');
+      setDialogMessage('購入者用パスワードを入力してください');
       setOpenInputDialog(true);
     }
   };
@@ -321,6 +336,88 @@ export const PurchaseForm = () => {
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
       />      
+      <Dialog
+        open={openDialog}
+        onClose={()=>{
+          setOpenDialog(false) 
+          setProgress(false)
+        }}
+        scroll={"paper"}
+      >
+        <DialogTitle id="scroll-dialog-title">注文情報確認</DialogTitle>
+        <DialogContent dividers={true}>
+          <DialogContentText
+            id="scroll-dialog-description"
+            tabIndex={-1}
+          >
+            <Typography gutterBottom>
+              商品名: {productInfo?.productName}
+            </Typography>
+            <Typography gutterBottom>
+              販売者: {productInfo?.sellerName}
+            </Typography>
+            <Typography gutterBottom>
+              価格: {productInfo?.price} xym
+            </Typography>
+            <Typography gutterBottom>
+              個数: {inputData?.amount}個
+            </Typography>
+            <Typography gutterBottom>
+              お名前: {inputData?.name} 
+            </Typography>
+            <Typography gutterBottom>
+              電話番号: {inputData?.tel}
+            </Typography>
+            <Typography gutterBottom>
+              送り先住所: {inputData?.address}
+            </Typography>
+            <Typography gutterBottom>
+              備考: {inputData?.notes}
+            </Typography>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                alignItems: 'center',
+                m: 2,
+                gap: 1
+              }}            
+            >
+            <Typography gutterBottom>
+              合計金額
+            </Typography>
+            <Typography gutterBottom variant="h5">
+              {productInfo?.price * inputData?.amount} 
+            </Typography>
+            <Typography gutterBottom>
+              xym
+            </Typography>
+            </Box>
+            <Typography gutterBottom variant="caption">
+              *送金に別途手数料がかかります
+            </Typography>
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button
+            variant='contained'
+            onClick={()=>{
+              setOpenDialog(false)
+              handleCheckAccount()
+            }}
+          >
+            注文を確定する
+          </Button>
+          <Button
+            onClick={()=>{
+              setOpenDialog(false) 
+              setProgress(false)
+            }}
+          >
+            キャンセルする
+          </Button>
+        </DialogActions>
+      </Dialog>
       {progress ? (
         <Backdrop open={progress}>
           <CircularProgress color='inherit' />
@@ -384,7 +481,7 @@ export const PurchaseForm = () => {
           </Box>
           <Box sx={{ mb: 2 }}>
             <TextField
-              label={`個数（残り）${productStockAmount}個`}
+              label={`個数（残り）${productStockAmount ?? ""}個`}
               variant="outlined"
               fullWidth
               type="number"

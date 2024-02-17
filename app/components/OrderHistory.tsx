@@ -56,7 +56,7 @@ export const OrderHistory = () => {
                 orderTxHash: info.exchangeOverview.orderTxHash,
                 productName: info.exchangeOverview.productName,
                 amount: info.exchangeOverview.amount,
-                price: info.exchangeOverview.price,
+                price: info.exchangeOverview.price * info.exchangeOverview.amount,
                 depositAddress: info.exchangeOverview.depositAddress,
                 createTimestamp: info.exchangeOverview.createTimestamp,
                 expiredAt: Utils.formatDateToYmdHms(new Date(info.expiredAt))
@@ -76,7 +76,7 @@ export const OrderHistory = () => {
                 orderTxHash: info.exchangeOverview.orderTxHash,
                 productName: info.exchangeOverview.productName,
                 amount: info.exchangeOverview.amount,
-                price: info.exchangeOverview.price,
+                price: info.exchangeOverview.price * info.exchangeOverview.amount,
                 depositAddress: info.exchangeOverview.depositAddress,
                 createTimestamp: info.exchangeOverview.createTimestamp,
                 expiredAt: Utils.formatDateToYmdHms(new Date(info.expiredAt))
