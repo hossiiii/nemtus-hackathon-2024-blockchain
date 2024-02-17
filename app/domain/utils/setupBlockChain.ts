@@ -27,12 +27,14 @@ interface BlockChainSetup {
   explorerUrl: string;
 }
 export const setupBlockChain = async (blockChainType: BlockChainType): Promise<BlockChainSetup> => {
+  console.log('blockChainType:', blockChainType);
   const node = await connectNode(blockChainType == 'symbol' ? symbolNodeList : momijiNodeList);
   if (node === '') return undefined;
   const repo = new RepositoryFactoryHttp(node, {
     websocketUrl: node.replace('http', 'ws') + '/ws',
     websocketInjected: WebSocket,
   });
+  console.log('repo:', repo);
   const txRepo = repo.createTransactionRepository();
   const tsRepo = repo.createTransactionStatusRepository();
   const accountRepo = repo.createAccountRepository();
@@ -47,7 +49,9 @@ export const setupBlockChain = async (blockChainType: BlockChainType): Promise<B
   const currencyMosaicId =
     blockChainType == 'symbol' ? symbolCurrencyMosaicId : momijiCurrencyMosaicId;
   const explorerUrl = blockChainType == 'symbol' ? symbolExplorer : momijiExplorer;
-
+  console.log('networkType:', networkType);
+  console.log('generationHash:', generationHash);
+  console.log('epochAdjustment:', epochAdjustment);
   return {
     txRepo,
     tsRepo,
