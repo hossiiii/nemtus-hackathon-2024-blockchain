@@ -24,6 +24,7 @@ import { secretLockTransaction } from '../domain/utils/transactions/secretLockTr
 import { OrderInfo } from '../domain/entities/orderInfo/orderInfo';
 import { orderTransaction } from '../domain/useCases/transactions/orderTransaction';
 import { PaymentInfo } from '../domain/entities/paymentInfo/paymentInfo';
+import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -164,7 +165,7 @@ export const PurchaseForm = () => {
 
         const hash = signedAggregateTx.hash;
         await firstValueFrom(symbolBlockChain.txRepo.announce(signedAggregateTx));
-        const result = await fetchTransactionStatus(
+        const result = await fetchUnconfirmedTransactionStatus(
           symbolBlockChain,
           hash,
           symbolUserPublicAccount.address,
@@ -195,7 +196,7 @@ export const PurchaseForm = () => {
         const signedSecretTx = symbolUserAccount.sign(secretTx,symbolBlockChain.generationHash);
         const hash = signedSecretTx.hash;
         await firstValueFrom(symbolBlockChain.txRepo.announce(signedSecretTx));
-        const result = await fetchTransactionStatus(
+        const result = await fetchUnconfirmedTransactionStatus(
           symbolBlockChain,
           hash,
           symbolUserPublicAccount.address,
@@ -255,7 +256,7 @@ export const PurchaseForm = () => {
     const orderSignedTxHash = orderSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(orderSignedTx));
   
-    const res = await fetchTransactionStatus(
+    const res = await fetchTransactionStatus( //ここはサーバー側でorderTxHashから情報をフェッチするのでUnconfirmedTransactionStatusではだめ
       momijiBlockChain,
       orderSignedTxHash,
       momijiUserAccount.address,

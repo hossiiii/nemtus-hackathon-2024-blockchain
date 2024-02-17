@@ -46,9 +46,10 @@ export const OrderDetail = () => {
   const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
   const [openDialog, setOpenDialog] = useState<boolean>(false); //AlertsDialogの設定(個別)
 
-  const [buttonText, setButtonText] = useState<ButtonText>("確認中"); //確認ボタンのテキスト
+  const [text, setText] = useState<ButtonText>("確認中"); //確認ボタンのテキスト
 
   const [userType, setUserType] = useState<UserType>('user')
+  const [exchangeStatus, setExchangeStatus] = useState<ExchangeStatus>('注文済み') //取引のステータス
   const [exchangeTxHash, setExchangeTxHash] = useState<string | null>(null) //取引のハッシュ
   const [momijiAccount, setMomijiAccount] = useState<Account | null>(null); //symbolのアカウント
   const [exchangeInfo, setExchangeInfo] = useState<ExchangeInfo | null>(null)
@@ -94,31 +95,32 @@ export const OrderDetail = () => {
         //取引情報の取得
         const exchangeInfo = await fetchExchangeInfo(momijiBlockChain, exchangeTxHash, momijiAccount);
         setExchangeInfo(exchangeInfo);
+        setExchangeStatus(exchangeInfo.status);
 
         //ボタンテキストの設定
         switch (exchangeInfo.status) {
           case '注文済み':
             if(userType == "seller"){
-              setButtonText('発送完了報告を行う');
+              setText('発送完了報告を行う');
             }else{
-              setButtonText('発送されるのを待っています');
+              setText('発送されるのを待っています');
             }
             break;
           case '配送済み':
             if(userType == "seller"){
-              setButtonText('受け取り確認を待っています');
+              setText('受け取り確認を待っています');
             }else{
-              setButtonText('受け取り完了報告を行う');
+              setText('受け取り完了報告を行う');
             }
             break;
           case '受取済み':
-            setButtonText('決済が完了するのを待っています');
+            setText('決済が完了するのを待っています');
             break;
           case '決済完了':
-            setButtonText('決済が完了しています');
+            setText('決済が完了しています');
             break;
           case '有効期限切れ':
-            setButtonText('取引有効期限が切れています');
+            setText('取引有効期限が切れています');
             break;
           default:
             break;
@@ -146,7 +148,7 @@ export const OrderDetail = () => {
 
   const handleClickCosign = async () => {
     setProgress(true);
-    switch (buttonText) {
+    switch (text) {
       case '発送完了報告を行う':
         // 注文済みの場合の処理(連署)
         const cosignatureTx = await cosignatureTransaction(
@@ -170,7 +172,8 @@ export const OrderDetail = () => {
           setOpenSnackbar(true);
         }
 
-        setButtonText('受け取り確認を待っています');
+        setText('受け取り確認を待っています');
+        setExchangeStatus('配送済み');
         
         break;
       case '受け取り完了報告を行う':
@@ -196,7 +199,9 @@ export const OrderDetail = () => {
           setOpenSnackbar(true);
         }
 
-        setButtonText('決済が完了するのを待っています');
+        setText('決済が完了するのを待っています');
+        setExchangeStatus('受取済み');
+
 
         // 管理者アカウントへのロック解除トランザクションの送信
         const response = await fetch('/api/proof', {
@@ -214,7 +219,8 @@ export const OrderDetail = () => {
             setSnackbarSeverity('success');
             setSnackbarMessage('受け取りと決済が完了しました');
             setOpenSnackbar(true);
-            setButtonText('決済が完了しています');
+            setText('決済が完了しています');
+            setExchangeStatus('決済完了');
           }else{
             setSnackbarSeverity('error');
             setSnackbarMessage('管理者にてロックの解除に失敗しました');
@@ -269,7 +275,7 @@ export const OrderDetail = () => {
       :(exchangeInfo)?
         <>
           <Box sx={{ p: 2 }}>
-            <Stepper activeStep={steps.indexOf(exchangeInfo.status)} alternativeLabel>
+            <Stepper activeStep={steps.indexOf(exchangeStatus)} alternativeLabel>
               {steps.map((label) => (
                 <Step key={label}>
                   <StepLabel>{label}</StepLabel>
@@ -277,7 +283,7 @@ export const OrderDetail = () => {
               ))}
             </Stepper>
             {
-              (exchangeInfo.status == '有効期限切れ')?
+              (exchangeStatus == '有効期限切れ')?
               <Paper
                 sx={{
                   p: 2,
@@ -309,9 +315,6 @@ export const OrderDetail = () => {
               <ListItem>
                 <ListItemText primary="取引期限" secondary={Utils.formatDateToYmdHms(new Date(exchangeInfo.expiredAt))} />
               </ListItem>
-              <ListItem>
-                <ListItemText primary="取引状況" secondary={exchangeInfo.status} />
-              </ListItem>
               {/* productInfo */}
               <ListItem>
                 <ListItemText primary="商品名" secondary={exchangeInfo.productInfo.productName} />
@@ -334,6 +337,16 @@ export const OrderDetail = () => {
                   <ListItem>
                     <ListItemText primary="購入者住所" secondary={exchangeInfo.orderInfo.address} />
                   </ListItem>
+                  <ListItem>
+                    <ListItemText primary="備考" secondary={
+                      exchangeInfo.orderInfo.notes.split('\n').map((line, index, array) => (
+                        <React.Fragment key={index}>
+                          {line} {/* 行のテキスト */}
+                          {index !== array.length - 1 && <br />} {/* 最後の行以外には改行を挿入 */}
+                        </React.Fragment>
+                      ))
+                      } />
+                  </ListItem>
                 </>
               )}
             </List>
@@ -345,7 +358,7 @@ export const OrderDetail = () => {
                 justifyContent: 'center',
               }}
             >
-              {(buttonText == "発送完了報告を行う") ? 
+              {(text == "発送完了報告を行う") ? 
                 <Button
                     variant="contained"
                     color="error"
@@ -355,9 +368,9 @@ export const OrderDetail = () => {
                       setOpenDialog(true);
                     }}
                   >
-                    {buttonText}
+                    {text}
                 </Button>
-                :(buttonText == "受け取り完了報告を行う")?
+                :(text == "受け取り完了報告を行う")?
                 <Button
                     variant="contained"
                     color="error"
@@ -367,10 +380,23 @@ export const OrderDetail = () => {
                       setOpenDialog(true);
                     }}
                   >
-                    {buttonText}
+                    {text}
                 </Button>
                 :
-                <></>
+                <Paper
+                  sx={{
+                    p: 2,
+                    mt: 2,
+                    backgroundColor: 'grey.main',
+                    color: 'black',
+                  }}
+                >
+                  <Box>
+                    <Box>
+                      <Box>{text}</Box>
+                    </Box>
+                  </Box>
+                </Paper>
               } 
             </Box>          
           </Box>        

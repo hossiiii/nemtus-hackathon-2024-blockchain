@@ -11,11 +11,11 @@ import InputDialog from './InputDialog';
 import { decryptedAccount } from '../domain/utils/accounts/decryptedAccount';
 import { registrationTransaction } from '../domain/useCases/transactions/registrationTransaction';
 import { firstValueFrom } from 'rxjs';
-import { fetchTransactionStatus } from '../domain/utils/fetches/fetchTransactionStatus';
 import AlertsSnackbar from './AlertsSnackbar';
 import { signupTransactions } from '../domain/useCases/transactions/signupTransactions';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { encryptedAccount } from '../domain/utils/accounts/encryptedAccount';
+import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -132,10 +132,10 @@ export const RegistrationForm = () => {
 
         const hash = signedAggregateTx.hash;
         await firstValueFrom(symbolBlockChain.txRepo.announce(signedAggregateTx));
-        const result = await fetchTransactionStatus(
+        const result = await fetchUnconfirmedTransactionStatus(
           symbolBlockChain,
           hash,
-          symbolSellerPublicAccount.address,
+          symbolSellerAccount.address
         );
         if(result.code === 'Success'){
           setSnackbarSeverity('success');
@@ -195,15 +195,15 @@ export const RegistrationForm = () => {
     const momijiHash = momijiSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(momijiSignedTx));
   
-    const result = await fetchTransactionStatus(
+    const result = await fetchUnconfirmedTransactionStatus(
       momijiBlockChain,
       momijiHash,
-      momijiSellerAccount.address,
+      momijiSellerAccount.address
     );
 
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
-      setSnackbarMessage('商品情報の登録に成功しました');
+      setSnackbarMessage('商品情報の登録に成功しました。しばらくすると登録商品にリストされます');
       setOpenSnackbar(true);
       setProgress(false);
       return

@@ -107,7 +107,7 @@ export const OrderHistory = () => {
       ) : (
         <Box component="section" sx={{ p: 2 }}>
           {
-            sellerExchangeHistoryInfo ? 
+            sellerExchangeHistoryInfo && sellerExchangeHistoryInfo.length > 0 ? 
             <>
               <Typography variant="body1" sx={{ mb: 2 }}>販売者の取引履歴</Typography>
               <OrderTable
@@ -120,9 +120,9 @@ export const OrderHistory = () => {
             <></>          
           }
           {
-            userExchangeHistoryInfo ? 
+            userExchangeHistoryInfo && userExchangeHistoryInfo.length > 0 ?
             <>
-              <Typography variant="body1" sx={{ mb: 2, mt: 4 }}>ユーザーの取引履歴</Typography>
+              <Typography variant="body1" sx={{ mb: 2, mt: 4 }}>購入者の取引履歴</Typography>
               <OrderTable
                 exchangeHistoryInfoFlat={userExchangeHistoryInfoFlat}
                 headerColorCode='#E25C39'

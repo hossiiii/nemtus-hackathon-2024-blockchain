@@ -1,40 +1,19 @@
 # nemtus-hackathon-2024-blockchain
 
-## コーディング規約
+## 環境構築
 
-### UseCaseの変数名の命名規則
+### 1.環境変数
+```
+cp sample.env .env
+```
+管理者用のSymbolアカウント情報を.envファイルに記入する
 
-#### アカウントの命名規則
+### 2.momijiチェーンへ入金
+以下URLから.envファイルに記載したアドレスに対して入金を行う
 
-・privateKeyのアカウント = xxxAccount
-・publicKeyのアカウント = xxxPublicAccount
-・addressクラス = xxxAddress
-・privateKeyの文字列 = xxxPrivateKey
-・publicKeyの文字列 = xxxPublicKey
-・address = xxxRawAddress
+http://66.94.121.126:100/
 
-#### モザイクの命名規則
-
-・mosaicIdクラス = xxxMosaicId
-・mosaicIdの文字列 = xxxMosaicIdHex
-
-#### ブロックチェーンタイプの命名規則
-
-・symbol、momijiを先頭につける
-
-## ディレクトリ構成イメージ
-
-utils => useCases => api or component
-
-### utils
-
-transactionなどのパーツ部分
-
-### useCases
-
-utilsを組み合わせてビジネスロジックを作る  
-署名やアナウンス、検知もここで行う
-
-### api or component
-
-アカウントや秘密鍵情報を読み込みuseCasesに渡す
+### 3.起動
+```
+npm run dev
+```

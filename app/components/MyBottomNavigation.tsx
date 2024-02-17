@@ -25,7 +25,7 @@ function MyBottomNavigation(): JSX.Element {
             />
 
             <BottomNavigationAction
-                label={<Typography variant="body2" sx={{ fontSize: "10px" }}>商品一覧</Typography>}
+                label={<Typography variant="body2" sx={{ fontSize: "10px" }}>登録商品</Typography>}
                 value="/product"
                 icon={<AppsIcon />}
                 component="a"
