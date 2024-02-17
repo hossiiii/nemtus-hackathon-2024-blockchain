@@ -19,7 +19,7 @@ export const symbolNodeList = [
 export const symbolExplorer = 'https://testnet.symbol.fyi';
 export const symbolCurrencyMosaicId = '72C0212E67A08BCE';
 
-export const momijiNodeList = ['http://66.94.121.126:3000'];
+export const momijiNodeList = ['https://momiji-dual-001.daisan.dev:3001'];
 
 export const momijiExplorer = 'https://ishidad2.github.io/momiji-exprorer/#';
 export const momijiCurrencyMosaicId = '049E3DAB4B813CC2';
