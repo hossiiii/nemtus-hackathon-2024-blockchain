@@ -122,7 +122,7 @@ export const RegistrationForm = () => {
           return
         }
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
-        const symbolAaggregateTx = await signupTransactions(symbolBlockChain, symbolSellerPublicAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
+        const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
 
         //TODO: aLiceの署名に置き換え
         const signedAggregateTx = symbolSellerAccount.sign(
