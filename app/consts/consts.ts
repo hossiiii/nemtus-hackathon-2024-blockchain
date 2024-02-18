@@ -1,5 +1,3 @@
-export const vercelTimeout = 120;
-
 export const serviceName = 'kojinkanbaibai';
 export const serviceVersion = 1;
 export const secretLockDuration = 480; // block(per 15s) 

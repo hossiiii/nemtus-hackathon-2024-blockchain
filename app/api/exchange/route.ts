@@ -6,8 +6,7 @@ import { setupBlockChain } from '../../domain/utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../../domain/utils/fetches/fetchTransactionStatus';
 import { exchangeTransaction } from '../../domain/useCases/transactions/exchangeTransaction';
-import { hashLockHour, vercelTimeout } from '../../consts/consts';
-export const maxDuration = vercelTimeout; // This function can run for a maximum of 120 seconds
+import { hashLockHour } from '../../consts/consts';
 
 export const POST = async (req: Request, res: NextResponse<string | null>) => {
   try {
