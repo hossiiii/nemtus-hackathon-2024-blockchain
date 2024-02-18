@@ -6,7 +6,7 @@ import { Account, PublicAccount } from 'symbol-sdk';
 import { setupBlockChain } from '../setupBlockChain';
 import { encryptedAccount } from './encryptedAccount';
 import { fetchAccountMetaData } from '../fetches/fetchAccountMetaData';
-import { symbolAccountMetaDataKey } from '../../../consts/consts';
+import { symbolUserAccountMetaDataKey } from '../../../consts/consts';
 import { decryptedAccountForNode } from './decryptedAccountForNode';
 
 describe('decryptedAccount', () => {
@@ -23,12 +23,12 @@ describe('decryptedAccount', () => {
   test.only('should return an specific account object', async () => {
     const symbolBlockChain = await setupBlockChain('symbol');
     const symbolTargetPublicAccount = PublicAccount.createFromPublicKey(
-      '7B4588AEF0D8AD9DF3AADD7F1B587E32DB03EF3D98F2C9C58A98018C40E512CC',
+      '3519F394AEF2DC66B42E5A60C015C0864449C1DDCC29516B46C37B37D18C6378',
       symbolBlockChain.networkType,
     );
     const strSignerQR = await fetchAccountMetaData(
       symbolBlockChain,
-      symbolAccountMetaDataKey,
+      symbolUserAccountMetaDataKey,
       symbolTargetPublicAccount.address,
     );
     console.log(strSignerQR);

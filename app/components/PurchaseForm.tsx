@@ -231,6 +231,8 @@ export const PurchaseForm = () => {
 
       localStorage.setItem(symbolUserAccountMetaDataKey, momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
 
+      console.log("momijiUserAccount")
+      console.log(momijiUserAccount)
       await order(momijiUserAccount, secret, proof);
 
     }else{
@@ -266,6 +268,11 @@ export const PurchaseForm = () => {
     }
 
     //注文トランザクションの作成-署名-アナウンス
+    console.log("orderTransaction")
+    console.log(productInfo)
+    console.log(paymentInfo)
+    console.log(orderInfo)
+
     const orderTx = await orderTransaction(momijiBlockChain, momijiUserAccount, productInfo, paymentInfo, orderInfo);
     const orderSignedTx = momijiUserAccount.sign(orderTx, momijiBlockChain.generationHash);
     const orderSignedTxHash = orderSignedTx.hash;
