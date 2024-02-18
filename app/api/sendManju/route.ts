@@ -6,6 +6,9 @@ import { setupBlockChain } from '../../domain/utils/setupBlockChain';
 import { transferTransactionWithMosaic } from '../../domain/utils/transactions/transferTransactionWithMosaic';
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../../domain/utils/fetches/fetchTransactionStatus';
+import { vercelTimeout } from '../../consts/consts';
+
+export const maxDuration = vercelTimeout; // This function can run for a maximum of 120 seconds
 
 export const POST = async (req: Request, res: NextResponse<string | null>) => {
   try {

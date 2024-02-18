@@ -9,6 +9,9 @@ import { fetchExchangeInfo } from '../../domain/useCases/fetches/fetchExchangeIn
 import { secretProofTransaction } from '../../domain/utils/transactions/secretProofTransaction';
 import { accountMetaDataTransaction } from '../../domain/utils/transactions/accountMetaDataTransaction';
 import { fetchUnconfirmedTransactionStatus } from '../../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
+import { vercelTimeout } from '../../consts/consts';
+
+export const maxDuration = vercelTimeout; // This function can run for a maximum of 120 seconds
 
 export const POST = async (req: Request, res: NextResponse<string | null>) => {
   try {
