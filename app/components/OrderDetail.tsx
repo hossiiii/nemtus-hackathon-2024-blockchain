@@ -20,6 +20,7 @@ import { cosignatureTransaction } from '../domain/utils/transactions/cosignature
 import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../domain/utils/fetches/fetchTransactionStatus';
 import { ExchangeStatus } from '../domain/entities/exchangeInfo/exchangeStatus';
+import Loading from './Loading';
 
 type ButtonText = '発送完了報告を行う' | '発送されるのを待っています' | '受け取り確認を待っています' | '受け取り完了報告を行う' | '決済が完了するのを待っています' | '決済が完了しています' | '取引有効期限が切れています' | "確認中";
 
@@ -270,7 +271,7 @@ export const OrderDetail = () => {
             
       {progress ? 
         <Backdrop open={progress}>
-          <CircularProgress color='inherit' />
+          <Loading />
         </Backdrop>
       :(exchangeInfo)?
         <>

@@ -9,6 +9,7 @@ import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { useRouter } from 'next/navigation';
 import { fetchSellerProductInfo } from '../domain/useCases/fetches/fetchSellerProductInfo';
 import { symbolSellerAccountMetaDataKey } from '../consts/consts';
+import Loading from './Loading';
 
 export const ProductList = () => {
   const router = useRouter();
@@ -52,7 +53,7 @@ export const ProductList = () => {
       />   
       {progress ? (
         <Backdrop open={progress}>
-          <CircularProgress color='inherit' />
+          <Loading />
         </Backdrop>
       ) : (
         <Box component="section" sx={{ p: 2 }}>

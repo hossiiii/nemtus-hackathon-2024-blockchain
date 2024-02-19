@@ -27,6 +27,7 @@ import { PaymentInfo } from '../domain/entities/paymentInfo/paymentInfo';
 import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
 import AlertsDialog from './AlertsDialog';
 import { fetchAccountBalance } from '../domain/utils/fetches/fetchAccountBalance';
+import Loading from './Loading';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -420,7 +421,7 @@ export const PurchaseForm = () => {
       </Dialog>
       {progress ? (
         <Backdrop open={progress}>
-          <CircularProgress color='inherit' />
+          <Loading />
         </Backdrop>
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>

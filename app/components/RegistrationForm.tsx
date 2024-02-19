@@ -16,6 +16,7 @@ import { signupTransactions } from '../domain/useCases/transactions/signupTransa
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { encryptedAccount } from '../domain/utils/accounts/encryptedAccount';
 import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
+import Loading from './Loading';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -235,7 +236,7 @@ export const RegistrationForm = () => {
       />      
       {progress ? (
         <Backdrop open={progress}>
-          <CircularProgress color='inherit' />
+          <Loading />
         </Backdrop>
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>

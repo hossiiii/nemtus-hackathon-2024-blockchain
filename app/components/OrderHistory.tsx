@@ -17,6 +17,7 @@ import { ExchangeHistoryInfo, ExchangeHistoryInfoFlat } from '../domain/entities
 import { symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from '../consts/consts';
 import OrderTable from './OrderTable';
 import { Utils } from '../domain/utils/utils';
+import Loading from './Loading';
 
 export const OrderHistory = () => {
   const router = useRouter();
@@ -102,7 +103,7 @@ export const OrderHistory = () => {
       />   
       {progress ? (
         <Backdrop open={progress}>
-          <CircularProgress color='inherit' />
+          <Loading />
         </Backdrop>
       ) : (
         <Box component="section" sx={{ p: 2 }}>

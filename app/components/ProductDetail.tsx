@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { fetchProductInfo } from '../domain/useCases/fetches/fetchProductInfo';
 import { fetchProductStock } from '../domain/useCases/fetches/fetchProductStock';
 import { symbolSellerAccountMetaDataKey } from '../consts/consts';
+import Loading from './Loading';
 
 export const ProductDetail = () => {
 
@@ -57,7 +58,7 @@ export const ProductDetail = () => {
       />   
       {progress ? (
         <Backdrop open={progress}>
-          <CircularProgress color='inherit' />
+          <Loading />
         </Backdrop>
       ) : (
         <Box sx={{ p: 3 }}>
