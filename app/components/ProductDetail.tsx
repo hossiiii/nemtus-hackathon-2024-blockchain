@@ -19,6 +19,7 @@ export const ProductDetail = () => {
 
   const { momijiBlockChain } = useSetupBlockChain();
   const [progress, setProgress] = useState<boolean>(true); //ローディングの設定
+  const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定  
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -58,7 +59,7 @@ export const ProductDetail = () => {
       />   
       {progress ? (
         <Backdrop open={progress}>
-          <Loading />
+          <Loading value={progressValue} />
         </Backdrop>
       ) : (
         <Box sx={{ p: 3 }}>

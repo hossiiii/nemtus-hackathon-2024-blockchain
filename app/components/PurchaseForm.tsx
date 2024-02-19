@@ -52,6 +52,7 @@ export const PurchaseForm = () => {
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
 
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
+  const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -89,6 +90,7 @@ export const PurchaseForm = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
+    setProgressValue(0); //進捗
     setInputData(data);
     console.log(data)
     setOpenDialog(true);
@@ -137,6 +139,7 @@ export const PurchaseForm = () => {
 
   const handlePasswordInput = async (inputPassword: string | null) => {
     setOpenInputDialog(false); // ダイアログを閉じる  
+    setProgressValue(10); //進捗
     
     let momijiUserAccount: Account
 
@@ -170,6 +173,8 @@ export const PurchaseForm = () => {
           setProgress(false);
           return
         }
+        
+        setProgressValue(30); //進捗
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiUserAccount, inputPassword)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolUserPublicAccount, momijiUserAccount, momijiStrSignerQR, symbolUserAccountMetaDataKey, secretTx); //アカウント登録に合わせてシークレットロックトランザクションを追加
 
@@ -230,6 +235,7 @@ export const PurchaseForm = () => {
         }        
       }
 
+      setProgressValue(40); //進捗
       localStorage.setItem(symbolUserAccountMetaDataKey, momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
 
       await order(momijiUserAccount, secret, proof);
@@ -272,6 +278,8 @@ export const PurchaseForm = () => {
     const orderSignedTxHash = orderSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(orderSignedTx));
   
+    setProgressValue(50); //進捗
+
     const res = await fetchTransactionStatus( //ここはサーバー側でorderTxHashから情報をフェッチするのでUnconfirmedTransactionStatusではだめ
       momijiBlockChain,
       orderSignedTxHash,
@@ -287,6 +295,8 @@ export const PurchaseForm = () => {
     }
 
     //交換トランザクションを管理者側で作成-署名-アナウンス
+    setProgressValue(70); //進捗
+
     const response = await fetch('/api/exchange', {
       method: 'POST',
       headers: {
@@ -421,7 +431,7 @@ export const PurchaseForm = () => {
       </Dialog>
       {progress ? (
         <Backdrop open={progress}>
-          <Loading />
+          <Loading value={progressValue} />
         </Backdrop>
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>

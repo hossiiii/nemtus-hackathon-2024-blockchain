@@ -38,6 +38,7 @@ export const OrderDetail = () => {
 
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
+  const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -149,6 +150,7 @@ export const OrderDetail = () => {
 
   const handleClickCosign = async () => {
     setProgress(true);
+    setProgressValue(10); //進捗
     switch (text) {
       case '発送完了報告を行う':
         // 注文済みの場合の処理(連署)
@@ -172,6 +174,8 @@ export const OrderDetail = () => {
           setSnackbarMessage('発送完了報告が完了しました');
           setOpenSnackbar(true);
         }
+        setProgressValue(100); //進捗
+
 
         setText('受け取り確認を待っています');
         setExchangeStatus('配送済み');
@@ -199,6 +203,8 @@ export const OrderDetail = () => {
           setSnackbarMessage('受け取り完了報告が失敗しました');
           setOpenSnackbar(true);
         }
+
+        setProgressValue(50); //進捗
 
         setText('決済が完了するのを待っています');
         setExchangeStatus('受取済み');
@@ -271,7 +277,7 @@ export const OrderDetail = () => {
             
       {progress ? 
         <Backdrop open={progress}>
-          <Loading />
+          <Loading value={progressValue} />
         </Backdrop>
       :(exchangeInfo)?
         <>

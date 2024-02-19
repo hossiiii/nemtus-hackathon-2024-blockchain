@@ -44,6 +44,7 @@ export const RegistrationForm = () => {
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
 
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
+  const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -62,6 +63,8 @@ export const RegistrationForm = () => {
 
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
+    setProgressValue(0); //進捗
+
     //商品情報の登録
     setInputData(data);
     console.log(data)
@@ -98,6 +101,7 @@ export const RegistrationForm = () => {
 
   const handlePasswordInput = async (inputPassword: string | null) => {
     setOpenInputDialog(false); // ダイアログを閉じる  
+    setProgressValue(10); //進捗
     
     let momijiSellerAccount: Account
 
@@ -122,6 +126,8 @@ export const RegistrationForm = () => {
           setProgress(false);
           return
         }
+        setProgressValue(30); //進捗
+
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
 
@@ -149,6 +155,7 @@ export const RegistrationForm = () => {
           setProgress(false);
           return
         }
+
       }else{
         try {
           momijiSellerAccount = decryptedAccount(momijiBlockChain, symbolAccountMetaData, inputPassword);
@@ -160,6 +167,8 @@ export const RegistrationForm = () => {
           return
         }
       }
+
+      setProgressValue(70); //進捗
 
       localStorage.setItem(symbolSellerAccountMetaDataKey, momijiSellerAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
 
@@ -196,11 +205,16 @@ export const RegistrationForm = () => {
     const momijiHash = momijiSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(momijiSignedTx));
   
+    setProgressValue(90); //進捗
+
     const result = await fetchUnconfirmedTransactionStatus(
       momijiBlockChain,
       momijiHash,
       momijiSellerAccount.address
     );
+
+    setProgressValue(100); //進捗
+
 
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
@@ -236,7 +250,7 @@ export const RegistrationForm = () => {
       />      
       {progress ? (
         <Backdrop open={progress}>
-          <Loading />
+          <Loading value={progressValue} />
         </Backdrop>
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>

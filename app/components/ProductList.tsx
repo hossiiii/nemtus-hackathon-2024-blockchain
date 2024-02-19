@@ -10,12 +10,14 @@ import { useRouter } from 'next/navigation';
 import { fetchSellerProductInfo } from '../domain/useCases/fetches/fetchSellerProductInfo';
 import { symbolSellerAccountMetaDataKey } from '../consts/consts';
 import Loading from './Loading';
+import ProgressCircular from './ProgressBar';
 
 export const ProductList = () => {
   const router = useRouter();
 
   const { momijiBlockChain } = useSetupBlockChain();
   const [progress, setProgress] = useState<boolean>(true); //ローディングの設定
+  const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -53,7 +55,7 @@ export const ProductList = () => {
       />   
       {progress ? (
         <Backdrop open={progress}>
-          <Loading />
+          <Loading value={progressValue} />
         </Backdrop>
       ) : (
         <Box component="section" sx={{ p: 2 }}>
