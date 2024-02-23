@@ -8,6 +8,7 @@ import { transferTransactionWithMessage } from '../../utils/transactions/transfe
 import { fetchProductInfo } from '../fetches/fetchProductInfo';
 import { ExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
 import { fetchPublicAccount } from '../../utils/fetches/fetchPublicAccount';
+import { hashLockHour } from '../../../consts/consts';
 
 export const exchangeTransaction = async (
   momijiBlockChain: any,
@@ -65,7 +66,7 @@ export const exchangeTransaction = async (
   );
 
   const momijiAggregateBondedTx = AggregateTransaction.createBonded(
-    Deadline.create(momijiBlockChain.epochAdjustment),
+    Deadline.create(momijiBlockChain.epochAdjustment, hashLockHour),
     [
       sellerToUserTx.toAggregate(momijiSellerPublicAccount),
       userToSellerTx.toAggregate(momijiUserPublicAccount),

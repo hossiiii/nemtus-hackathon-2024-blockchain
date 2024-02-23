@@ -29,9 +29,9 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
 
     //ハッシュロックトランザクションの作成
     const momijiHashLockTx = HashLockTransaction.create(
-      Deadline.create(momijiBlockChain.epochAdjustment,hashLockHour),
+      Deadline.create(momijiBlockChain.epochAdjustment),
       new Mosaic(new MosaicId(momijiBlockChain.currencyMosaicId), UInt64.fromUint(10000000)),
-      UInt64.fromUint(480),
+      UInt64.fromUint(hashLockHour*4*60),
       momijiSignedAggregateBondedTx,
       momijiBlockChain.networkType,
     ).setMaxFee(100);
