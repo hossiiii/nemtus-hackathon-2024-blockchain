@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete } from '@mui/material';
 import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
-import { Account, Address, PublicAccount } from 'symbol-sdk';
+import { Account, Address, AggregateTransaction, CosignatureTransaction, Deadline, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import InputDialog from './InputDialog';
@@ -76,8 +76,8 @@ export const RegistrationForm = () => {
 
     const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(symbolSellerAccount.publicKey, symbolBlockChain.networkType);
     setSymbolSellerPublicAccount(symbolSellerPublicAccount);
-    
-    //アカウントのチェック    
+
+    //アカウントのチェック
     const symbolAccountMetaData = await fetchAccountMetaData(
       symbolBlockChain,
       symbolSellerAccountMetaDataKey,
@@ -85,7 +85,7 @@ export const RegistrationForm = () => {
     );
 
     setSymbolAccountMetaData(symbolAccountMetaData);
-    
+
     if (symbolAccountMetaData === null) {
       //未登録アカウントの場合
       setDialogTitle('販売アカウント登録');
@@ -100,9 +100,9 @@ export const RegistrationForm = () => {
   };
 
   const handlePasswordInput = async (inputPassword: string | null) => {
-    setOpenInputDialog(false); // ダイアログを閉じる  
+    setOpenInputDialog(false); // ダイアログを閉じる
     setProgressValue(10); //進捗
-    
+
     let momijiSellerAccount: Account
 
     if (inputPassword) {
@@ -126,6 +126,25 @@ export const RegistrationForm = () => {
           setProgress(false);
           return
         }
+        setProgressValue(20); //進捗
+        // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
+        const res = await fetch('/api/metadata', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            privateKey: momijiSellerAccount.privateKey,
+          }),
+        })
+        if (!res.ok) {
+          setSnackbarSeverity('error');
+          setSnackbarMessage('メタデータの生成に失敗しました');
+          setOpenSnackbar(true);
+          setProgress(false);
+          return
+        }
+
         setProgressValue(30); //進捗
 
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
