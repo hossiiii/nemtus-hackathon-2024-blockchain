@@ -50,8 +50,6 @@ export const fetchAllProductinfo = async (
         }),
       ) as any;
 
-      console.log(res.data[0]);
-
       if (!res.data || !res.data[0] || !res.data[0].metadataEntry) {
         continue; // 条件を満たさない場合は次のループへ
       }
