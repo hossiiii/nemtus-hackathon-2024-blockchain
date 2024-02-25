@@ -21,7 +21,7 @@ export const POST = async (req: Request, res: NextResponse<string | null>) => {
       momijiAdminPrivateKey,
       momijiBlockChain.networkType,
     );
-    const key = process.env.APP_NAME;
+    const key = process.env.NEXT_PUBLIC_APP_NAME;
     const value = "momiji";
 
     const uint64key = KeyGenerator.generateUInt64Key(key);
