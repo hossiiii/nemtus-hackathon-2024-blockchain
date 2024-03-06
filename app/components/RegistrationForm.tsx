@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete } from '@mui/material';
 import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
@@ -17,6 +17,7 @@ import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { encryptedAccount } from '../domain/utils/accounts/encryptedAccount';
 import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
 import Loading from './Loading';
+import type { PutBlobResult } from '@vercel/blob';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -24,7 +25,7 @@ type Inputs = {
   sellerName: string;
   description: string;
   category: string[];
-  metalIds: string;
+  imageUrl: string;
   price: number;
   amount: number;
 };
@@ -61,9 +62,43 @@ export const RegistrationForm = () => {
 
   const [inputData, setInputData] = useState<Inputs>(null); //インプットデータ
 
+  const [preview, setPreview] = useState(null);
+  const inputFileRef = useRef<HTMLInputElement>(null);
+  const [blob, setBlob] = useState<PutBlobResult | null>(null);
+
+  const handleFileChange = (event) => {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
     setProgressValue(0); //進捗
+
+    //画像のアップロード
+    if (!inputFileRef.current?.files) {
+      setSnackbarSeverity('error');
+      setSnackbarMessage('画像が選択されていません');
+      setOpenSnackbar(true);
+      return;
+    }
+
+    const file = inputFileRef.current.files[0];
+    const response = await fetch(
+      `/api/upload?filename=${file.name}`,
+      {
+        method: 'POST',
+        body: file,
+      },
+    );
+    const newBlob = (await response.json()) as PutBlobResult;
+    setBlob(newBlob);
 
     //商品情報の登録
     setInputData(data);
@@ -209,7 +244,7 @@ export const RegistrationForm = () => {
       sellerName: inputData.sellerName,
       description: inputData.description,
       category: inputData.category,
-      metalIds: [inputData.metalIds],
+      imageUrl: blob.url,
       price: inputData.price,
       mosaicId: null,
       ownerAddress: momijiSellerAccount.address.plain(),
@@ -345,17 +380,33 @@ export const RegistrationForm = () => {
               {errors.category && <Typography color="error" variant="caption">{errors.category.message}</Typography>}
             </FormControl>
           </Box>
-
-          <Box sx={{ mb: 2 }}>
-            <TextField
-              label="メタルID"
-              variant="outlined"
-              fullWidth
-              error={!!errors.metalIds}
-              helperText={errors.metalIds?.message}
-              {...register("metalIds", { required: "メタルIDを入力してください" })}
+          <Box
+            sx={{
+              display: 'flex',
+              flexDirection: 'column',
+              rowGap: 2,
+              justifyContent: 'center',
+              alignContent: 'center',
+              mb: 2,
+            }}
+          >
+            <input
+              type="file"
+              id="contained-button-file"
+              ref={inputFileRef}
+              style={{ display: 'none' }}
+              onChange={handleFileChange}
+              required
             />
+            {preview && <img src={preview} alt="preview" style={{ maxWidth: '500px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />}
+            <label htmlFor="contained-button-file">
+              <Button variant="contained" component="span">
+                画像を選択
+              </Button>
+            </label>
           </Box>
+
+
           <Box sx={{ mb: 2 }}>
             <TextField
               label="価格(xym)"

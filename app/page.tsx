@@ -52,8 +52,9 @@ const Home = () => {
             {productList?.map((product, index) => (
               <Grid item key={index}>
                 <Card onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
-                  <CardContent>
-                    <Typography gutterBottom variant="h5" component="div">
+                  <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                    <img src={product.imageUrl} alt="description" style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', display: 'block' }} />
+                    <Typography gutterBottom variant="h5" component="div" sx={{mt:1}}>
                       {product.productName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">

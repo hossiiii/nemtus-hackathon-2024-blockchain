@@ -65,6 +65,7 @@ export const ProductDetail = () => {
         <Box sx={{ p: 3 }}>
           <List>
             {/* exchangeInfo */}
+            <img src={productInfo?.imageUrl} alt="description" style={{ maxWidth: '500px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
             <ListItem>
               <ListItemText primary="商品名" secondary={productInfo?.productName} />
             </ListItem>

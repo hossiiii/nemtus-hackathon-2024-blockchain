@@ -60,7 +60,9 @@ export const fetchAllProductinfo = async (
 
       try {
         productInfo = JSON.parse(value) as ProductInfo;
-        productInfoList.push(productInfo); // 条件を満たす値をリストに追加
+        if(productInfo.serviceName == process.env.NEXT_PUBLIC_APP_NAME){
+          productInfoList.push(productInfo); // 条件を満たす値をリストに追加
+        }
       } catch (error) {
         console.error(`Error parsing product info for mosaic ${mosaicId.toHex()}: ${error}`); // オプション: エラーをログに記録
         continue; // JSONのパースに失敗した場合は次のモザイクへ進む

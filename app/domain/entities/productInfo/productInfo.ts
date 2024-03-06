@@ -3,7 +3,7 @@ export type ProductInfo = {
   sellerName: string;
   description: string;
   category: string[];
-  metalIds: string[];
+  imageUrl: string;
   depositAddress: string; //販売者Symbolのアドレス
   ownerAddress: string; //販売者Momijiのアドレス
   price: number;
