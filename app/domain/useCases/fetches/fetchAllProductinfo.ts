@@ -2,12 +2,13 @@ import { AccountInfo, Address, KeyGenerator, Metadata, MetadataType, MosaicInfo,
 import { ProductInfo } from '../../entities/productInfo/productInfo';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
+import { serviceName } from '../../../consts/consts';
 
 export const fetchAllProductinfo = async (
   address?: Address,
 ): Promise<ProductInfo[]> => {
   const momijiBlockChain = await setupBlockChain('momiji');
-  const momijiKey = KeyGenerator.generateUInt64Key(process.env.NEXT_PUBLIC_APP_NAME).toHex();
+  const momijiKey = KeyGenerator.generateUInt64Key(serviceName).toHex();
   const key = 'productInfo';
 
   // メタデータに設定された情報を取得
