@@ -1,10 +1,10 @@
 'use client';
 
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
-import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete } from '@mui/material';
+import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete, Alert } from '@mui/material';
 import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
-import { Account, Address, AggregateTransaction, CosignatureTransaction, Deadline, PublicAccount } from 'symbol-sdk';
+import { Account, Address, AggregateTransaction, Convert, CosignatureTransaction, Deadline, PublicAccount } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import InputDialog from './InputDialog';
@@ -18,6 +18,7 @@ import { encryptedAccount } from '../domain/utils/accounts/encryptedAccount';
 import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetchUnconfirmedTransactionStatus';
 import Loading from './Loading';
 import type { PutBlobResult } from '@vercel/blob';
+import AlertsDialog from './AlertsDialog';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -53,6 +54,8 @@ export const RegistrationForm = () => {
   const [dialogTitle, setDialogTitle] = useState<string | null>(null);
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
 
+  const [openDialog, setOpenDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+
   const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
   const [symbolSellerAccount, setSymbolSellerAccount] = useState<Account | null>(null); //symbolのアカウント
@@ -65,6 +68,17 @@ export const RegistrationForm = () => {
   const [preview, setPreview] = useState(null);
   const inputFileRef = useRef<HTMLInputElement>(null);
   const [blob, setBlob] = useState<PutBlobResult | null>(null);
+
+  useEffect(() => {
+    console.log(localStorage.getItem(momijiAccountMetaDataKey))
+    if (!localStorage.getItem(momijiAccountMetaDataKey)) {
+      setDialogTitle('公開鍵の確認');
+      setDialogMessage('商品登録をするには初回Symbolの公開鍵を登録する必要があります。公開鍵を登録しますか？');
+      setOpenDialog(true);
+    }else{
+    }
+  }
+  , []);
 
   const handleFileChange = (event) => {
     const file = event.target.files[0];
@@ -293,6 +307,19 @@ export const RegistrationForm = () => {
         vertical={'bottom'}
         snackbarSeverity={snackbarSeverity}
         snackbarMessage={snackbarMessage}
+      />
+      <AlertsDialog
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        handleAgreeClick={() => {
+          const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/registration`;
+          console.log(callback)
+          const aliceEndPoint = `alice://sign?method=post&type=request_pubkey&callback=${Convert.utf8ToHex(callback)}`
+          window.location.href = aliceEndPoint;
+          setOpenDialog(false);
+        }}
+        dialogTitle={dialogTitle}
+        dialogMessage={dialogMessage}
       />
       <InputDialog
         openDialog={openInputDialog}

@@ -20,7 +20,6 @@ const Home = () => {
 
   useEffect(() => {
     if (momijiBlockChain) {
-
       const func = async () => {
         const productInfoList = await fetchAllProductinfo();
         setProductList(productInfoList)
