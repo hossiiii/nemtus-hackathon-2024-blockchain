@@ -76,7 +76,6 @@ export const RegistrationForm = () => {
         const params = new URLSearchParams(url.search);
         const pubkey = params.get('pubkey');
         localStorage.setItem(momijiAccountMetaDataKey, pubkey);
-        // setSymbolSellerPublicAccount(PublicAccount.createFromPublicKey(pubkey, symbolBlockChain.networkType));
         setSnackbarSeverity('success');
         setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
         setOpenSnackbar(true);
@@ -86,7 +85,6 @@ export const RegistrationForm = () => {
         setOpenDialog(true);  
       }
     }else{
-      setSymbolSellerPublicAccount(PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType));
     }
   }
   , []);
@@ -134,8 +132,8 @@ export const RegistrationForm = () => {
     // setSymbolSellerAccount(symbolSellerAccount);
     // localStorage.setItem(momijiAccountMetaDataKey, symbolSellerAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
 
-    // const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
-    // setSymbolSellerPublicAccount(symbolSellerPublicAccount);
+    const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
+    setSymbolSellerPublicAccount(symbolSellerPublicAccount);
 
     //アカウントのチェック
     const symbolAccountMetaData = await fetchAccountMetaData(
