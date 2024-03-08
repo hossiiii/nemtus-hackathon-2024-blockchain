@@ -71,12 +71,17 @@ export const RegistrationForm = () => {
 
   useEffect(() => {
     //現在のURLをalertに表示
-    window.alert(window.location.href);
-    console.log(localStorage.getItem(momijiAccountMetaDataKey))
     if (!localStorage.getItem(momijiAccountMetaDataKey)) {
-      setDialogTitle('公開鍵の確認');
-      setDialogMessage('商品登録をするには初回Symbolの公開鍵を登録する必要があります。公開鍵を登録しますか？');
-      setOpenDialog(true);
+      if(window.location.href.includes('pubkey')){
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        const pubkey = params.get('pubkey');
+        localStorage.setItem(momijiAccountMetaDataKey, pubkey);
+      }else{
+        setDialogTitle('公開鍵の確認');
+        setDialogMessage('商品登録をするには初回のみ販売者用Symbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
+        setOpenDialog(true);  
+      }
     }else{
     }
   }
