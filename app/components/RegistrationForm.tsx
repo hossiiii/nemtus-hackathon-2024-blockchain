@@ -77,6 +77,9 @@ export const RegistrationForm = () => {
         const params = new URLSearchParams(url.search);
         const pubkey = params.get('pubkey');
         localStorage.setItem(momijiAccountMetaDataKey, pubkey);
+        setSnackbarSeverity('success');
+        setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
+        setOpenSnackbar(true);
       }else{
         setDialogTitle('公開鍵の確認');
         setDialogMessage('商品登録をするには初回のみ販売者用Symbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
