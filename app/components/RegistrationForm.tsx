@@ -70,14 +70,13 @@ export const RegistrationForm = () => {
   const [blob, setBlob] = useState<PutBlobResult | null>(null);
 
   useEffect(() => {
-    //現在のURLをalertに表示
     if (!localStorage.getItem(momijiAccountMetaDataKey)) {
       if(window.location.href.includes('pubkey')){
         const url = new URL(window.location.href);
         const params = new URLSearchParams(url.search);
         const pubkey = params.get('pubkey');
         localStorage.setItem(momijiAccountMetaDataKey, pubkey);
-        setSymbolSellerPublicAccount(PublicAccount.createFromPublicKey(pubkey, symbolBlockChain.networkType));
+        // setSymbolSellerPublicAccount(PublicAccount.createFromPublicKey(pubkey, symbolBlockChain.networkType));
         setSnackbarSeverity('success');
         setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
         setOpenSnackbar(true);
