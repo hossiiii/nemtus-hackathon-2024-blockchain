@@ -314,6 +314,7 @@ export const RegistrationForm = () => {
         handleAgreeClick={() => {
           const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/registration`;
           console.log(callback)
+          
           const aliceEndPoint = `alice://sign?method=post&type=request_pubkey&callback=${Convert.utf8ToHex(callback)}`
           window.location.href = aliceEndPoint;
           setOpenDialog(false);
