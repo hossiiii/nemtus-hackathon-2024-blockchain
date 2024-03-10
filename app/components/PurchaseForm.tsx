@@ -178,7 +178,13 @@ export const PurchaseForm = () => {
       symbolUserPublicAccount.address,
     );
 
-    setTransactionsHistory([{message: '暗号化したプライベートネットのアカウントをメタデータに登録', url: `${symbolExplorer}/transactions/${hash}`}]);
+    setTransactionsHistory(prevTransactions => [
+      ...prevTransactions,
+      {
+        message: '暗号化したプライベートネットのアカウントをメタデータに登録',
+        url: `${symbolExplorer}/transactions/${hash}`
+      }
+    ]);     
 
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
@@ -238,7 +244,14 @@ export const PurchaseForm = () => {
         }
 
         const responseJson = await response.json();
-        setTransactionsHistory([{message: 'プライベートネットで手数料分の基軸通貨を送付', url: `${momijiExplorer}/transactions/${responseJson.data.hash}`}]);
+
+        setTransactionsHistory(prevTransactions => [
+          ...prevTransactions,
+          {
+            message: 'プライベートネットで手数料分の基軸通貨を送付',
+            url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
+          }
+        ]);  
         
         setProgressValue(30); //進捗
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiUserAccount, inputPassword)
@@ -314,7 +327,13 @@ export const PurchaseForm = () => {
     const orderSignedTxHash = orderSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(orderSignedTx));
 
-    setTransactionsHistory([{message: '注文トランザクションの発行', url: `${momijiExplorer}/transactions/${orderSignedTxHash}`}]);
+    setTransactionsHistory(prevTransactions => [
+      ...prevTransactions,
+      {
+        message: '注文トランザクションの発行',
+        url: `${momijiExplorer}/transactions/${orderSignedTxHash}`
+      }
+    ]);  
     
     setProgressValue(50); //進捗
 
@@ -346,7 +365,14 @@ export const PurchaseForm = () => {
     })
 
     const responseJson = await response.json();
-    setTransactionsHistory([{message: '取引トランザクションの発行', url: `${momijiExplorer}/transactions/${responseJson.data.hash}`}]);
+
+    setTransactionsHistory(prevTransactions => [
+      ...prevTransactions,
+      {
+        message: '取引トランザクションの発行',
+        url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
+      }
+    ]);      
     
     if (!response.ok) {
       setSnackbarSeverity('error');

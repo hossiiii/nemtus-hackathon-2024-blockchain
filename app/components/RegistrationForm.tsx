@@ -168,7 +168,13 @@ export const RegistrationForm = () => {
       symbolSellerPublicAccount.address
     );
 
-    setTransactionsHistory([{message: '暗号化したプライベートネットのアカウントをメタデータに登録', url: `${symbolExplorer}/transactions/${hash}`}]);
+    setTransactionsHistory(prevTransactions => [
+      ...prevTransactions,
+      {
+        message: '暗号化したプライベートネットのアカウントをメタデータに登録',
+        url: `${symbolExplorer}/transactions/${hash}`
+      }
+    ]);      
 
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
@@ -215,27 +221,15 @@ export const RegistrationForm = () => {
           return
         }
         const responseJson = await response.json();
-        setTransactionsHistory([{message: 'プライベートネットで手数料分の基軸通貨を送付', url: `${momijiExplorer}/transactions/${responseJson.data.hash}`}]);
+        setTransactionsHistory(prevTransactions => [
+          ...prevTransactions,
+          {
+            message: 'プライベートネットで手数料分の基軸通貨を送付',
+            url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
+          }
+        ]);           
         
         setProgressValue(30); //進捗
-        // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
-        // const res = await fetch('/api/metadata', {
-        //   method: 'POST',
-        //   headers: {
-        //     'Content-Type': 'application/json',
-        //   },
-        //   body: JSON.stringify({
-        //     privateKey: momijiSellerAccount.privateKey,
-        //   }),
-        // })
-        // if (!res.ok) {
-        //   setSnackbarSeverity('error');
-        //   setSnackbarMessage('メタデータの生成に失敗しました');
-        //   setOpenSnackbar(true);
-        //   setProgress(false);
-        //   return
-        // }
-        // setProgressValue(30); //進捗
 
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
@@ -294,7 +288,13 @@ export const RegistrationForm = () => {
     const momijiHash = momijiSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(momijiSignedTx));
 
-    setTransactionsHistory([{message: 'プライベートネットで商品モザイクを発行', url: `${momijiExplorer}/transactions/${momijiHash}`}]);
+    setTransactionsHistory(prevTransactions => [
+      ...prevTransactions,
+      {
+        message: 'プライベートネットで商品モザイクを発行',
+        url: `${momijiExplorer}/transactions/${momijiHash}`
+      }
+    ]);   
 
     setProgressValue(90); //進捗
 
