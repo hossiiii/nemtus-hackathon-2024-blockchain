@@ -467,7 +467,7 @@ export const OrderDetail = () => {
             <Typography variant="caption" component="div" sx={{ mt: 2 }}>
               ブロックチェーンExplorer
             </Typography>
-            <List sx={{ bgcolor: 'grey.50' }}>
+            <List sx={{ bgcolor: 'grey.100' }}>
               {transactionsHistory.map((transaction, index) => (
                 <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                   <ListItemIcon>

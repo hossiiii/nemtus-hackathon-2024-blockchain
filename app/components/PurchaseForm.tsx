@@ -181,7 +181,7 @@ export const PurchaseForm = () => {
     setTransactionsHistory(prevTransactions => [
       ...prevTransactions,
       {
-        message: '暗号化したプライベートネットのアカウントをメタデータに登録',
+        message: 'アカウントをメタデータに登録',
         url: `${symbolExplorer}/transactions/${hash}`
       }
     ]);     
@@ -622,7 +622,7 @@ export const PurchaseForm = () => {
               <Typography variant="caption" component="div" sx={{ mt: 2 }}>
                 ブロックチェーンExplorer
               </Typography>
-              <List sx={{ bgcolor: 'grey.50' }}>
+              <List sx={{ bgcolor: 'grey.100' }}>
                 {transactionsHistory.map((transaction, index) => (
                   <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <ListItemIcon>
