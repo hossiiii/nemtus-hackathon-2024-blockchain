@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete, Alert } from '@mui/material';
-import { categories, initialManju, momijiAccountMetaDataKey, momijiExplorer, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
+import { categories, initialManju, momijiAccountMetaDataKey, momijiExplorer, serviceName, serviceVersion, symbolExplorer, symbolSellerAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, AggregateTransaction, Convert, CosignatureTransaction, Deadline, PublicAccount, SignedTransaction, Transaction, TransactionMapping } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
@@ -167,6 +167,10 @@ export const RegistrationForm = () => {
       hash,
       symbolSellerPublicAccount.address
     );
+
+    const url = `${symbolExplorer}/transaction/${hash}`;
+    setTransactionsHistory([{message: '暗号化したプライベートネットのアカウントをメタデータに登録', url: url}]);
+
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
       setSnackbarMessage('アカウントを登録しました。');
@@ -213,7 +217,7 @@ export const RegistrationForm = () => {
         }
         const responseJson = await response.json();
         const url = `${momijiExplorer}/transaction/${responseJson.data.hash}`;
-        setTransactionsHistory([{message: '手数料分のmanjuを送りました', url: url}]);
+        setTransactionsHistory([{message: 'プライベートネットで手数料分の基軸通貨を送付', url: url}]);
         
         setProgressValue(30); //進捗
         // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
@@ -291,7 +295,10 @@ export const RegistrationForm = () => {
     const momijiSignedTx = momijiSellerAccount.sign(momijiAggregateTx, momijiBlockChain.generationHash);
     const momijiHash = momijiSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(momijiSignedTx));
-  
+
+    const url = `${momijiExplorer}/transaction/${momijiHash}`;
+    setTransactionsHistory([{message: 'プライベートネットで商品モザイクを発行', url: url}]);
+
     setProgressValue(90); //進捗
 
     const result = await fetchUnconfirmedTransactionStatus(
