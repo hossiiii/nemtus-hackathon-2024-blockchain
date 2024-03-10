@@ -249,16 +249,18 @@ export const OrderDetail = () => {
             setOpenSnackbar(true);
             setText('決済が完了しています');
             setExchangeStatus('決済完了');
+            setProgress(false);
             setTransactionsHistory(prevTransactions => [
               ...prevTransactions,
               {
                 message: 'ロック解除トランザクションの発行',
                 url: `${symbolExplorer}/transactions/${responseJson.data.hash}`
               }
-            ]);            
+            ]);
           }else{
             setSnackbarSeverity('error');
             setSnackbarMessage('管理者にてロックの解除に失敗しました');
+            setProgress(false);
             setOpenSnackbar(true);
           }
         }else{
