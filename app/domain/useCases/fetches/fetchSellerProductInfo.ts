@@ -45,6 +45,9 @@ export const fetchSellerProductInfo = async (
     }
   }
 
+  //リストの並びを反対にする
+  productInfoList = productInfoList.reverse();
+
   return productInfoList;
 };
 
