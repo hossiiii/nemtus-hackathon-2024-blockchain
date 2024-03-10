@@ -1,6 +1,6 @@
 export const serviceName = process.env.NEXT_PUBLIC_APP_NAME;
 export const serviceVersion = 1;
-export const hashLockHour = 72; // 時間
+export const hashLockHour = 168; // 時間
 
 export const symbolSellerAccountMetaDataKey = 'momiji_seller_account';
 export const symbolUserAccountMetaDataKey = 'momiji_user_account';

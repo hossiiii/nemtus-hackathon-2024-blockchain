@@ -437,7 +437,28 @@ export const OrderDetail = () => {
                   </Box>
                 </Paper>
               } 
-            </Box>          
+            </Box>
+            {transactionsHistory.length > 0 ? (
+              <Box>
+                <Typography variant="caption" component="div" sx={{ mt: 2 }}>
+                  ブロックチェーンExplorer
+                </Typography>
+                <List sx={{ bgcolor: 'grey.100' }}>
+                  {transactionsHistory.map((transaction, index) => (
+                    <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                      <ListItemIcon>
+                        {transaction.url.includes("symbol")?
+                        <img src="symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                        :
+                        <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                        }
+                      </ListItemIcon>
+                      <ListItemText primary={(transaction.url.includes("symbol"))?"SYMBOLブロックチェーン":"プライベートブロックチェーン"} secondary={transaction.message} />
+                    </ListItem>
+                  ))}
+                </List>
+              </Box>
+            ) : (<></>)}
           </Box>        
         </>
         :
@@ -461,28 +482,6 @@ export const OrderDetail = () => {
             注文一覧に戻る
           </Button>   
         </Box>
-
-        {transactionsHistory.length > 0 ? (
-          <Box>
-            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
-              ブロックチェーンExplorer
-            </Typography>
-            <List sx={{ bgcolor: 'grey.100' }}>
-              {transactionsHistory.map((transaction, index) => (
-                <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                  <ListItemIcon>
-                    {transaction.url.includes("symbol")?
-                    <img src="symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
-                    :
-                    <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
-                    }
-                  </ListItemIcon>
-                  <ListItemText primary={(transaction.url.includes("symbol"))?"SYMBOLブロックチェーン":"プライベートブロックチェーン"} secondary={transaction.message} />
-                </ListItem>
-              ))}
-            </List>
-          </Box>
-        ) : (<></>)}
       </>
   );
 };
