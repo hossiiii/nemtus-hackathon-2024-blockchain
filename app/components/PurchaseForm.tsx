@@ -181,7 +181,7 @@ export const PurchaseForm = () => {
     setTransactionsHistory(prevTransactions => [
       ...prevTransactions,
       {
-        message: 'アカウントをメタデータに登録',
+        message: '資金のロック',
         url: `${symbolExplorer}/transactions/${hash}`
       }
     ]);     
