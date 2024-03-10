@@ -1,5 +1,6 @@
 {
   "compilerOptions": {
+    "downlevelIteration": true, // このオプションを有効にする
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,

@@ -4,7 +4,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete, Alert } from '@mui/material';
 import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
-import { Account, Address, AggregateTransaction, Convert, CosignatureTransaction, Deadline, PublicAccount } from 'symbol-sdk';
+import { Account, Address, AggregateTransaction, Convert, CosignatureTransaction, Deadline, PublicAccount, SignedTransaction, Transaction, TransactionMapping } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import InputDialog from './InputDialog';
@@ -56,7 +56,8 @@ export const RegistrationForm = () => {
 
   const [openDialog, setOpenDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
-  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+  const [openInputPassDialog, setOpenInputPassDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+  const [openInputPayloadDialog, setOpenInputPayloadDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
   const [symbolSellerAccount, setSymbolSellerAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolSellerPublicAccount, setSymbolSellerPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
@@ -77,7 +78,7 @@ export const RegistrationForm = () => {
         const pubkey = params.get('pubkey');
         localStorage.setItem(momijiAccountMetaDataKey, pubkey);
         setSnackbarSeverity('success');
-        setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
+        setSnackbarMessage('公開鍵を登録しました。引き続きアカウント登録を行って下さい');
         setOpenSnackbar(true);
       }else{
         setDialogTitle('公開鍵の確認');
@@ -148,17 +149,43 @@ export const RegistrationForm = () => {
       //未登録アカウントの場合
       setDialogTitle('販売アカウント登録');
       setDialogMessage('販売アカウントが未登録です。サービス利用のためパスワードを登録してください');
-      setOpenInputDialog(true);
+      setOpenInputPassDialog(true);
     }else{
       //TODO 登録済みアカウントの場合
       setDialogTitle('パスワード入力');
       setDialogMessage('サービス利用のための販売アカウントのパスワードを入力してください');
-      setOpenInputDialog(true);
+      setOpenInputPassDialog(true);
     }
   };
 
-  const handlePasswordInput = async (inputPassword: string | null) => {
-    setOpenInputDialog(false); // ダイアログを閉じる
+  const handleInputPayload = async (signedPayload: string | null) => {
+    const generationHash : string  = symbolBlockChain.generationHash
+    const signedPayloadhash = Transaction.createTransactionHash(signedPayload, [... Convert.hexToUint8(generationHash)])
+    const signed = TransactionMapping.createFromPayload(signedPayload);
+    const signedAggregateTx = new SignedTransaction(signedPayload, signedPayloadhash, signed.signer?.publicKey!, signed.type, signed.networkType);
+
+    const hash = signedAggregateTx.hash;
+    await firstValueFrom(symbolBlockChain.txRepo.announce(signedAggregateTx));
+    const result = await fetchUnconfirmedTransactionStatus(
+      symbolBlockChain,
+      hash,
+      symbolSellerPublicAccount.address
+    );
+    if(result.code === 'Success'){
+      setSnackbarSeverity('success');
+      setSnackbarMessage('アカウントを登録しました。引き続き商品登録を行うのでこのままお待ちください');
+      setOpenSnackbar(true);
+    }else{
+      setSnackbarSeverity('error');
+      setSnackbarMessage('アカウント登録に失敗しました');
+      setOpenSnackbar(true);
+      setProgress(false);
+      return
+    }
+  };
+
+  const handleInputPassword = async (inputPassword: string | null) => {
+    setOpenInputPassDialog(false); // ダイアログを閉じる
     setProgressValue(10); //進捗
 
     let momijiSellerAccount: Account
@@ -207,31 +234,15 @@ export const RegistrationForm = () => {
 
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
+        const payload = symbolAaggregateTx.serialize();
+
+        const aliceEndPoint = `alice://sign?type=request_sign_transaction&data=${payload}`
+        window.location.href = aliceEndPoint;
 
         //TODO: aLiceの署名に置き換え
-        const signedAggregateTx = symbolSellerAccount.sign(
-          symbolAaggregateTx,
-          symbolBlockChain.generationHash,
-        );
-
-        const hash = signedAggregateTx.hash;
-        await firstValueFrom(symbolBlockChain.txRepo.announce(signedAggregateTx));
-        const result = await fetchUnconfirmedTransactionStatus(
-          symbolBlockChain,
-          hash,
-          symbolSellerPublicAccount.address
-        );
-        if(result.code === 'Success'){
-          setSnackbarSeverity('success');
-          setSnackbarMessage('アカウントを登録しました。引き続き商品登録を行うのでこのままお待ちください');
-          setOpenSnackbar(true);
-        }else{
-          setSnackbarSeverity('error');
-          setSnackbarMessage('アカウント登録に失敗しました');
-          setOpenSnackbar(true);
-          setProgress(false);
-          return
-        }
+        setDialogTitle('署名');
+        setDialogMessage('Symbolアカウントにサービス登録用のキーを設定します。aLiceにて署名したペイロードを入力して下さい');
+        setOpenInputPayloadDialog(true);
 
       }else{
         try {
@@ -332,13 +343,21 @@ export const RegistrationForm = () => {
         dialogMessage={dialogMessage}
       />
       <InputDialog
-        openDialog={openInputDialog}
-        setOpenDialog={setOpenInputDialog}
-        handleAgreeClick={handlePasswordInput} // パスワード入力処理関数を渡す
+        openDialog={openInputPassDialog}
+        setOpenDialog={setOpenInputPassDialog}
+        handleAgreeClick={handleInputPassword} // パスワード入力処理関数を渡す
         setProgress={setProgress}
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
-      />      
+      />
+      <InputDialog
+        openDialog={openInputPayloadDialog}
+        setOpenDialog={setOpenInputPayloadDialog}
+        handleAgreeClick={handleInputPayload} // 署名済みペイロード入力処理関数を渡す
+        setProgress={setProgress}
+        dialogTitle={dialogTitle}
+        dialogMessage={dialogMessage}
+      />
       {progress ? (
         <Backdrop open={progress}>
           <Loading value={progressValue} />
