@@ -59,8 +59,8 @@ export const RegistrationForm = () => {
   const [openInputPassDialog, setOpenInputPassDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
   const [openInputPayloadDialog, setOpenInputPayloadDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
-  const [symbolSellerAccount, setSymbolSellerAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolSellerPublicAccount, setSymbolSellerPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
+  const [momijiSellerAccount, setMomijiSellerAccount] = useState<Account | null>(null); //momijiの暗号化アカウント
 
   const [symbolAccountMetaData, setSymbolAccountMetaData] = useState<string | null>(null); //momijiの暗号化アカウント
 
@@ -78,11 +78,11 @@ export const RegistrationForm = () => {
         const pubkey = params.get('pubkey');
         localStorage.setItem(momijiAccountMetaDataKey, pubkey);
         setSnackbarSeverity('success');
-        setSnackbarMessage('公開鍵を登録しました。引き続きアカウント登録を行って下さい');
+        setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
         setOpenSnackbar(true);
       }else{
         setDialogTitle('公開鍵の確認');
-        setDialogMessage('商品登録をするには初回のみ販売者用Symbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
+        setDialogMessage('初回のみSymbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
         setOpenDialog(true);  
       }
     }else{
@@ -127,11 +127,6 @@ export const RegistrationForm = () => {
     //商品情報の登録
     setInputData(data);
     console.log(data)
-
-    //TODO；あとでaLiceに置き換え パブリックアカウントの作成
-    // const symbolSellerAccount = Account.createFromPrivateKey(data.symbolPrivateKey, symbolBlockChain.networkType)
-    // setSymbolSellerAccount(symbolSellerAccount);
-    // localStorage.setItem(momijiAccountMetaDataKey, symbolSellerAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
 
     const symbolSellerPublicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
     setSymbolSellerPublicAccount(symbolSellerPublicAccount);
@@ -182,6 +177,8 @@ export const RegistrationForm = () => {
       setProgress(false);
       return
     }
+    setProgressValue(70); //進捗
+    await registrationProduct(momijiSellerAccount, symbolSellerPublicAccount.address);
   };
 
   const handleInputPassword = async (inputPassword: string | null) => {
@@ -194,6 +191,8 @@ export const RegistrationForm = () => {
       if(symbolAccountMetaData === null){
         // momijiのアカウントを作成
         momijiSellerAccount = Account.generateNewAccount(momijiBlockChain.networkType);
+        localStorage.setItem(symbolSellerAccountMetaDataKey, momijiSellerAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
+        setMomijiSellerAccount(momijiSellerAccount);
         const response = await fetch('/api/sendManju', {
           method: 'POST',
           headers: {
@@ -254,14 +253,9 @@ export const RegistrationForm = () => {
           setProgress(false);
           return
         }
+        setProgressValue(70); //進捗
+        await registrationProduct(momijiSellerAccount, symbolSellerPublicAccount.address);
       }
-
-      setProgressValue(70); //進捗
-
-      localStorage.setItem(symbolSellerAccountMetaDataKey, momijiSellerAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
-
-      await registrationProduct(momijiSellerAccount, symbolSellerPublicAccount.address);
-
     }else{
       setSnackbarSeverity('error');
       setSnackbarMessage('パスワードが入力されていません');

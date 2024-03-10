@@ -59,7 +59,7 @@ export const ProductList = () => {
         </Backdrop>
       ) : (
         <Box component="section" sx={{ p: 2 }}>
-          <Grid container spacing={4}>
+          <Grid container spacing={4} justifyContent="center"> {/* 水平方向に中央揃えにする */}
             {productList?.map((product, index) => (
               <Grid item key={index}>
                 <Card onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
