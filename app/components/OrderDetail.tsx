@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Backdrop, CircularProgress, Button, Paper, List, ListItem, ListItemText, Stepper, Step, StepLabel, Typography } from '@mui/material';
+import { Box, Backdrop, CircularProgress, Button, Paper, List, ListItem, ListItemText, Stepper, Step, StepLabel, Typography, ListItemIcon } from '@mui/material';
 import { Account, PublicAccount } from 'symbol-sdk';
 import AlertsSnackbar from './AlertsSnackbar';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
@@ -461,16 +461,28 @@ export const OrderDetail = () => {
             注文一覧に戻る
           </Button>   
         </Box>
-        {transactionsHistory.length > 0 ?<Box>
-            <Typography variant="caption" component="div" sx={{mt:2}}>
+
+        {transactionsHistory.length > 0 ? (
+          <Box>
+            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
               ブロックチェーンExplorer
             </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+            <List>
               {transactionsHistory.map((transaction, index) => (
-                <a key={index} href={transaction.url} target="_blank" rel="noreferrer">{transaction.message}</a> 
+                <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                  <ListItemIcon>
+                    {transaction.url.includes("symbol")?
+                    <img src="symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                    :
+                    <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                    }
+                  </ListItemIcon>
+                  <ListItemText secondary={transaction.message} />
+                </ListItem>
               ))}
-            </Box>
-          </Box>:<></>}
+            </List>
+          </Box>
+        ) : (<></>)}
       </>
   );
 };

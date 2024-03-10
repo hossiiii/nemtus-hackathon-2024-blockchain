@@ -3,7 +3,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, set } from 'react-hook-form';
-import { Box, Button, TextField, Backdrop, CircularProgress, Dialog, DialogTitle, DialogActions, Typography, DialogContentText, DialogContent } from '@mui/material';
+import { Box, Button, TextField, Backdrop, CircularProgress, Dialog, DialogTitle, DialogActions, Typography, DialogContentText, DialogContent, List, ListItem, ListItemIcon, ListItemText } from '@mui/material';
 import { initialManju, momijiAccountMetaDataKey, momijiExplorer, serviceName, serviceVersion, symbolExplorer, symbolUserAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, Convert, Crypto, MosaicId, PublicAccount, SignedTransaction, Transaction, TransactionMapping } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
@@ -628,16 +628,28 @@ export const PurchaseForm = () => {
               注文情報の確認
             </Button>
           </Box>
-          {transactionsHistory.length > 0 ?<Box>
-            <Typography variant="caption" component="div" sx={{mt:2}}>
-              ブロックチェーンExplorer
-            </Typography>
-            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-              {transactionsHistory.map((transaction, index) => (
-                <a key={index} href={transaction.url} target="_blank" rel="noreferrer">{transaction.message}</a> 
-              ))}
+
+          {transactionsHistory.length > 0 ? (
+            <Box>
+              <Typography variant="caption" component="div" sx={{ mt: 2 }}>
+                ブロックチェーンExplorer
+              </Typography>
+              <List>
+                {transactionsHistory.map((transaction, index) => (
+                  <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <ListItemIcon>
+                      {transaction.url.includes("symbol")?
+                      <img src="symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                      :
+                      <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                      }
+                    </ListItemIcon>
+                    <ListItemText secondary={transaction.message} />
+                  </ListItem>
+                ))}
+              </List>
             </Box>
-          </Box>:<></>}
+          ) : (<></>)}
         </form>
       </Box>
       )}
