@@ -63,7 +63,8 @@ export const PurchaseForm = () => {
   const [openInputPassDialog, setOpenInputPassDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
   const [openInputPayloadDialog, setOpenInputPayloadDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
 
-  const [openDialog, setOpenDialog] = useState<boolean>(false); //AlertsDialogの設定(個別)
+  const [openDialog, setOpenDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+  const [openOrderDialog, setOpenOrderDialog] = useState<boolean>(false); //AlertsDialogの設定(個別)
 
   const [symbolUserAccount, setSymbolUserAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolUserPublicAccount, setSymbolUserPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
@@ -119,7 +120,7 @@ export const PurchaseForm = () => {
     setProgressValue(0); //進捗
     setInputData(data);
     console.log(data)
-    setOpenDialog(true);
+    setOpenOrderDialog(true);
   };
 
   const handleCheckAccount = async () => {
@@ -365,6 +366,20 @@ export const PurchaseForm = () => {
         snackbarSeverity={snackbarSeverity}
         snackbarMessage={snackbarMessage}
       />
+      <AlertsDialog
+        openDialog={openDialog}
+        setOpenDialog={setOpenDialog}
+        handleAgreeClick={() => {
+          const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/registration`;
+          console.log(callback)
+
+          const aliceEndPoint = `alice://sign?method=post&type=request_pubkey&callback=${Convert.utf8ToHex(callback)}`
+          window.location.href = aliceEndPoint;
+          setOpenDialog(false);
+        }}
+        dialogTitle={dialogTitle}
+        dialogMessage={dialogMessage}
+      />      
       <InputDialog
         openDialog={openInputPassDialog}
         setOpenDialog={setOpenInputPassDialog}
@@ -382,9 +397,9 @@ export const PurchaseForm = () => {
         dialogMessage={dialogMessage}
       />      
       <Dialog
-        open={openDialog}
+        open={openOrderDialog}
         onClose={()=>{
-          setOpenDialog(false) 
+          setOpenOrderDialog(false) 
           setProgress(false)
         }}
         scroll={"paper"}
@@ -447,7 +462,7 @@ export const PurchaseForm = () => {
           <Button
             variant='contained'
             onClick={()=>{
-              setOpenDialog(false)
+              setOpenOrderDialog(false)
               handleCheckAccount()
             }}
           >
@@ -455,7 +470,7 @@ export const PurchaseForm = () => {
           </Button>
           <Button
             onClick={()=>{
-              setOpenDialog(false) 
+              setOpenOrderDialog(false) 
               setProgress(false)
             }}
           >
