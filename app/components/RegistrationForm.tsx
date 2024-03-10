@@ -361,17 +361,6 @@ export const RegistrationForm = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ mb: 2 }}>
             <TextField
-              label="秘密鍵"
-              variant="outlined"
-              fullWidth
-              error={!!errors.symbolPrivateKey}
-              helperText={errors.symbolPrivateKey?.message}
-              {...register("symbolPrivateKey", { required: "Symbolの秘密鍵を入力してください" })}
-            />
-          </Box>
-          {/* 以下、商品情報入力フィールド */}
-          <Box sx={{ mb: 2 }}>
-            <TextField
               label="商品名"
               variant="outlined"
               fullWidth

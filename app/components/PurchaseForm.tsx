@@ -5,7 +5,7 @@ import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, Backdrop, CircularProgress, Dialog, DialogTitle, DialogActions, Typography, DialogContentText, DialogContent } from '@mui/material';
 import { initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolUserAccountMetaDataKey } from '../consts/consts';
-import { Account, Address, Crypto, MosaicId, PublicAccount } from 'symbol-sdk';
+import { Account, Address, Convert, Crypto, MosaicId, PublicAccount, SignedTransaction, Transaction, TransactionMapping } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import InputDialog from './InputDialog';
@@ -60,11 +60,14 @@ export const PurchaseForm = () => {
   const [dialogTitle, setDialogTitle] = useState<string | null>(null);
   const [dialogMessage, setDialogMessage] = useState<string | null>(null);
 
-  const [openInputDialog, setOpenInputDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+  const [openInputPassDialog, setOpenInputPassDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+  const [openInputPayloadDialog, setOpenInputPayloadDialog] = useState<boolean>(false); //パスワード入力ダイアログの設定
+
   const [openDialog, setOpenDialog] = useState<boolean>(false); //AlertsDialogの設定(個別)
 
   const [symbolUserAccount, setSymbolUserAccount] = useState<Account | null>(null); //symbolのアカウント
   const [symbolUserPublicAccount, setSymbolUserPublicAccount] = useState<PublicAccount | null>(null); //symbolのアカウント
+  const [momijiUserAccount, setMomijiUserAccount] = useState<Account | null>(null); //momijiのアカウント
 
   const [symbolAccountMetaData, setSymbolAccountMetaData] = useState<string | null>(null); //momijiの暗号化アカウント
 
@@ -72,6 +75,9 @@ export const PurchaseForm = () => {
 
   const [productInfo, setProductInfo] = useState<ProductInfo | null>(null); //productInfo
   const [productStockAmount, setProductStockAmount] = useState<number | null>(null)
+
+  const [secret, setSecret] = useState<string | null>(null); //シークレット
+  const [proof, setProof] = useState<string | null>(null); //プルーフ
 
   useEffect(() => {
     if (momijiBlockChain) {
@@ -98,11 +104,10 @@ export const PurchaseForm = () => {
 
   const handleCheckAccount = async () => {
     //TODO；あとでaLiceに置き換え パブリックアカウントの作成
-    const symbolUserAccount = Account.createFromPrivateKey(inputData.symbolPrivateKey, symbolBlockChain.networkType)
-    setSymbolUserAccount(symbolUserAccount);
-    localStorage.setItem(momijiAccountMetaDataKey, symbolUserAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
-
-    const symbolUserPublicAccount = PublicAccount.createFromPublicKey(symbolUserAccount.publicKey, symbolBlockChain.networkType);
+    // const symbolUserAccount = Account.createFromPrivateKey(inputData.symbolPrivateKey, symbolBlockChain.networkType)
+    // setSymbolUserAccount(symbolUserAccount);
+    // localStorage.setItem(momijiAccountMetaDataKey, symbolUserAccount.publicKey); //Symbol側の公開鍵をローカルストレージに保存
+    const symbolUserPublicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
     setSymbolUserPublicAccount(symbolUserPublicAccount);
 
     //アカウントのチェック    
@@ -128,17 +133,45 @@ export const PurchaseForm = () => {
       //未登録アカウントの場合
       setDialogTitle('購入者アカウント登録');
       setDialogMessage('購入者アカウントが未登録です。購入時のパスワードを登録してください');
-      setOpenInputDialog(true);
+      setOpenInputPassDialog(true);
     }else{
       //TODO 登録済みアカウントの場合
       setDialogTitle('パスワード入力');
       setDialogMessage('購入者用パスワードを入力してください');
-      setOpenInputDialog(true);
+      setOpenInputPassDialog(true);
     }
   };
 
-  const handlePasswordInput = async (inputPassword: string | null) => {
-    setOpenInputDialog(false); // ダイアログを閉じる  
+  const handleInputPayload = async (signedPayload: string | null) => {
+    const generationHash : string  = symbolBlockChain.generationHash
+    const signedPayloadhash = Transaction.createTransactionHash(signedPayload, [... Convert.hexToUint8(generationHash)])
+    const signed = TransactionMapping.createFromPayload(signedPayload);
+    const signedAggregateTx = new SignedTransaction(signedPayload, signedPayloadhash, signed.signer?.publicKey!, signed.type, signed.networkType);
+
+    const hash = signedAggregateTx.hash;
+    await firstValueFrom(symbolBlockChain.txRepo.announce(signedAggregateTx));
+    const result = await fetchUnconfirmedTransactionStatus(
+      symbolBlockChain,
+      hash,
+      symbolUserPublicAccount.address,
+    );
+    if(result.code === 'Success'){
+      setSnackbarSeverity('success');
+      setSnackbarMessage('資金のロックが完了しました。引き続き注文処理を行いますのでこのままお待ちください');
+      setOpenSnackbar(true);
+    }else{
+      setSnackbarSeverity('error');
+      setSnackbarMessage('資金のロックに失敗しました。');
+      setOpenSnackbar(true);
+      setProgress(false);
+      return
+    }
+    setProgressValue(40); //進捗
+    await order(momijiUserAccount, secret, proof);
+  };
+
+  const handleInputPassword = async (inputPassword: string | null) => {
+    setOpenInputPassDialog(false); // ダイアログを閉じる  
     setProgressValue(10); //進捗
     
     let momijiUserAccount: Account
@@ -149,13 +182,18 @@ export const PurchaseForm = () => {
       const random = Crypto.randomBytes(20);
       const secretHash = sha3_256.create();
       const secret = secretHash.update(random).hex();
+      setSecret(secret);
       const proof = random.toString('hex');
+      setProof(proof);
       const symbolSellerAddress = Address.createFromRawAddress(productInfo.depositAddress)
       const secretTx = secretLockTransaction(symbolBlockChain, totalPrice, secret, symbolSellerAddress);
       
       if(symbolAccountMetaData === null){
         // momijiのアカウントを作成
         momijiUserAccount = Account.generateNewAccount(momijiBlockChain.networkType);
+        localStorage.setItem(symbolUserAccountMetaDataKey, momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
+        setMomijiUserAccount(momijiUserAccount);
+
         const response = await fetch('/api/sendManju', {
           method: 'POST',
           headers: {
@@ -177,31 +215,16 @@ export const PurchaseForm = () => {
         setProgressValue(30); //進捗
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiUserAccount, inputPassword)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolUserPublicAccount, momijiUserAccount, momijiStrSignerQR, symbolUserAccountMetaDataKey, secretTx); //アカウント登録に合わせてシークレットロックトランザクションを追加
+        const payload = symbolAaggregateTx.serialize();
+        
+        const aliceEndPoint = `alice://sign?type=request_sign_transaction&data=${payload}`
+        window.location.href = aliceEndPoint;
 
         //TODO: aLiceの署名に置き換え
-        const signedAggregateTx = symbolUserAccount.sign(
-          symbolAaggregateTx,
-          symbolBlockChain.generationHash,
-        );
+        setDialogTitle('署名');
+        setDialogMessage('Symbolアカウントで決済を行います。aLiceにて署名したペイロードを入力して下さい');
+        setOpenInputPayloadDialog(true);
 
-        const hash = signedAggregateTx.hash;
-        await firstValueFrom(symbolBlockChain.txRepo.announce(signedAggregateTx));
-        const result = await fetchUnconfirmedTransactionStatus(
-          symbolBlockChain,
-          hash,
-          symbolUserPublicAccount.address,
-        );
-        if(result.code === 'Success'){
-          setSnackbarSeverity('success');
-          setSnackbarMessage('アカウントを登録しました。引き続き注文登録を行うのでこのままお待ちください');
-          setOpenSnackbar(true);
-        }else{
-          setSnackbarSeverity('error');
-          setSnackbarMessage('アカウント登録に失敗しました');
-          setOpenSnackbar(true);
-          setProgress(false);
-          return
-        }
       }else{
         try {
           momijiUserAccount = decryptedAccount(momijiBlockChain, symbolAccountMetaData, inputPassword);
@@ -213,32 +236,15 @@ export const PurchaseForm = () => {
           return
         }
 
+        const payload = secretTx.serialize();
+        const aliceEndPoint = `alice://sign?type=request_sign_transaction&data=${payload}`
+        window.location.href = aliceEndPoint;
+
         //TODO: aLiceの署名に置き換え
-        const signedSecretTx = symbolUserAccount.sign(secretTx,symbolBlockChain.generationHash);
-        const hash = signedSecretTx.hash;
-        await firstValueFrom(symbolBlockChain.txRepo.announce(signedSecretTx));
-        const result = await fetchUnconfirmedTransactionStatus(
-          symbolBlockChain,
-          hash,
-          symbolUserPublicAccount.address,
-        );
-        if(result.code === 'Success'){
-          setSnackbarSeverity('success');
-          setSnackbarMessage('資金のロックが完了しました。引き続き注文処理を行いますのでこのままお待ちください');
-          setOpenSnackbar(true);
-        }else{
-          setSnackbarSeverity('error');
-          setSnackbarMessage('資金のロックに失敗しました。');
-          setOpenSnackbar(true);
-          setProgress(false);
-          return
-        }        
+        setDialogTitle('署名');
+        setDialogMessage('Symbolアカウントで決済を行います。aLiceにて署名したペイロードを入力して下さい');
+        setOpenInputPayloadDialog(true);    
       }
-
-      setProgressValue(40); //進捗
-      localStorage.setItem(symbolUserAccountMetaDataKey, momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
-
-      await order(momijiUserAccount, secret, proof);
 
     }else{
       setSnackbarSeverity('error');
@@ -340,9 +346,17 @@ export const PurchaseForm = () => {
         snackbarMessage={snackbarMessage}
       />
       <InputDialog
-        openDialog={openInputDialog}
-        setOpenDialog={setOpenInputDialog}
-        handleAgreeClick={handlePasswordInput} // パスワード入力処理関数を渡す
+        openDialog={openInputPassDialog}
+        setOpenDialog={setOpenInputPassDialog}
+        handleAgreeClick={handleInputPassword} // パスワード入力処理関数を渡す
+        setProgress={setProgress}
+        dialogTitle={dialogTitle}
+        dialogMessage={dialogMessage}
+      />
+      <InputDialog
+        openDialog={openInputPayloadDialog}
+        setOpenDialog={setOpenInputPayloadDialog}
+        handleAgreeClick={handleInputPayload} // 署名済みペイロード入力処理関数を渡す
         setProgress={setProgress}
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
