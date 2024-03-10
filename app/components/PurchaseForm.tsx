@@ -88,7 +88,7 @@ export const PurchaseForm = () => {
         const pubkey = params.get('pubkey');
         localStorage.setItem(momijiAccountMetaDataKey, pubkey);
         setSnackbarSeverity('success');
-        setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
+        setSnackbarMessage('公開鍵を登録しました。引き続き注文情報を入力して下さい');
         setOpenSnackbar(true);
       }else{
         setDialogTitle('公開鍵の確認');
@@ -370,7 +370,7 @@ export const PurchaseForm = () => {
         openDialog={openDialog}
         setOpenDialog={setOpenDialog}
         handleAgreeClick={() => {
-          const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/registration`;
+          const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/purchase?mosaicId=${searchParams.get('mosaicId')}`;
           console.log(callback)
 
           const aliceEndPoint = `alice://sign?method=post&type=request_pubkey&callback=${Convert.utf8ToHex(callback)}`
