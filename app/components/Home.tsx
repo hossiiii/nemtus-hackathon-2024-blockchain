@@ -51,7 +51,7 @@ const Home = () => {
                 <Card onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
                   <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <img src={product.imageUrl} alt="description" style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', display: 'block' }} />
-                    <Typography gutterBottom variant="h5" component="div" sx={{mt:1}}>
+                    <Typography gutterBottom variant="h6" component="div" sx={{mt:1}}>
                       {product.productName}
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
