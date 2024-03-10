@@ -80,6 +80,26 @@ export const PurchaseForm = () => {
   const [proof, setProof] = useState<string | null>(null); //プルーフ
 
   useEffect(() => {
+    if (!localStorage.getItem(momijiAccountMetaDataKey)) {
+      if(window.location.href.includes('pubkey')){
+        const url = new URL(window.location.href);
+        const params = new URLSearchParams(url.search);
+        const pubkey = params.get('pubkey');
+        localStorage.setItem(momijiAccountMetaDataKey, pubkey);
+        setSnackbarSeverity('success');
+        setSnackbarMessage('公開鍵を登録しました。引き続き商品登録を行って下さい');
+        setOpenSnackbar(true);
+      }else{
+        setDialogTitle('公開鍵の確認');
+        setDialogMessage('初回のみSymbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
+        setOpenDialog(true);  
+      }
+    }else{
+    }
+  }
+  , []);  
+
+  useEffect(() => {
     if (momijiBlockChain) {
       const func = async () => {
         const mosaicId = new MosaicId(searchParams.get('mosaicId'))
