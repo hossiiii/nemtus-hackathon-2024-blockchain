@@ -249,6 +249,8 @@ export const PurchaseForm = () => {
       }else{
         try {
           momijiUserAccount = decryptedAccount(momijiBlockChain, symbolAccountMetaData, inputPassword);
+          localStorage.setItem(symbolUserAccountMetaDataKey, momijiUserAccount.publicKey); //Momiji側の公開鍵をローカルストレージに保存
+          setMomijiUserAccount(momijiUserAccount);
         } catch (error) {
           setSnackbarSeverity('error');
           setSnackbarMessage('パスワードが間違っています');
