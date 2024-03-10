@@ -239,8 +239,6 @@ export const OrderDetail = () => {
           }),
         })
 
-        const responseJson = await response.json();
-
         if (response.ok) {
           const data = await response.json();
           if (data.data.code == 'Success') {
@@ -254,7 +252,7 @@ export const OrderDetail = () => {
               ...prevTransactions,
               {
                 message: 'ロック解除トランザクションの発行',
-                url: `${symbolExplorer}/transactions/${responseJson.data.hash}`
+                url: `${symbolExplorer}/transactions/${data.data.hash}`
               }
             ]);
           }else{
