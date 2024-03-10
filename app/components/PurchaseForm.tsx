@@ -356,7 +356,7 @@ export const PurchaseForm = () => {
         }, 2000); // 2000ミリ秒 = 2秒
 
         return
-        
+
       }else{
         setSnackbarSeverity('error');
         setSnackbarMessage('管理者側の交換トランザクションでブロックチェーン上の不整合が発生しました');
@@ -495,17 +495,6 @@ export const PurchaseForm = () => {
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <Box sx={{ mb: 2 }}>
-            <TextField
-              label="秘密鍵"
-              variant="outlined"
-              fullWidth
-              error={!!errors.symbolPrivateKey}
-              helperText={errors.symbolPrivateKey?.message}
-              {...register("symbolPrivateKey", { required: "Symbolの秘密鍵を入力してください" })}
-            />
-          </Box>
-          {/* 以下、注文情報入力フィールド */}
           <Box sx={{ mb: 2 }}>
             <TextField
               label="お名前"
