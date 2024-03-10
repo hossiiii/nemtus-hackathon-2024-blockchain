@@ -363,16 +363,6 @@ export const PurchaseForm = () => {
         orderTxHash: orderSignedTxHash
       }),
     })
-
-    const responseJson = await response.json();
-
-    setTransactionsHistory(prevTransactions => [
-      ...prevTransactions,
-      {
-        message: '取引トランザクションの発行',
-        url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
-      }
-    ]);      
     
     if (!response.ok) {
       setSnackbarSeverity('error');
@@ -388,6 +378,15 @@ export const PurchaseForm = () => {
         setSnackbarMessage('注文が完了しました');
         setOpenSnackbar(true);
         setProgress(false);
+
+        setTransactionsHistory(prevTransactions => [
+          ...prevTransactions,
+          {
+            message: '取引トランザクションの発行',
+            url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
+          }
+        ]);
+    
       }else{
         setSnackbarSeverity('error');
         setSnackbarMessage('管理者側の交換トランザクションでブロックチェーン上の不整合が発生しました');
@@ -528,17 +527,6 @@ export const PurchaseForm = () => {
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ mb: 2 }}>
             <TextField
-              label="秘密鍵"
-              variant="outlined"
-              fullWidth
-              error={!!errors.symbolPrivateKey}
-              helperText={errors.symbolPrivateKey?.message}
-              {...register("symbolPrivateKey", { required: "Symbolの秘密鍵を入力してください" })}
-            />
-          </Box>
-          {/* 以下、注文情報入力フィールド */}
-          <Box sx={{ mb: 2 }}>
-            <TextField
               label="お名前"
               variant="outlined"
               fullWidth
@@ -644,7 +632,7 @@ export const PurchaseForm = () => {
                       <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
                       }
                     </ListItemIcon>
-                    <ListItemText secondary={transaction.message} />
+                    <ListItemText primary={(transaction.url.includes("symbol"))?"SYMBOLブロックチェーン":"プライベートブロックチェーン"} secondary={transaction.message} />
                   </ListItem>
                 ))}
               </List>

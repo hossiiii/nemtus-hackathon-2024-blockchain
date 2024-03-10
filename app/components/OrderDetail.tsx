@@ -477,7 +477,7 @@ export const OrderDetail = () => {
                     <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
                     }
                   </ListItemIcon>
-                  <ListItemText secondary={transaction.message} />
+                  <ListItemText primary={(transaction.url.includes("symbol"))?"SYMBOLブロックチェーン":"プライベートブロックチェーン"} secondary={transaction.message} />
                 </ListItem>
               ))}
             </List>
