@@ -39,8 +39,6 @@ export const OrderDetail = () => {
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
   const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
-  const [progressText, setProgressText] = useState<string>(''); //ローディングのテキスト
-  const [progressUrl, setProgressUrl] = useState<string>(''); //ローディングのURL
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定

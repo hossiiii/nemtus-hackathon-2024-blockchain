@@ -7,7 +7,6 @@ import AppsIcon from '@mui/icons-material/Apps';
 import ShoppingCartIcon from '@mui/icons-material/ShoppingCart';
 import Settings from '@mui/icons-material/Settings';
 import { usePathname } from 'next/navigation';
-import { symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from "../consts/consts";
 
 function MyBottomNavigation(): JSX.Element {
     const pathname = usePathname()
@@ -25,7 +24,6 @@ function MyBottomNavigation(): JSX.Element {
                 href="/registration"
             />
 
-            {typeof window !== 'undefined' && localStorage.getItem(symbolSellerAccountMetaDataKey) ?
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>登録商品</Typography>}
                 value="/product"
@@ -33,9 +31,6 @@ function MyBottomNavigation(): JSX.Element {
                 component="a"
                 href="/product"
             />
-            :
-            <></>
-            }
 
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>ホーム</Typography>}
@@ -45,7 +40,6 @@ function MyBottomNavigation(): JSX.Element {
                 href="/"
             />
 
-            {typeof window !== 'undefined' && localStorage.getItem(symbolUserAccountMetaDataKey) ?
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>注文情報</Typography>}
                 value="/order"
@@ -53,9 +47,6 @@ function MyBottomNavigation(): JSX.Element {
                 component="a"
                 href="/order"
             />
-            :
-            <></>
-            }
 
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>設定</Typography>}

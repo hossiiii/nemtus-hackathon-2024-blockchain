@@ -44,11 +44,10 @@ export const RegistrationForm = () => {
   });
 
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
+  const [transactionsUrlHistory, setTransactionsUrlHistory] = useState<string[]>([])
 
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
   const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
-  const [progressText, setProgressText] = useState<string>(''); //ローディングのテキスト
-  const [progressUrl, setProgressUrl] = useState<string>(''); //ローディングのURL
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -106,7 +105,6 @@ export const RegistrationForm = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
     setProgressValue(0); //進捗
-    setProgressText('商品情報を開始します...'); //テキスト
 
     //画像のアップロード
     if (!inputFileRef.current?.files) {
@@ -187,7 +185,6 @@ export const RegistrationForm = () => {
   const handleInputPassword = async (inputPassword: string | null) => {
     setOpenInputPassDialog(false); // ダイアログを閉じる
     setProgressValue(10); //進捗
-    setProgressText('パスワード情報を確認します...'); //テキスト
 
     let momijiSellerAccount: Account
 
@@ -214,12 +211,11 @@ export const RegistrationForm = () => {
           setProgress(false);
           return
         }
-        setProgressValue(20); //進捗
-        setProgressText('プライベートネットで手数料分の基軸通貨を発行中...'); //テキスト
         const responseJson = await response.json();
         const url = `${momijiExplorer}/transaction/${responseJson.data.hash}`;
-        setProgressUrl(url);
-
+        setTransactionsUrlHistory([...transactionsUrlHistory, url]);
+        
+        setProgressValue(30); //進捗
         // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
         // const res = await fetch('/api/metadata', {
         //   method: 'POST',
@@ -237,12 +233,6 @@ export const RegistrationForm = () => {
         //   setProgress(false);
         //   return
         // }
-
-        // setProgressText('プライベートネットでメタデータに...'); //テキスト
-        // const resJson = await res.json();
-        // const url2 = `${momijiExplorer}/transaction/${resJson.data.hash}`;
-        // setProgressUrl(url2);
-
         // setProgressValue(30); //進捗
 
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
@@ -318,12 +308,6 @@ export const RegistrationForm = () => {
       setSnackbarMessage('商品情報の登録に成功しました。しばらくすると登録商品にリストされます');
       setOpenSnackbar(true);
       setProgress(false);
-
-      // 2秒後にページをリロード
-      setTimeout(() => {
-        window.location.reload();
-      }, 2000); // 2000ミリ秒 = 2秒
-
       return
     }else{
       setSnackbarSeverity('error');
@@ -375,11 +359,7 @@ export const RegistrationForm = () => {
       />
       {progress ? (
         <Backdrop open={progress}>
-          <Loading
-            value={progressValue}
-            text={progressText}
-            url={progressUrl}
-          />
+          <Loading value={progressValue} />
         </Backdrop>
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
@@ -516,7 +496,18 @@ export const RegistrationForm = () => {
             <Button type="submit" variant="contained" color="primary">
               登録する
             </Button>
-          </Box>          
+          </Box>
+
+          {transactionsUrlHistory.length > 0 ?<Box>
+            <Typography variant="h6" component="div" sx={{mt:2}}>
+              登録内容
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+              {transactionsUrlHistory.map((url, index) => (
+                <a key={index} href={url} target="_blank" rel="noreferrer">{url}</a> 
+              ))}
+            </Box>
+          </Box>:<></>}
         </form>
       </Box>
       )}
