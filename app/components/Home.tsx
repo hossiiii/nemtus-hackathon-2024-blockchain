@@ -41,7 +41,9 @@ const Home = () => {
       />
       {progress ? (
         <Backdrop open={progress}>
-          <Loading value={progressValue} />
+          <Loading
+            value={progressValue}
+          />
         </Backdrop>
       ) : (
         <Box component="section" sx={{ p: 2 }}>

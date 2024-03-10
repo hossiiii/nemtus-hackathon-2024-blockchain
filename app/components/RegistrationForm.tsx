@@ -3,7 +3,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { useForm, Controller, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, FormControl, InputLabel, Select, MenuItem, OutlinedInput, Typography, Backdrop, CircularProgress, Autocomplete, Alert } from '@mui/material';
-import { categories, initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
+import { categories, initialManju, momijiAccountMetaDataKey, momijiExplorer, serviceName, serviceVersion, symbolSellerAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, AggregateTransaction, Convert, CosignatureTransaction, Deadline, PublicAccount, SignedTransaction, Transaction, TransactionMapping } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
@@ -47,6 +47,8 @@ export const RegistrationForm = () => {
 
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
   const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
+  const [progressText, setProgressText] = useState<string>(''); //ローディングのテキスト
+  const [progressUrl, setProgressUrl] = useState<string>(''); //ローディングのURL
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
   const [snackbarSeverity, setSnackbarSeverity] = useState<'error' | 'success'>('error'); //AlertsSnackbarの設定
   const [snackbarMessage, setSnackbarMessage] = useState<string>(''); //AlertsSnackbarの設定
@@ -104,6 +106,7 @@ export const RegistrationForm = () => {
   const onSubmit: SubmitHandler<Inputs> = async (data) => {
     setProgress(true); //ローディング開始
     setProgressValue(0); //進捗
+    setProgressText('商品情報を開始します...'); //テキスト
 
     //画像のアップロード
     if (!inputFileRef.current?.files) {
@@ -184,6 +187,7 @@ export const RegistrationForm = () => {
   const handleInputPassword = async (inputPassword: string | null) => {
     setOpenInputPassDialog(false); // ダイアログを閉じる
     setProgressValue(10); //進捗
+    setProgressText('パスワード情報を確認します...'); //テキスト
 
     let momijiSellerAccount: Account
 
@@ -211,25 +215,35 @@ export const RegistrationForm = () => {
           return
         }
         setProgressValue(20); //進捗
-        // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
-        const res = await fetch('/api/metadata', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            privateKey: momijiSellerAccount.privateKey,
-          }),
-        })
-        if (!res.ok) {
-          setSnackbarSeverity('error');
-          setSnackbarMessage('メタデータの生成に失敗しました');
-          setOpenSnackbar(true);
-          setProgress(false);
-          return
-        }
+        setProgressText('プライベートネットで手数料分の基軸通貨を発行中...'); //テキスト
+        const responseJson = await response.json();
+        const url = `${momijiExplorer}/transaction/${responseJson.data.hash}`;
+        setProgressUrl(url);
 
-        setProgressValue(30); //進捗
+        // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
+        // const res = await fetch('/api/metadata', {
+        //   method: 'POST',
+        //   headers: {
+        //     'Content-Type': 'application/json',
+        //   },
+        //   body: JSON.stringify({
+        //     privateKey: momijiSellerAccount.privateKey,
+        //   }),
+        // })
+        // if (!res.ok) {
+        //   setSnackbarSeverity('error');
+        //   setSnackbarMessage('メタデータの生成に失敗しました');
+        //   setOpenSnackbar(true);
+        //   setProgress(false);
+        //   return
+        // }
+
+        // setProgressText('プライベートネットでメタデータに...'); //テキスト
+        // const resJson = await res.json();
+        // const url2 = `${momijiExplorer}/transaction/${resJson.data.hash}`;
+        // setProgressUrl(url2);
+
+        // setProgressValue(30); //進捗
 
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiSellerAccount, inputPassword)
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
@@ -361,7 +375,11 @@ export const RegistrationForm = () => {
       />
       {progress ? (
         <Backdrop open={progress}>
-          <Loading value={progressValue} />
+          <Loading
+            value={progressValue}
+            text={progressText}
+            url={progressUrl}
+          />
         </Backdrop>
       ) : (
       <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
