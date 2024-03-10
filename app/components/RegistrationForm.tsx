@@ -236,8 +236,12 @@ export const RegistrationForm = () => {
         const symbolAaggregateTx = await signupTransactions(momijiBlockChain, symbolBlockChain, symbolSellerPublicAccount, momijiSellerAccount, momijiStrSignerQR, symbolSellerAccountMetaDataKey);
         const payload = symbolAaggregateTx.serialize();
 
-        const aliceEndPoint = `alice://sign?type=request_sign_transaction&data=${payload}`
+        const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/registration`;
+        console.log(callback)
+
+        const aliceEndPoint = `alice://sign?method=post&type=request_sign_transaction&data=${payload}&callback=${Convert.utf8ToHex(callback)}`
         window.location.href = aliceEndPoint;
+
 
         //TODO: aLiceの署名に置き換え
         setDialogTitle('署名');

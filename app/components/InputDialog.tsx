@@ -37,7 +37,7 @@ function InputDialog(props: {
           autoFocus
           margin="dense"
           id="password"
-          label="パスワード"
+          label="入力"
           type="password"
           fullWidth
           variant="outlined"
