@@ -248,7 +248,7 @@ export const PurchaseForm = () => {
         setTransactionsHistory(prevTransactions => [
           ...prevTransactions,
           {
-            message: 'プライベートネットで手数料分の基軸通貨を送付',
+            message: '手数料分の基軸通貨を送付',
             url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
           }
         ]);  
@@ -622,7 +622,7 @@ export const PurchaseForm = () => {
               <Typography variant="caption" component="div" sx={{ mt: 2 }}>
                 ブロックチェーンExplorer
               </Typography>
-              <List>
+              <List sx={{ bgcolor: 'grey.50' }}>
                 {transactionsHistory.map((transaction, index) => (
                   <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                     <ListItemIcon>
