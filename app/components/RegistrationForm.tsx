@@ -168,8 +168,7 @@ export const RegistrationForm = () => {
       symbolSellerPublicAccount.address
     );
 
-    const url = `${symbolExplorer}/transaction/${hash}`;
-    setTransactionsHistory([{message: '暗号化したプライベートネットのアカウントをメタデータに登録', url: url}]);
+    setTransactionsHistory([{message: '暗号化したプライベートネットのアカウントをメタデータに登録', url: `${symbolExplorer}/transactions/${hash}`}]);
 
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
@@ -216,8 +215,7 @@ export const RegistrationForm = () => {
           return
         }
         const responseJson = await response.json();
-        const url = `${momijiExplorer}/transaction/${responseJson.data.hash}`;
-        setTransactionsHistory([{message: 'プライベートネットで手数料分の基軸通貨を送付', url: url}]);
+        setTransactionsHistory([{message: 'プライベートネットで手数料分の基軸通貨を送付', url: `${momijiExplorer}/transactions/${responseJson.data.hash}`}]);
         
         setProgressValue(30); //進捗
         // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
@@ -296,8 +294,7 @@ export const RegistrationForm = () => {
     const momijiHash = momijiSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(momijiSignedTx));
 
-    const url = `${momijiExplorer}/transaction/${momijiHash}`;
-    setTransactionsHistory([{message: 'プライベートネットで商品モザイクを発行', url: url}]);
+    setTransactionsHistory([{message: 'プライベートネットで商品モザイクを発行', url: `${momijiExplorer}/transactions/${momijiHash}`}]);
 
     setProgressValue(90); //進捗
 
@@ -506,8 +503,8 @@ export const RegistrationForm = () => {
           </Box>
 
           {transactionsHistory.length > 0 ?<Box>
-            <Typography variant="h6" component="div" sx={{mt:2}}>
-              登録内容
+            <Typography variant="caption" component="div" sx={{mt:2}}>
+              ブロックチェーンExplorer
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
               {transactionsHistory.map((transaction, index) => (

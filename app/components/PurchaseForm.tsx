@@ -4,7 +4,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm, SubmitHandler, set } from 'react-hook-form';
 import { Box, Button, TextField, Backdrop, CircularProgress, Dialog, DialogTitle, DialogActions, Typography, DialogContentText, DialogContent } from '@mui/material';
-import { initialManju, momijiAccountMetaDataKey, serviceName, serviceVersion, symbolUserAccountMetaDataKey } from '../consts/consts';
+import { initialManju, momijiAccountMetaDataKey, momijiExplorer, serviceName, serviceVersion, symbolExplorer, symbolUserAccountMetaDataKey } from '../consts/consts';
 import { Account, Address, Convert, Crypto, MosaicId, PublicAccount, SignedTransaction, Transaction, TransactionMapping } from 'symbol-sdk';
 import { fetchAccountMetaData } from '../domain/utils/fetches/fetchAccountMetaData';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
@@ -50,6 +50,7 @@ export const PurchaseForm = () => {
   } = useForm<Inputs>({});
 
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
+  const [transactionsHistory, setTransactionsHistory] = useState<{message:string, url:string}[]>([])
 
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
   const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
@@ -176,6 +177,9 @@ export const PurchaseForm = () => {
       hash,
       symbolUserPublicAccount.address,
     );
+
+    setTransactionsHistory([{message: '暗号化したプライベートネットのアカウントをメタデータに登録', url: `${symbolExplorer}/transactions/${hash}`}]);
+
     if(result.code === 'Success'){
       setSnackbarSeverity('success');
       setSnackbarMessage('資金のロックが完了しました。引き続き注文処理を行いますのでこのままお待ちください');
@@ -232,6 +236,9 @@ export const PurchaseForm = () => {
           setProgress(false);
           return
         }
+
+        const responseJson = await response.json();
+        setTransactionsHistory([{message: 'プライベートネットで手数料分の基軸通貨を送付', url: `${momijiExplorer}/transactions/${responseJson.data.hash}`}]);
         
         setProgressValue(30); //進捗
         const momijiStrSignerQR = encryptedAccount(momijiBlockChain, momijiUserAccount, inputPassword)
@@ -306,7 +313,9 @@ export const PurchaseForm = () => {
     const orderSignedTx = momijiUserAccount.sign(orderTx, momijiBlockChain.generationHash);
     const orderSignedTxHash = orderSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(orderSignedTx));
-  
+
+    setTransactionsHistory([{message: '注文トランザクションの発行', url: `${momijiExplorer}/transactions/${orderSignedTxHash}`}]);
+    
     setProgressValue(50); //進捗
 
     const res = await fetchTransactionStatus( //ここはサーバー側でorderTxHashから情報をフェッチするのでUnconfirmedTransactionStatusではだめ
@@ -335,6 +344,10 @@ export const PurchaseForm = () => {
         orderTxHash: orderSignedTxHash
       }),
     })
+
+    const responseJson = await response.json();
+    setTransactionsHistory([{message: '取引トランザクションの発行', url: `${momijiExplorer}/transactions/${responseJson.data.hash}`}]);
+    
     if (!response.ok) {
       setSnackbarSeverity('error');
       setSnackbarMessage('管理者側の交換トランザクションに失敗しました');
@@ -589,6 +602,16 @@ export const PurchaseForm = () => {
               注文情報の確認
             </Button>
           </Box>
+          {transactionsHistory.length > 0 ?<Box>
+            <Typography variant="caption" component="div" sx={{mt:2}}>
+              ブロックチェーンExplorer
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+              {transactionsHistory.map((transaction, index) => (
+                <a key={index} href={transaction.url} target="_blank" rel="noreferrer">{transaction.message}</a> 
+              ))}
+            </Box>
+          </Box>:<></>}
         </form>
       </Box>
       )}

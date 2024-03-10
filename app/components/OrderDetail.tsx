@@ -1,12 +1,12 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Backdrop, CircularProgress, Button, Paper, List, ListItem, ListItemText, Stepper, Step, StepLabel } from '@mui/material';
+import { Box, Backdrop, CircularProgress, Button, Paper, List, ListItem, ListItemText, Stepper, Step, StepLabel, Typography } from '@mui/material';
 import { Account, PublicAccount } from 'symbol-sdk';
 import AlertsSnackbar from './AlertsSnackbar';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { momijiAccountMetaDataKey, symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from '../consts/consts';
+import { momijiAccountMetaDataKey, momijiExplorer, symbolExplorer, symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from '../consts/consts';
 import { ExchangeInfo } from '../domain/entities/exchangeInfo/exchangeInfo';
 import { fetchExchangeInfo } from '../domain/useCases/fetches/fetchExchangeInfo';
 import InputDialog from './InputDialog';
@@ -37,6 +37,8 @@ export const OrderDetail = () => {
   const router = useRouter();
 
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
+  const [transactionsHistory, setTransactionsHistory] = useState<{message:string, url:string}[]>([])
+
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
   const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
   const [openSnackbar, setOpenSnackbar] = useState<boolean>(false); //AlertsSnackbarの設定
@@ -168,6 +170,8 @@ export const OrderDetail = () => {
           exchangeTxHash,
           momijiAccount.address,
         );
+
+        setTransactionsHistory([{message: '連署用トランザクションの発行', url: `${momijiExplorer}/transactions/${signedCosTx}`}]);    
       
         if(result.code == 'Success'){
           setSnackbarSeverity('success');
@@ -198,6 +202,8 @@ export const OrderDetail = () => {
           momijiAccount.address,
         );
 
+        setTransactionsHistory([{message: '連署用トランザクションの発行', url: `${momijiExplorer}/transactions/${signedCosTx2}`}]);
+
         if(result2.code != 'Success'){
           setSnackbarSeverity('success');
           setSnackbarMessage('受け取り完了報告が失敗しました');
@@ -220,6 +226,10 @@ export const OrderDetail = () => {
             exchangeTxHash: exchangeTxHash
           }),
         })
+
+        const responseJson = await response.json();
+        setTransactionsHistory([{message: 'ロック解除トランザクションの発行', url: `${symbolExplorer}/transactions/${responseJson.data.hash}`}]);
+
         if (response.ok) {
           const data = await response.json();
           if (data.data.code == 'Success') {
@@ -431,7 +441,17 @@ export const OrderDetail = () => {
           >
             注文一覧に戻る
           </Button>   
-        </Box>        
+        </Box>
+        {transactionsHistory.length > 0 ?<Box>
+            <Typography variant="caption" component="div" sx={{mt:2}}>
+              ブロックチェーンExplorer
+            </Typography>
+            <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
+              {transactionsHistory.map((transaction, index) => (
+                <a key={index} href={transaction.url} target="_blank" rel="noreferrer">{transaction.message}</a> 
+              ))}
+            </Box>
+          </Box>:<></>}
       </>
   );
 };
