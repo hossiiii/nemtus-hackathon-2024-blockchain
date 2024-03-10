@@ -239,9 +239,8 @@ export const RegistrationForm = () => {
         const callback = `${process.env.NEXT_PUBLIC_WEB_SITE}/registration`;
         console.log(callback)
 
-        const aliceEndPoint = `alice://sign?method=post&type=request_sign_transaction&data=${payload}&callback=${Convert.utf8ToHex(callback)}`
+        const aliceEndPoint = `alice://sign?method=post&type=request_sign_transaction&data=${payload}&callback=${Convert.utf8ToHex(callback)}&redirect_url=${Convert.utf8ToHex(callback)}`
         window.location.href = aliceEndPoint;
-
 
         //TODO: aLiceの署名に置き換え
         setDialogTitle('署名');
