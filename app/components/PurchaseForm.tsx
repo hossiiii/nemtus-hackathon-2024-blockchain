@@ -349,6 +349,14 @@ export const PurchaseForm = () => {
         setSnackbarMessage('注文が完了しました');
         setOpenSnackbar(true);
         setProgress(false);
+
+        // 2秒後にページをリロード
+        setTimeout(() => {
+          window.location.reload();
+        }, 2000); // 2000ミリ秒 = 2秒
+
+        return
+        
       }else{
         setSnackbarSeverity('error');
         setSnackbarMessage('管理者側の交換トランザクションでブロックチェーン上の不整合が発生しました');

@@ -304,6 +304,12 @@ export const RegistrationForm = () => {
       setSnackbarMessage('商品情報の登録に成功しました。しばらくすると登録商品にリストされます');
       setOpenSnackbar(true);
       setProgress(false);
+
+      // 2秒後にページをリロード
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000); // 2000ミリ秒 = 2秒
+
       return
     }else{
       setSnackbarSeverity('error');
