@@ -25,7 +25,7 @@ function MyBottomNavigation(): JSX.Element {
                 href="/registration"
             />
 
-            {localStorage.getItem(momijiAccountMetaDataKey)?
+            {typeof window !== 'undefined' && localStorage.getItem(momijiAccountMetaDataKey) ?
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>登録商品</Typography>}
                 value="/product"
@@ -37,7 +37,6 @@ function MyBottomNavigation(): JSX.Element {
             <></>
             }
 
-
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>ホーム</Typography>}
                 value="/"
@@ -46,7 +45,7 @@ function MyBottomNavigation(): JSX.Element {
                 href="/"
             />
 
-            {localStorage.getItem(momijiAccountMetaDataKey)?
+            {typeof window !== 'undefined' && localStorage.getItem(momijiAccountMetaDataKey) ?
             <BottomNavigationAction
                 label={<Typography variant="body2" sx={{ fontSize: "10px" }}>注文情報</Typography>}
                 value="/order"
