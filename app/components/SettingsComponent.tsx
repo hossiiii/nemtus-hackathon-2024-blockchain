@@ -4,7 +4,6 @@ import Container from '@mui/material/Container';
 import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
-import AlertsDialog from './AlertsDialog';
 
 
 const SettingsComponent = () => {
@@ -13,28 +12,18 @@ const SettingsComponent = () => {
   return (
     <Container component="main" maxWidth="md">
       <Box
-        sx={{
-          marginTop: 12,
-          display: 'flex',
-          flexDirection: 'column',
-          alignItems: 'center',
-        }}
       >
-        <Typography variant="h6" component="h1" gutterBottom>
+        <Typography variant="h6" component="h1" gutterBottom sx={{mt:2,mb:2}}>
             BRIDGE PAYとは
         </Typography>
         <Typography variant="caption" component="h1" gutterBottom>
-            ブロックチェーンを活用した誰もが自由に使える個人間取引アプリです。
+            ブロックチェーンを活用した誰もが自由に使える個人間取引アプリです。本アプリを利用する際は以下事前の準備が必要になります。
         </Typography>
-        <Typography variant="caption" component="h1" gutterBottom>
-            本アプリを利用する際は以下事前の準備が必要になります。
-        </Typography>
-
         <Typography variant="caption" component="h1" gutterBottom sx={{mt:2}}>
-            ・スマートフォンorタブレット（今後PC対応を行う予定です）
+            ・スマートフォンorタブレット
         </Typography>
         <Typography variant="caption" component="h1" gutterBottom>
-            ・Symbolテストネットアカウント（今後メインネット対応を行う予定です）
+            ・Symbolテストネットアカウント
         </Typography>
         <Typography variant="caption" component="h1" gutterBottom>
             ・aLice（モバイル用署名用アプリ）

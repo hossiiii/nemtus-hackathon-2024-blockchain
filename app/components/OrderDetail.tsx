@@ -241,14 +241,6 @@ export const OrderDetail = () => {
 
         const responseJson = await response.json();
 
-        setTransactionsHistory(prevTransactions => [
-          ...prevTransactions,
-          {
-            message: 'ロック解除トランザクションの発行',
-            url: `${symbolExplorer}/transactions/${responseJson.data.hash}`
-          }
-        ]);        
-
         if (response.ok) {
           const data = await response.json();
           if (data.data.code == 'Success') {
@@ -257,6 +249,13 @@ export const OrderDetail = () => {
             setOpenSnackbar(true);
             setText('決済が完了しています');
             setExchangeStatus('決済完了');
+            setTransactionsHistory(prevTransactions => [
+              ...prevTransactions,
+              {
+                message: 'ロック解除トランザクションの発行',
+                url: `${symbolExplorer}/transactions/${responseJson.data.hash}`
+              }
+            ]);            
           }else{
             setSnackbarSeverity('error');
             setSnackbarMessage('管理者にてロックの解除に失敗しました');
