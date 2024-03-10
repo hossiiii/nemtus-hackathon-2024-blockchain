@@ -44,7 +44,7 @@ export const RegistrationForm = () => {
   });
 
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
-  const [transactionsUrlHistory, setTransactionsUrlHistory] = useState<string[]>([])
+  const [transactionsHistory, setTransactionsHistory] = useState<{message:string, url:string}[]>([])
 
   const [progress, setProgress] = useState<boolean>(false); //ローディングの設定
   const [progressValue, setProgressValue] = useState<number>(100); //ローディングの設定
@@ -213,7 +213,7 @@ export const RegistrationForm = () => {
         }
         const responseJson = await response.json();
         const url = `${momijiExplorer}/transaction/${responseJson.data.hash}`;
-        setTransactionsUrlHistory([...transactionsUrlHistory, url]);
+        setTransactionsHistory([{message: '手数料分のmanjuを送りました', url: url}]);
         
         setProgressValue(30); //進捗
         // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
@@ -498,13 +498,13 @@ export const RegistrationForm = () => {
             </Button>
           </Box>
 
-          {transactionsUrlHistory.length > 0 ?<Box>
+          {transactionsHistory.length > 0 ?<Box>
             <Typography variant="h6" component="div" sx={{mt:2}}>
               登録内容
             </Typography>
             <Box sx={{ display: 'flex', gap: 1, flexWrap: 'wrap', mt: 1 }}>
-              {transactionsUrlHistory.map((url, index) => (
-                <a key={index} href={url} target="_blank" rel="noreferrer">{url}</a> 
+              {transactionsHistory.map((transaction, index) => (
+                <a key={index} href={transaction.url} target="_blank" rel="noreferrer">{transaction.message}</a> 
               ))}
             </Box>
           </Box>:<></>}
