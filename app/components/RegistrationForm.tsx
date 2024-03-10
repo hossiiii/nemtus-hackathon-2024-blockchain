@@ -227,7 +227,35 @@ export const RegistrationForm = () => {
             message: '手数料分の基軸通貨を送付',
             url: `${momijiExplorer}/transactions/${responseJson.data.hash}`
           }
-        ]);           
+        ]);
+
+        setProgressValue(20); //進捗
+        // momijiシステムアカウントより商品用momijiアカウントへメタデータ登録
+        const res = await fetch('/api/metadata', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            privateKey: momijiSellerAccount.privateKey,
+          }),
+        })
+        if (!res.ok) {
+          setSnackbarSeverity('error');
+          setSnackbarMessage('メタデータの生成に失敗しました');
+          setOpenSnackbar(true);
+          setProgress(false);
+          return
+        }
+
+        const resJson = await res.json();
+        setTransactionsHistory(prevTransactions => [
+          ...prevTransactions,
+          {
+            message: 'サービス利用のためのキーを登録',
+            url: `${momijiExplorer}/transactions/${resJson.data.hash}`
+          }
+        ]);
         
         setProgressValue(30); //進捗
 
