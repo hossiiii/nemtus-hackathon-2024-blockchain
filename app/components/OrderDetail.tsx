@@ -476,6 +476,19 @@ export const OrderDetail = () => {
             >
               注文一覧に戻る
             </Button>
+            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
+              symbol_publickey
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
+              {localStorage.getItem(momijiAccountMetaDataKey)}
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
+              momiji_user_account
+            </Typography>
+            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
+              {localStorage.getItem(symbolUserAccountMetaDataKey)}
+            </Typography>
+
           </Box>
         </>
         :

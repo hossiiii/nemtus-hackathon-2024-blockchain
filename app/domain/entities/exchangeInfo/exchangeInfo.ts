@@ -6,6 +6,7 @@ import { ExchangeStatus } from "./exchangeStatus";
 export type ExchangeInfo = {
   orderTxHash: string;
   secretLockTxHash?: string;
+  proofTxHash?: string;
   status: ExchangeStatus;
   cosignaturePublicKeys: string[]; //この状態で購入状況を確認する
   orderInfo?: OrderInfo; //みれるのは販売者と購入者のみ

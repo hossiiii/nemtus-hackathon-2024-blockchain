@@ -1,4 +1,4 @@
-import { Account, AggregateTransaction, MosaicId, TransactionGroup, TransferTransaction } from 'symbol-sdk';
+import { Account, Address, AggregateTransaction, MosaicId, TransactionGroup, TransactionType, TransferTransaction, UInt64 } from 'symbol-sdk';
 import { ExchangeInfo } from '../../entities/exchangeInfo/exchangeInfo';
 import { firstValueFrom } from 'rxjs';
 import { fetchProductInfo } from './fetchProductInfo';
@@ -9,6 +9,7 @@ import { determineExchangeStatus } from '../determineExchangeStatus';
 import { ExchangeOverview, isExchangeOverview } from '../../entities/exchangeHistoryInfo/exchangeOverview';
 import { UserType } from '../../entities/userType/userType';
 import { fetchAccountMetaData } from '../../utils/fetches/fetchAccountMetaData';
+import { setupBlockChain } from '../../utils/setupBlockChain';
 
 export const fetchExchangeInfo = async (
   momijiBlockChain: any,
@@ -92,15 +93,28 @@ export const fetchExchangeInfo = async (
   // secretLockTxHashの取得
   let secretLockTxHash = null
   if(momijiAggregateTxInfo[2]){
-    alert('momijiAggregateTxInfo[2] is not null')
     const secretLockHashTx = momijiAggregateTxInfo.innerTransactions[2] as TransferTransaction;
-    alert(secretLockHashTx)
     secretLockTxHash = secretLockHashTx.message.payload;
-    alert(secretLockTxHash)
   }
 
   // 管理者のメタデータからproof記録時のheightを取得
   const proofTxHeight = await fetchAccountMetaData(momijiBlockChain, exchangeTxHash, adminPublicAccount.address);
+
+  // proofTxHashの取得
+  let proofTxHash = null
+  if(proofTxHeight){
+    const symbolBlockCain = await setupBlockChain('symbol');
+    const resultSearch = await firstValueFrom(
+      symbolBlockCain.txRepo.search({
+        type: [TransactionType.SECRET_PROOF],
+        group: TransactionGroup.Confirmed,
+        height: UInt64.fromUint(Number(proofTxHeight)),
+        address: Address.createFromRawAddress(productInfo.depositAddress),
+        pageSize: 1,
+      })
+    );
+    proofTxHash = resultSearch.data[0].transactionInfo.hash;
+  }
   
   // 取引状態の確認
   const status = await determineExchangeStatus( expiredAt,cosignaturePublicKeys,sellerPublicAccount,exchangeOverview.depositAddress,proofTxHeight,exchangeOverview.price*exchangeOverview.amount)
@@ -109,6 +123,7 @@ export const fetchExchangeInfo = async (
   const exchangeInfo: ExchangeInfo = {
     orderTxHash: exchangeOverview.orderTxHash,
     secretLockTxHash: secretLockTxHash,
+    proofTxHash: proofTxHash,
     status: status,
     cosignaturePublicKeys: cosignaturePublicKeys,
     orderInfo: orderInfo,
