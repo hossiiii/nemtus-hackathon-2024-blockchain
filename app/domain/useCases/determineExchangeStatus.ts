@@ -14,7 +14,7 @@ export const determineExchangeStatus = async (
     status = '注文済み';
   }
   else if (cosignaturePublicKeys.includes(sellerPublicAccount.publicKey) && cosignaturePublicKeys.length === 1){ //sellerの連署
-    status = '配送済み';
+    status = '発送済み';
   }
   else if (cosignaturePublicKeys.length === 2){ //userとsellerの連署
     if(proofTxHeight){ //proofTxHeightがある場合

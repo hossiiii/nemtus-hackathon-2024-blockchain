@@ -518,18 +518,6 @@ export const RegistrationForm = () => {
               })}
             />
           </Box>
-          <Box
-            mt={2}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <Button type="submit" variant="contained" color="primary">
-              登録する
-            </Button>
-          </Box>
-
           {transactionsHistory.length > 0 ? (
             <Box>
               <Typography variant="caption" component="div" sx={{ mt: 2 }}>
@@ -550,7 +538,19 @@ export const RegistrationForm = () => {
                 ))}
               </List>
             </Box>
-          ) : (<></>)}
+          ) : (
+            <Box
+            mt={2}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button type="submit" variant="contained" color="primary">
+              登録する
+            </Button>
+          </Box>
+          )}
 
         </form>
       </Box>

@@ -11,7 +11,7 @@ const SettingsComponent = () => {
   const { symbolBlockChain } = useSetupBlockChain();
   const [address, setAddress] = useState(null);
   useEffect(() => {
-    if (!symbolBlockChain) return;
+    if (!symbolBlockChain || !localStorage.getItem(momijiAccountMetaDataKey)) return;
     const publicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
     setAddress(publicAccount.address.plain());
   }, [symbolBlockChain]);

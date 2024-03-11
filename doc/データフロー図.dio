@@ -1,6 +1,6 @@
 <mxfile host="65bd71144e" pages="3">
     <diagram name="商品登録" id="8bTmCagiG4bF68fE6Lq8">
-        <mxGraphModel dx="892" dy="430" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1238" dy="509" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="zr-Xw6MyM5Aju3ZRIltO-0"/>
                 <mxCell id="zr-Xw6MyM5Aju3ZRIltO-1" parent="zr-Xw6MyM5Aju3ZRIltO-0"/>
@@ -96,7 +96,7 @@
         </mxGraphModel>
     </diagram>
     <diagram name="商品購入" id="wxKKYTTi2Nzhcjw8EDCT">
-        <mxGraphModel dx="3022" dy="1045" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="2088" dy="509" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="zVZUr2cYHe7Ijyk185nz-0"/>
                 <mxCell id="zVZUr2cYHe7Ijyk185nz-1" parent="zVZUr2cYHe7Ijyk185nz-0"/>
@@ -305,20 +305,20 @@
                 <mxCell id="8QPJSkxAoeZ_uW1LpAuc-16" value="交換情報（サマリー）&lt;br&gt;&lt;div&gt;&lt;div&gt;export type ExchangeOverview = {&lt;/div&gt;&lt;div&gt;&amp;nbsp; orderTxHash: string;&lt;/div&gt;&lt;div&gt;&amp;nbsp; productName: string;&lt;/div&gt;&lt;div&gt;&amp;nbsp; amount: number;&lt;/div&gt;&lt;div&gt;&amp;nbsp; price: number;&lt;/div&gt;&lt;div&gt;&amp;nbsp; depositAddress: string;&lt;/div&gt;&lt;div&gt;&amp;nbsp; createTimestamp: string;&lt;/div&gt;&lt;div&gt;};&lt;/div&gt;&lt;/div&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;align=left;flipV=1;" parent="zVZUr2cYHe7Ijyk185nz-1" vertex="1">
                     <mxGeometry x="150" y="925" width="220" height="184" as="geometry"/>
                 </mxCell>
-                <mxCell id="gOa7OdPvTc1x6kSUAxDu-1" value="&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;注文ステータスは&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;exchangeTxの署名状況によって変化する&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;export type ExchangeStatus =&amp;nbsp;&amp;nbsp;&lt;/div&gt;&lt;div&gt;　'注文済み'：署名がない状態&lt;/div&gt;&lt;div&gt;　'配送済み'：販売者の署名あり&lt;/div&gt;&lt;div&gt;　'受取済み'：販売者、購入者の署名あり&lt;/div&gt;&lt;div&gt;　'決済完了' ：&lt;span style=&quot;background-color: initial;&quot;&gt;レシートに記録あり&lt;/span&gt;&lt;/div&gt;&lt;div&gt;　有効期限切れ'：有効期限切れ（実際にはTxが無くなる）&lt;/div&gt;&lt;div&gt;　'エラー'：先に購入者が署名してしまったなど&lt;br&gt;&lt;/div&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;" parent="zVZUr2cYHe7Ijyk185nz-1" vertex="1">
+                <mxCell id="gOa7OdPvTc1x6kSUAxDu-1" value="&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;注文ステータスは&lt;/span&gt;&lt;/div&gt;&lt;div style=&quot;text-align: center;&quot;&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;exchangeTxの署名状況によって変化する&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;export type ExchangeStatus =&amp;nbsp;&amp;nbsp;&lt;/div&gt;&lt;div&gt;　'注文済み'：署名がない状態&lt;/div&gt;&lt;div&gt;　'発送済み'：販売者の署名あり&lt;/div&gt;&lt;div&gt;　'受取済み'：販売者、購入者の署名あり&lt;/div&gt;&lt;div&gt;　'決済完了' ：&lt;span style=&quot;background-color: initial;&quot;&gt;レシートに記録あり&lt;/span&gt;&lt;/div&gt;&lt;div&gt;　有効期限切れ'：有効期限切れ（実際にはTxが無くなる）&lt;/div&gt;&lt;div&gt;　'エラー'：先に購入者が署名してしまったなど&lt;br&gt;&lt;/div&gt;" style="shape=note;whiteSpace=wrap;html=1;backgroundOutline=1;darkOpacity=0.05;align=left;" parent="zVZUr2cYHe7Ijyk185nz-1" vertex="1">
                     <mxGeometry x="400" y="953" width="360" height="160" as="geometry"/>
                 </mxCell>
-                <mxCell id="G9oRgp6nBg6Rc_Fp9rkS-0" value="AccountMetaData&lt;br&gt;symbolの公開鍵" style="html=1;points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="zVZUr2cYHe7Ijyk185nz-1">
+                <mxCell id="G9oRgp6nBg6Rc_Fp9rkS-0" value="AccountMetaData&lt;br&gt;symbolの公開鍵" style="html=1;points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="zVZUr2cYHe7Ijyk185nz-1" vertex="1">
                     <mxGeometry x="80" y="273" width="10" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="G9oRgp6nBg6Rc_Fp9rkS-1" value="momijiAccountから&lt;br&gt;Txを発生させて&lt;br&gt;BC上でPubkeyを&lt;br&gt;参照できるように" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;size=20;position=0.33;flipH=1;" vertex="1" parent="zVZUr2cYHe7Ijyk185nz-1">
+                <mxCell id="G9oRgp6nBg6Rc_Fp9rkS-1" value="momijiAccountから&lt;br&gt;Txを発生させて&lt;br&gt;BC上でPubkeyを&lt;br&gt;参照できるように" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;size=20;position=0.33;flipH=1;" parent="zVZUr2cYHe7Ijyk185nz-1" vertex="1">
                     <mxGeometry x="130" y="217" width="120" height="80" as="geometry"/>
                 </mxCell>
             </root>
         </mxGraphModel>
     </diagram>
     <diagram name="決済" id="2-sqbjuceI9n3lPt0dhx">
-        <mxGraphModel dx="1303" dy="627" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+        <mxGraphModel dx="1238" dy="509" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
             <root>
                 <mxCell id="9MFSzqkug0VnZ4ZBVqfB-0"/>
                 <mxCell id="9MFSzqkug0VnZ4ZBVqfB-1" parent="9MFSzqkug0VnZ4ZBVqfB-0"/>
@@ -456,10 +456,10 @@
                 <mxCell id="C257qvzweHB7PHGmPbsi-4" value="注文情報&lt;br&gt;exchangeTxHash" style="html=1;points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="9MFSzqkug0VnZ4ZBVqfB-1" vertex="1">
                     <mxGeometry x="73" y="90" width="10" height="80" as="geometry"/>
                 </mxCell>
-                <mxCell id="GPFyMUMjJy8xefdRB9vl-0" value="支払い証明の記録&lt;br&gt;&lt;div&gt;key :&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;exchangeTxHash&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;value :&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;Proofした時のSymbolのheight&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;align=left;flipV=1;" vertex="1" parent="9MFSzqkug0VnZ4ZBVqfB-1">
+                <mxCell id="GPFyMUMjJy8xefdRB9vl-0" value="支払い証明の記録&lt;br&gt;&lt;div&gt;key :&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;exchangeTxHash&lt;/span&gt;&lt;/div&gt;&lt;div&gt;&lt;div&gt;value :&amp;nbsp;&lt;span style=&quot;background-color: initial;&quot;&gt;Proofした時のSymbolのheight&lt;/span&gt;&lt;/div&gt;&lt;/div&gt;&lt;div&gt;&lt;span style=&quot;background-color: initial;&quot;&gt;&lt;br&gt;&lt;/span&gt;&lt;/div&gt;" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;align=left;flipV=1;" parent="9MFSzqkug0VnZ4ZBVqfB-1" vertex="1">
                     <mxGeometry x="263" y="810" width="220" height="110" as="geometry"/>
                 </mxCell>
-                <mxCell id="GPFyMUMjJy8xefdRB9vl-1" value="AccountMetadata" style="html=1;points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" vertex="1" parent="9MFSzqkug0VnZ4ZBVqfB-1">
+                <mxCell id="GPFyMUMjJy8xefdRB9vl-1" value="AccountMetadata" style="html=1;points=[];perimeter=orthogonalPerimeter;outlineConnect=0;targetShapes=umlLifeline;portConstraint=eastwest;newEdgeStyle={&quot;edgeStyle&quot;:&quot;elbowEdgeStyle&quot;,&quot;elbow&quot;:&quot;vertical&quot;,&quot;curved&quot;:0,&quot;rounded&quot;:0};" parent="9MFSzqkug0VnZ4ZBVqfB-1" vertex="1">
                     <mxGeometry x="368" y="720" width="10" height="80" as="geometry"/>
                 </mxCell>
             </root>

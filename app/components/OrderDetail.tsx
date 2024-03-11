@@ -28,7 +28,7 @@ export const OrderDetail = () => {
 
   const steps : ExchangeStatus[] = [
     '注文済み',
-    '配送済み',
+    '発送済み',
     '受取済み',
     '決済完了',
   ];
@@ -110,7 +110,7 @@ export const OrderDetail = () => {
               setText('発送されるのを待っています');
             }
             break;
-          case '配送済み':
+          case '発送済み':
             if(userType == "seller"){
               setText('受け取り確認を待っています');
             }else{
@@ -188,11 +188,11 @@ export const OrderDetail = () => {
 
 
         setText('受け取り確認を待っています');
-        setExchangeStatus('配送済み');
+        setExchangeStatus('発送済み');
         
         break;
       case '受け取り完了報告を行う':
-        // 配送済みの場合の処理(連署)
+        // 発送済みの場合の処理(連署)
         const cosignatureTx2 = await cosignatureTransaction(
           momijiBlockChain,
           exchangeTxHash,
@@ -307,7 +307,8 @@ export const OrderDetail = () => {
         <Backdrop open={progress}>
           <Loading value={progressValue} />
         </Backdrop>
-      :(exchangeInfo)?
+      :
+      (exchangeInfo)?
         <>
           <Box sx={{ p: 2 }}>
             <Stepper activeStep={steps.indexOf(exchangeStatus)} alternativeLabel>
@@ -458,29 +459,29 @@ export const OrderDetail = () => {
                 </List>
               </Box>
             ) : (<></>)}
-          </Box>        
+          </Box> 
+          <Box
+            mt={2}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => {
+                router.push('/order')
+              }}
+            >
+              注文一覧に戻る
+            </Button>
+          </Box>
         </>
         :
         <>
         </>
       }
-        <Box
-          mt={2}
-          sx={{
-            display: 'flex',
-            justifyContent: 'center',
-          }}
-        >
-          <Button
-            variant="contained"
-            color="primary"
-            onClick={() => {
-              router.push('/order')
-            }}
-          >
-            注文一覧に戻る
-          </Button>
-        </Box>
       </>
   );
 };

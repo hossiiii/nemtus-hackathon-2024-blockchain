@@ -605,17 +605,6 @@ export const PurchaseForm = () => {
               {...register("notes")}
             />
           </Box>
-          <Box
-            mt={2}
-            sx={{
-              display: 'flex',
-              justifyContent: 'center',
-            }}
-          >
-            <Button type="submit" variant="contained" color="primary">
-              注文情報の確認
-            </Button>
-          </Box>
 
           {transactionsHistory.length > 0 ? (
             <Box>
@@ -637,7 +626,19 @@ export const PurchaseForm = () => {
                 ))}
               </List>
             </Box>
-          ) : (<></>)}
+          ) : (
+            <Box
+            mt={2}
+            sx={{
+              display: 'flex',
+              justifyContent: 'center',
+            }}
+          >
+            <Button type="submit" variant="contained" color="primary">
+              注文情報の確認
+            </Button>
+          </Box>
+          )}
         </form>
       </Box>
       )}
