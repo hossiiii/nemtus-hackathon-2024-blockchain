@@ -9,7 +9,7 @@ import useSetupBlockChain from '../hooks/useSetupBlockChain';
 
 const SettingsComponent = () => {
   const { symbolBlockChain } = useSetupBlockChain();
-  const [address, setAddress] = useState(null);
+  const [address, setAddress] = useState("まだアカウントが登録されていません");
   useEffect(() => {
     if (!symbolBlockChain || !localStorage.getItem(momijiAccountMetaDataKey)) return;
     const publicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
@@ -39,7 +39,7 @@ const SettingsComponent = () => {
             　お持ちでない場合はこちらの作成してください。
         </Typography>
         <ListItemButton component="a" href="https://desktop-wallet1013.web.app/#/profiles/create" target="_blank" rel="noreferrer" >
-            <ListItemText primary="Symbolウォレット" secondary="ブラウザ上で動作します" />
+            <ListItemText primary="Symbolウォレット" secondary="テストネットで作成して下さい" />
         </ListItemButton>
         <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
             3.aLice（モバイル用署名用アプリ）
