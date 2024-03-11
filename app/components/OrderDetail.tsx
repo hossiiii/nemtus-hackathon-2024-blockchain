@@ -175,7 +175,7 @@ export const OrderDetail = () => {
           ...prevTransactions,
           {
             message: '連署用トランザクションの発行',
-            url: `${momijiExplorer}/transactions/${signedCosTx}`
+            url: `${momijiExplorer}/transactions/${signedCosTx.parentHash}`
           }
         ]);
       
@@ -212,7 +212,7 @@ export const OrderDetail = () => {
           ...prevTransactions,
           {
             message: '連署用トランザクションの発行',
-            url: `${momijiExplorer}/transactions/${signedCosTx2}`
+            url: `${momijiExplorer}/transactions/${signedCosTx2.parentHash}`
           }
         ]);
 
@@ -240,8 +240,8 @@ export const OrderDetail = () => {
         })
 
         if (response.ok) {
-          const data = await response.json();
-          if (data.data.code == 'Success') {
+          const responseJson = await response.json();
+          if (responseJson.data.code == 'Success') {
             setSnackbarSeverity('success');
             setSnackbarMessage('受け取りと決済が完了しました');
             setOpenSnackbar(true);
@@ -252,7 +252,7 @@ export const OrderDetail = () => {
               ...prevTransactions,
               {
                 message: 'ロック解除トランザクションの発行',
-                url: `${symbolExplorer}/transactions/${data.data.hash}`
+                url: `${symbolExplorer}/transactions/${responseJson.data.hash}`
               }
             ]);
           }else{
