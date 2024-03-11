@@ -438,27 +438,45 @@ export const OrderDetail = () => {
                 </Paper>
               } 
             </Box>
-            {transactionsHistory.length > 0 ? (
-              <Box>
+            <Box>
                 <Typography variant="caption" component="div" sx={{ mt: 2 }}>
                   Tx履歴
                 </Typography>
                 <List sx={{ bgcolor: 'grey.100' }}>
-                  {transactionsHistory.map((transaction, index) => (
-                    <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
-                      <ListItemIcon>
-                        {transaction.url.includes("symbol")?
-                        <img src="/symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
-                        :
-                        <img src="/momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
-                        }
-                      </ListItemIcon>
-                      <ListItemText primary={(transaction.url.includes("symbol"))?"SYMBOLブロックチェーン":"プライベートブロックチェーン"} secondary={transaction.message} />
-                    </ListItem>
-                  ))}
+                  {exchangeInfo.secretLockTxHash?<>
+                    <ListItem component="a" href={`${symbolExplorer}/transactions/${exchangeInfo.secretLockTxHash}`} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <ListItemIcon>
+                      <img src="/symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                    </ListItemIcon>
+                    <ListItemText primary={"Symbolブロックチェーン"} secondary={"資金ロックトランザクションの発行"} />
+                  </ListItem>                  
+                  </>:<></>}
+                  {exchangeInfo.orderTxHash?<>
+                    <ListItem component="a" href={`${momijiExplorer}/transactions/${exchangeInfo.orderTxHash}`} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <ListItemIcon>
+                      <img src="/momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                    </ListItemIcon>
+                    <ListItemText primary={"プライベートブロックチェーン"} secondary={"注文用トランザクションの発行"} />
+                  </ListItem>                  
+                  </>:<></>}
+                  {searchParams.get('exchangeTxHash')?<>
+                    <ListItem component="a" href={`${momijiExplorer}/transactions/${searchParams.get('exchangeTxHash')}`} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <ListItemIcon>
+                      <img src="/momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                    </ListItemIcon>
+                    <ListItemText primary={"プライベートブロックチェーン"} secondary={"取引用トランザクションの発行"} />
+                  </ListItem>                  
+                  </>:<></>}
+                  {exchangeInfo.proofTxHash?<>
+                    <ListItem component="a" href={`${symbolExplorer}/transactions/${exchangeInfo.proofTxHash}`} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
+                    <ListItemIcon>
+                      <img src="/symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                    </ListItemIcon>
+                    <ListItemText primary={"Symbolブロックチェーン"} secondary={"資金ロック解除トランザクションの発行"} />
+                  </ListItem>                  
+                  </>:<></>}                  
                 </List>
               </Box>
-            ) : (<></>)}
           </Box> 
           <Box
             mt={2}
@@ -476,19 +494,6 @@ export const OrderDetail = () => {
             >
               注文一覧に戻る
             </Button>
-            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
-              symbol_publickey
-            </Typography>
-            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
-              {localStorage.getItem(momijiAccountMetaDataKey)}
-            </Typography>
-            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
-              momiji_user_account
-            </Typography>
-            <Typography variant="caption" component="div" sx={{ mt: 2 }}>
-              {localStorage.getItem(symbolUserAccountMetaDataKey)}
-            </Typography>
-
           </Box>
         </>
         :

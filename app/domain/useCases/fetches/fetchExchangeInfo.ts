@@ -92,7 +92,7 @@ export const fetchExchangeInfo = async (
 
   // secretLockTxHashの取得
   let secretLockTxHash = null
-  if(momijiAggregateTxInfo[2]){
+  if(momijiAggregateTxInfo.innerTransactions[2]){
     const secretLockHashTx = momijiAggregateTxInfo.innerTransactions[2] as TransferTransaction;
     secretLockTxHash = secretLockHashTx.message.payload;
   }
@@ -109,7 +109,7 @@ export const fetchExchangeInfo = async (
         type: [TransactionType.SECRET_PROOF],
         group: TransactionGroup.Confirmed,
         height: UInt64.fromUint(Number(proofTxHeight)),
-        address: Address.createFromRawAddress(productInfo.depositAddress),
+        recipientAddress: Address.createFromRawAddress(productInfo.depositAddress),
         pageSize: 1,
       })
     );
