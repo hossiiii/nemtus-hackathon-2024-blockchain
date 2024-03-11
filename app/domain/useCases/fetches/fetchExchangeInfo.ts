@@ -92,7 +92,8 @@ export const fetchExchangeInfo = async (
   // secretLockTxHashの取得
   let secretLockTxHash = null
   if(momijiAggregateTxInfo[2]){
-    secretLockTxHash = momijiAggregateTxInfo[2].message.payload;  
+    const secretLockHashTx = momijiAggregateTxInfo.innerTransactions[2] as TransferTransaction;
+    secretLockTxHash = secretLockHashTx.message.payload;  
   }
 
   // 管理者のメタデータからproof記録時のheightを取得
