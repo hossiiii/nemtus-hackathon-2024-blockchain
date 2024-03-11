@@ -1,13 +1,20 @@
 'use client'
-import { Box, Typography, Backdrop, CircularProgress, List, ListItemButton, ListItemText, Dialog, DialogTitle, DialogContentText, DialogActions, Button } from '@mui/material';
+import { Box, Typography, List, ListItemButton, ListItemText } from '@mui/material';
 import Container from '@mui/material/Container';
-import { signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react';
-
+import React, { useEffect, useState } from 'react';
+import { momijiAccountMetaDataKey } from '../consts/consts';
+import { PublicAccount } from 'symbol-sdk';
+import useSetupBlockChain from '../hooks/useSetupBlockChain';
 
 const SettingsComponent = () => {
-  const router = useRouter()
+  const { symbolBlockChain } = useSetupBlockChain();
+  const [address, setAddress] = useState(null);
+  useEffect(() => {
+    if (!symbolBlockChain) return;
+    const publicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
+    setAddress(publicAccount.address.plain());
+  }, [symbolBlockChain]);
 
   return (
     <Container component="main" maxWidth="md">
@@ -28,7 +35,7 @@ const SettingsComponent = () => {
         <Typography variant="caption" component="h1" gutterBottom>
             ・aLice（モバイル用署名用アプリ）
         </Typography>
-        
+
         <List component="nav" aria-label="Settings options" sx={{ width: '100%', bgcolor: 'background.paper' }}>
         <ListItemButton component="a" href="https://note.com/nononon_symbol/n/n87e8ef3f89e0">
             <ListItemText primary="aLiceの使い方" secondary="aLiceの使い方 by のののんさん" />
@@ -38,6 +45,9 @@ const SettingsComponent = () => {
         </ListItemButton>
         <ListItemButton component="a" href="https://play.google.com/store/apps/details?id=com.pine.alice">
             <ListItemText primary="aLice（Android）" secondary="Androidダウンロードはこちらから" />
+        </ListItemButton>
+        <ListItemButton component="a">
+            <ListItemText primary="アカウント情報" secondary={address} />
         </ListItemButton>
         </List>
       </Box>
