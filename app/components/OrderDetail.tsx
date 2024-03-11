@@ -100,7 +100,6 @@ export const OrderDetail = () => {
         const exchangeInfo = await fetchExchangeInfo(momijiBlockChain, exchangeTxHash, momijiAccount);
         setExchangeInfo(exchangeInfo);
         setExchangeStatus(exchangeInfo.status);
-        alert(exchangeInfo.secretLockTxHash)
 
         //ボタンテキストの設定
         switch (exchangeInfo.status) {
