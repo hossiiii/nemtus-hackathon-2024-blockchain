@@ -20,20 +20,29 @@ const SettingsComponent = () => {
     <Container component="main" maxWidth="md">
       <Box
       >
-        <Typography variant="h6" component="h1" gutterBottom sx={{mt:2,mb:2}}>
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:1,mb:2}}>
             BRIDGE PAYとは
         </Typography>
         <Typography variant="caption" component="h1" gutterBottom>
-            ブロックチェーンを活用した誰もが自由に使える個人間取引アプリです。本アプリを利用する際は以下事前の準備が必要になります。
+            ブロックチェーンを活用した誰もが自由に使える個人間取引アプリです。本アプリを利用する際は以下の事前の準備が必要になります。
         </Typography>
-        <Typography variant="caption" component="h1" gutterBottom sx={{mt:2}}>
-            ・スマートフォンorタブレット
-        </Typography>
-        <Typography variant="caption" component="h1" gutterBottom>
-            ・Symbolテストネットアカウント
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
+            1.スマートフォンorタブレット
         </Typography>
         <Typography variant="caption" component="h1" gutterBottom>
-            ・aLice（モバイル用署名用アプリ）
+            　今後PCにも対応する予定です。
+        </Typography>
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
+            2.Symbolテストネットアカウント
+        </Typography>
+        <Typography variant="caption" component="h1" gutterBottom>
+            　お持ちでない場合はこちらの作成してください。
+        </Typography>
+        <ListItemButton component="a" href="https://desktop-wallet1013.web.app/#/profiles/create" target="_blank" rel="noreferrer" >
+            <ListItemText primary="Symbolウォレット" secondary="ブラウザ上で動作します" />
+        </ListItemButton>
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
+            3.aLice（モバイル用署名用アプリ）
         </Typography>
 
         <List component="nav" aria-label="Settings options" sx={{ width: '100%', bgcolor: 'background.paper' }}>
@@ -46,8 +55,18 @@ const SettingsComponent = () => {
         <ListItemButton component="a" href="https://play.google.com/store/apps/details?id=com.pine.alice" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLice（Android）" secondary="Androidダウンロードはこちらから" />
         </ListItemButton>
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
+            アカウント情報
+        </Typography>
         <ListItemButton component="a" href={`${symbolExplorer}/accounts/${address}`} target="_blank" rel="noreferrer" >
-            <ListItemText primary="アカウント情報" secondary={address} />
+            <ListItemText primary="現在利用中のアカウント"
+              secondary={address} 
+              sx={{
+                '.MuiListItemText-secondary': {
+                  wordBreak: 'break-all',
+                },
+              }}
+            />
         </ListItemButton>
         </List>
       </Box>

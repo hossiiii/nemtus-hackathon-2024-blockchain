@@ -49,9 +49,9 @@ function MyBottomNavigation(): JSX.Element {
             />
 
             <BottomNavigationAction
-                label={<Typography variant="body2" sx={{ fontSize: "10px" }}>設定</Typography>}
+                label={<Typography variant="body2" sx={{ fontSize: "10px" }}>はじめ方</Typography>}
                 value="/settings"
-                icon={<Settings />}
+                icon={<img src={"first.png"} alt="Settings" style={{ width: 23, height: 23 }} />}
                 component="a"
                 href="/settings"
             />
