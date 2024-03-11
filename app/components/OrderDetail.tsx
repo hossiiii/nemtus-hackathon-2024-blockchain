@@ -100,7 +100,7 @@ export const OrderDetail = () => {
         const exchangeInfo = await fetchExchangeInfo(momijiBlockChain, exchangeTxHash, momijiAccount);
         setExchangeInfo(exchangeInfo);
         setExchangeStatus(exchangeInfo.status);
-        alert(exchangeInfo)
+        alert(exchangeInfo.secretLockTxHash)
 
         //ボタンテキストの設定
         switch (exchangeInfo.status) {
@@ -442,7 +442,7 @@ export const OrderDetail = () => {
             {transactionsHistory.length > 0 ? (
               <Box>
                 <Typography variant="caption" component="div" sx={{ mt: 2 }}>
-                  ブロックチェーンExplorer
+                  Tx履歴
                 </Typography>
                 <List sx={{ bgcolor: 'grey.100' }}>
                   {transactionsHistory.map((transaction, index) => (
