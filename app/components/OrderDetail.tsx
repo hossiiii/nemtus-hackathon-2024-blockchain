@@ -447,9 +447,9 @@ export const OrderDetail = () => {
                     <ListItem key={index} component="a" href={transaction.url} target="_blank" rel="noreferrer" sx={{ display: 'flex', gap: 1, flexWrap: 'wrap' }}>
                       <ListItemIcon>
                         {transaction.url.includes("symbol")?
-                        <img src="symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                        <img src="/symbol_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
                         :
-                        <img src="momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
+                        <img src="/momiji_logo.png" alt="Link Icon" style={{ width: 24, height: 24 }} />
                         }
                       </ListItemIcon>
                       <ListItemText primary={(transaction.url.includes("symbol"))?"SYMBOLブロックチェーン":"プライベートブロックチェーン"} secondary={transaction.message} />
@@ -479,7 +479,7 @@ export const OrderDetail = () => {
             }}
           >
             注文一覧に戻る
-          </Button>   
+          </Button>
         </Box>
       </>
   );
