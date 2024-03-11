@@ -3,6 +3,7 @@ import { ProductInfo } from '../../entities/productInfo/productInfo';
 import { setupBlockChain } from '../../utils/setupBlockChain';
 import { firstValueFrom } from 'rxjs';
 import { serviceName } from '../../../consts/consts';
+import { fetchProductStock } from './fetchProductStock';
 
 export const fetchAllProductinfo = async (
   address?: Address,
@@ -62,7 +63,9 @@ export const fetchAllProductinfo = async (
       try {
         productInfo = JSON.parse(value) as ProductInfo;
         if(productInfo.serviceName == process.env.NEXT_PUBLIC_APP_NAME){
-          productInfoList.push(productInfo); // 条件を満たす値をリストに追加
+          //在庫があるかどうかを確認
+          const res = await fetchProductStock(Address.createFromRawAddress(followDict[i].address), mosaicId);
+          if(res.amount > 0) productInfoList.push(productInfo); // 条件を満たす値をリストに追加
         }
       } catch (error) {
         console.error(`Error parsing product info for mosaic ${mosaicId.toHex()}: ${error}`); // オプション: エラーをログに記録
