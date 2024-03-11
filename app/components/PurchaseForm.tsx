@@ -198,7 +198,7 @@ export const PurchaseForm = () => {
       return
     }
     setProgressValue(40); //進捗
-    await order(momijiUserAccount, secret, proof);
+    await order(momijiUserAccount, secret, proof, hash);
   };
 
   const handleInputPassword = async (inputPassword: string | null) => {
@@ -298,7 +298,7 @@ export const PurchaseForm = () => {
     }  
   };
 
-  const order = async (momijiUserAccount:Account, secret:string, proof:string) => {
+  const order = async (momijiUserAccount:Account, secret:string, proof:string, hash:string) => {
 
     //注文情報の登録
     const orderInfo : OrderInfo = {
@@ -322,7 +322,7 @@ export const PurchaseForm = () => {
     }
 
     //注文トランザクションの作成-署名-アナウンス
-    const orderTx = await orderTransaction(momijiBlockChain, momijiUserAccount, productInfo, paymentInfo, orderInfo);
+    const orderTx = await orderTransaction(momijiBlockChain, momijiUserAccount, productInfo, paymentInfo, orderInfo, hash);
     const orderSignedTx = momijiUserAccount.sign(orderTx, momijiBlockChain.generationHash);
     const orderSignedTxHash = orderSignedTx.hash;
     await firstValueFrom(momijiBlockChain.txRepo.announce(orderSignedTx));

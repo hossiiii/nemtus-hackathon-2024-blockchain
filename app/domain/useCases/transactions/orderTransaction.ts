@@ -5,6 +5,7 @@ import { fetchPublicAccount } from '../../utils/fetches/fetchPublicAccount';
 import { PaymentInfo } from '../../entities/paymentInfo/paymentInfo';
 import { OrderInfo } from '../../entities/orderInfo/orderInfo';
 import { ProductInfo } from '../../entities/productInfo/productInfo';
+import { transferTransactionWithMessage } from '../../utils/transactions/transferTransactionWithMessage';
 
 export const orderTransaction = async (
   momijiBlockChain: any,
@@ -12,6 +13,7 @@ export const orderTransaction = async (
   productInfo: ProductInfo,
   paymentInfo:PaymentInfo,
   orderInfo: OrderInfo,
+  hash: string
 ): Promise<AggregateTransaction> => {
   // 販売者向けの注文情報送信用Txを作成
   const strOrderInfo = JSON.stringify(orderInfo);
@@ -34,11 +36,18 @@ export const orderTransaction = async (
     momijiAdminPublicAccount
   );
 
+  const secretLockHashTx = transferTransactionWithMessage(
+    momijiBlockChain,
+    hash,
+    momijiSellerPublicAccount.address
+  )
+
   const agregateTx = AggregateTransaction.createComplete(
     Deadline.create(momijiBlockChain.epochAdjustment),
     [
       orderInfoTx.toAggregate(momijiUserAccount.publicAccount),
-      paymentInfoTx.toAggregate(momijiUserAccount.publicAccount)
+      paymentInfoTx.toAggregate(momijiUserAccount.publicAccount),
+      secretLockHashTx.toAggregate(momijiUserAccount.publicAccount)
     ],
     momijiBlockChain.networkType,
     [],

@@ -89,6 +89,12 @@ export const fetchExchangeInfo = async (
     paymentInfo = await parsePaymentTx(momijiAggregateTxInfo, account, (type==='user') ? adminPublicAccount : userPublicAccount);
   }
 
+  // secretLockTxHashの取得
+  let secretLockTxHash = null
+  if(momijiAggregateTxInfo[2]){
+    secretLockTxHash = momijiAggregateTxInfo[2].message.payload;  
+  }
+
   // 管理者のメタデータからproof記録時のheightを取得
   const proofTxHeight = await fetchAccountMetaData(momijiBlockChain, exchangeTxHash, adminPublicAccount.address);
   
@@ -98,6 +104,7 @@ export const fetchExchangeInfo = async (
   // ExchangeInfoの生成
   const exchangeInfo: ExchangeInfo = {
     orderTxHash: exchangeOverview.orderTxHash,
+    secretLockTxHash: secretLockTxHash,
     status: status,
     cosignaturePublicKeys: cosignaturePublicKeys,
     orderInfo: orderInfo,
