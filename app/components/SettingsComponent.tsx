@@ -3,7 +3,7 @@ import { Box, Typography, List, ListItemButton, ListItemText } from '@mui/materi
 import Container from '@mui/material/Container';
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react';
-import { momijiAccountMetaDataKey } from '../consts/consts';
+import { momijiAccountMetaDataKey, symbolExplorer } from '../consts/consts';
 import { PublicAccount } from 'symbol-sdk';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
 
@@ -37,16 +37,16 @@ const SettingsComponent = () => {
         </Typography>
 
         <List component="nav" aria-label="Settings options" sx={{ width: '100%', bgcolor: 'background.paper' }}>
-        <ListItemButton component="a" href="https://note.com/nononon_symbol/n/n87e8ef3f89e0">
+        <ListItemButton component="a" href="https://note.com/nononon_symbol/n/n87e8ef3f89e0" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLiceの使い方" secondary="aLiceの使い方 by のののんさん" />
         </ListItemButton>
-        <ListItemButton component="a" href="https://apps.apple.com/us/app/alice-sign/id6449146041">
+        <ListItemButton component="a" href="https://apps.apple.com/us/app/alice-sign/id6449146041" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLice（iOS）" secondary="iOSダウンロードはこちらから" />
         </ListItemButton>
-        <ListItemButton component="a" href="https://play.google.com/store/apps/details?id=com.pine.alice">
+        <ListItemButton component="a" href="https://play.google.com/store/apps/details?id=com.pine.alice" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLice（Android）" secondary="Androidダウンロードはこちらから" />
         </ListItemButton>
-        <ListItemButton component="a">
+        <ListItemButton component="a" href={`${symbolExplorer}/accounts/${address}`} target="_blank" rel="noreferrer" >
             <ListItemText primary="アカウント情報" secondary={address} />
         </ListItemButton>
         </List>
