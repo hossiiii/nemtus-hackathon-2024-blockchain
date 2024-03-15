@@ -18,16 +18,11 @@ const SettingsComponent = () => {
   }, [symbolBlockChain]);
   
   //プッシュ通知のパーミッション確認
-  useEffect(() => {
-    (async() => {
-      await OneSignal.init({
-        appId: "5fb95b7b-d5fa-4c46-93ce-4212c08958fe",
-        notifyButton: {
-            enable: true,
-        }
-      });
-    })()
-  },[])
+  // useEffect(() => {
+  //   (async() => {
+  //     });
+  //   })()
+  // },[])
 
   return (
     <Container component="main" maxWidth="md">
@@ -67,6 +62,18 @@ const SettingsComponent = () => {
         </ListItemButton>
         <ListItemButton component="a" href="https://play.google.com/store/apps/details?id=com.pine.alice" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLice（Android）" secondary="Androidダウンロードはこちらから" />
+        </ListItemButton>
+        <ListItemButton
+        onClick={async() => {
+          await OneSignal.init({
+            appId: "5fb95b7b-d5fa-4c46-93ce-4212c08958fe",
+            notifyButton: {
+                enable: true,
+            }
+          });
+        }}
+        >
+            <ListItemText primary="購読" secondary="しますか" />
         </ListItemButton>
         <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
             アカウント情報
