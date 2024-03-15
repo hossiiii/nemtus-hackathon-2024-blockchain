@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { momijiAccountMetaDataKey, symbolExplorer } from '../consts/consts';
 import { PublicAccount } from 'symbol-sdk';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
+import OneSignal from 'react-onesignal';
 
 const SettingsComponent = () => {
   const { symbolBlockChain } = useSetupBlockChain();
@@ -15,6 +16,18 @@ const SettingsComponent = () => {
     const publicAccount = PublicAccount.createFromPublicKey(localStorage.getItem(momijiAccountMetaDataKey), symbolBlockChain.networkType);
     setAddress(publicAccount.address.plain());
   }, [symbolBlockChain]);
+  
+  //プッシュ通知のパーミッション確認
+  useEffect(() => {
+    (async() => {
+      await OneSignal.init({
+        appId: process.env.NEXT_PUBLIC_PUSH_APP_ID,
+        notifyButton: {
+            enable: true,
+        }
+      });
+    })()
+  },[])
 
   return (
     <Container component="main" maxWidth="md">

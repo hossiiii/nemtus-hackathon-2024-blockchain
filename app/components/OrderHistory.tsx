@@ -18,8 +18,6 @@ import OrderTable from './OrderTable';
 import { Utils } from '../domain/utils/utils';
 import Loading from './Loading';
 
-import OneSignal from 'react-onesignal';
-
 export const OrderHistory = () => {
   const router = useRouter();
 
@@ -34,18 +32,6 @@ export const OrderHistory = () => {
 
   const [sellerExchangeHistoryInfoFlat, setSellerExchangeHistoryInfoFlat] = useState<ExchangeHistoryInfoFlat[] | null>(null)
   const [userExchangeHistoryInfoFlat, setUserExchangeHistoryInfoFlat] = useState<ExchangeHistoryInfoFlat[] | null>(null)
-
-  //プッシュ通知のパーミッション確認
-  useEffect(() => {
-    (async() => {
-      await OneSignal.init({
-        appId: process.env.NEXT_PUBLIC_PUSH_APP_ID,
-        notifyButton: {
-            enable: true,
-        }
-      });
-    })()
-  },[])
 
   useEffect(() => {
     if (momijiBlockChain) {
