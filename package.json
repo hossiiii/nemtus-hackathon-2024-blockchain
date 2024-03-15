@@ -46,6 +46,7 @@
     "react-chartjs-2": "^5.2.0",
     "react-dom": "18.2.0",
     "react-hook-form": "^7.50.1",
+    "react-onesignal": "^3.0.1",
     "react-timer-hook": "^3.0.7",
     "symbol-qr-library": "^0.14.2",
     "symbol-sdk": "^2.0.4",
