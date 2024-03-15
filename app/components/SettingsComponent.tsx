@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import { momijiAccountMetaDataKey, symbolExplorer } from '../consts/consts';
 import { PublicAccount } from 'symbol-sdk';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
-import { YouTubeEmbed } from '@next/third-parties/google'
 
 const SettingsComponent = () => {
   const { symbolBlockChain } = useSetupBlockChain();
@@ -45,9 +44,7 @@ const SettingsComponent = () => {
         <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
             3.aLice（モバイル用署名用アプリ）
         </Typography>
-        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
-            アカウント情報
-        </Typography>
+
         <List component="nav" aria-label="Settings options" sx={{ width: '100%', bgcolor: 'background.paper' }}>
         <ListItemButton component="a" href="https://note.com/nononon_symbol/n/n87e8ef3f89e0" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLiceの使い方" secondary="aLiceの使い方 by のののんさん" />
@@ -58,6 +55,9 @@ const SettingsComponent = () => {
         <ListItemButton component="a" href="https://play.google.com/store/apps/details?id=com.pine.alice" target="_blank" rel="noreferrer" >
             <ListItemText primary="aLice（Android）" secondary="Androidダウンロードはこちらから" />
         </ListItemButton>
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
+            アカウント情報
+        </Typography>
         <ListItemButton component="a" href={`${symbolExplorer}/accounts/${address}`} target="_blank" rel="noreferrer" >
             <ListItemText primary="現在利用中のアカウント"
               secondary={address} 
@@ -68,10 +68,6 @@ const SettingsComponent = () => {
               }}
             />
         </ListItemButton>
-        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
-            アプリイメージ動画
-        </Typography>
-        <YouTubeEmbed videoid="I_hgEevVoGg" height={400} params="controls=0" />
         </List>
       </Box>
     </Container>
