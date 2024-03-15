@@ -21,7 +21,6 @@ import { firstValueFrom } from 'rxjs';
 import { fetchTransactionStatus } from '../domain/utils/fetches/fetchTransactionStatus';
 import { ExchangeStatus } from '../domain/entities/exchangeInfo/exchangeStatus';
 import Loading from './Loading';
-import OneSignal from 'react-onesignal';
 
 type ButtonText = '発送完了報告を行う' | '発送されるのを待っています' | '受け取り確認を待っています' | '受け取り完了報告を行う' | '決済が完了するのを待っています' | '決済が完了しています' | '取引有効期限が切れています' | "確認中";
 
@@ -59,18 +58,6 @@ export const OrderDetail = () => {
   const [momijiAccount, setMomijiAccount] = useState<Account | null>(null); //symbolのアカウント
   const [exchangeInfo, setExchangeInfo] = useState<ExchangeInfo | null>(null)
   
-  //プッシュ通知のパーミッション確認
-  useEffect(() => {
-    (async() => {
-      await OneSignal.init({
-        appId: process.env.NEXT_PUBLIC_PUSH_APP_ID,
-        notifyButton: {
-            enable: true,
-        }
-      });
-    })()
-  },[])
-
   useEffect(() => {
     setUserType(searchParams.get('userType') as UserType)
     setExchangeTxHash(searchParams.get('exchangeTxHash'))
