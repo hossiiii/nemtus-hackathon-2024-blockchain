@@ -21,7 +21,7 @@ const SettingsComponent = () => {
   useEffect(() => {
     (async() => {
       await OneSignal.init({
-        appId: process.env.NEXT_PUBLIC_PUSH_APP_ID,
+        appId: "5fb95b7b-d5fa-4c46-93ce-4212c08958fe",
         notifyButton: {
             enable: true,
         }
