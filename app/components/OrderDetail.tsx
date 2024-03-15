@@ -60,16 +60,16 @@ export const OrderDetail = () => {
   const [exchangeInfo, setExchangeInfo] = useState<ExchangeInfo | null>(null)
   
   //プッシュ通知のパーミッション確認
-  useEffect(() => {
-    (async() => {
-      await OneSignal.init({
-        appId: process.env.NEXT_PUBLIC_PUSH_APP_ID,
-        notifyButton: {
-            enable: true,
-        }
-      });
-    })()
-  },[])
+  // useEffect(() => {
+  //   (async() => {
+  //     await OneSignal.init({
+  //       appId: process.env.NEXT_PUBLIC_PUSH_APP_ID,
+  //       notifyButton: {
+  //           enable: true,
+  //       }
+  //     });
+  //   })()
+  // },[])
 
   useEffect(() => {
     setUserType(searchParams.get('userType') as UserType)
