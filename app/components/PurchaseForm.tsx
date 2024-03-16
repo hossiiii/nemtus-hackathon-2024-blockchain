@@ -417,15 +417,15 @@ export const PurchaseForm = () => {
           window.location.href = aliceEndPoint;
           setOpenDialog(false);
           setTimeout(() => {
-            setSnackbarSeverity('error');
-            setSnackbarMessage('aLiceとの連携が必要です');    
+            setSnackbarSeverity('success');
+            setSnackbarMessage('aLiceとの連携を行って下さい');    
             setOpenSnackbar(true);
           }
-          , 1000);
+          , 2000);
           setTimeout(() => {
             router.push('/settings');
           }
-          , 2000);
+          , 3000);
         }}
         onCancelClick={() => {
           setSnackbarSeverity('error');
