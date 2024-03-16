@@ -6,6 +6,7 @@ import React, { useEffect, useState } from 'react';
 import { momijiAccountMetaDataKey, symbolExplorer } from '../consts/consts';
 import { PublicAccount } from 'symbol-sdk';
 import useSetupBlockChain from '../hooks/useSetupBlockChain';
+import { YouTubeEmbed } from '@next/third-parties/google'
 
 const SettingsComponent = () => {
   const { symbolBlockChain } = useSetupBlockChain();
@@ -68,6 +69,10 @@ const SettingsComponent = () => {
               }}
             />
         </ListItemButton>
+        <Typography variant="body1" component="h1" gutterBottom sx={{mt:2}}>
+            アプリイメージ動画
+        </Typography>
+        <YouTubeEmbed videoid="I_hgEevVoGg" height={400} params="controls=0" />        
         </List>
       </Box>
     </Container>
