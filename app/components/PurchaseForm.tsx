@@ -93,7 +93,7 @@ export const PurchaseForm = () => {
         setOpenSnackbar(true);
       }else{
         setDialogTitle('公開鍵の確認');
-        setDialogMessage('初回のみSymbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
+        setDialogMessage('初回のみSymbolアカウントの公開鍵を登録する必要があります。aLiceと連携して公開鍵を登録しますか？');
         setOpenDialog(true);  
       }
     }else{
@@ -416,7 +416,27 @@ export const PurchaseForm = () => {
           const aliceEndPoint = `alice://sign?method=post&type=request_pubkey&callback=${Convert.utf8ToHex(callback)}`
           window.location.href = aliceEndPoint;
           setOpenDialog(false);
+          setTimeout(() => {
+            setSnackbarSeverity('error');
+            setSnackbarMessage('aLiceとの連携が必要です');    
+            setOpenSnackbar(true);
+          }
+          , 1000);
+          setTimeout(() => {
+            router.push('/settings');
+          }
+          , 2000);
         }}
+        onCancelClick={() => {
+          setSnackbarSeverity('error');
+          setSnackbarMessage('aLiceとの連携が必要です');    
+          setOpenSnackbar(true);
+          setTimeout(() => {
+            router.push('/settings');
+          }
+          , 1500);
+        }}
+
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
       />      

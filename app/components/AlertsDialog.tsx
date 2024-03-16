@@ -11,8 +11,9 @@ function AlertsDialog(props: {
   handleAgreeClick: () => void;
   dialogTitle: string;
   dialogMessage: string;
+  onCancelClick?: () => void;
 }): JSX.Element {
-  const { openDialog, setOpenDialog, handleAgreeClick, dialogTitle, dialogMessage } = props;
+  const { openDialog, setOpenDialog, handleAgreeClick, dialogTitle, dialogMessage,onCancelClick } = props;
 
   return (
     <Dialog open={openDialog} onClose={() => setOpenDialog(false)}>
@@ -27,7 +28,12 @@ function AlertsDialog(props: {
           <DialogContentText>{`${dialogMessage}`}</DialogContentText>
         </DialogContent>
         <DialogActions>
-          <Button color='primary' variant='outlined' onClick={() => setOpenDialog(false)}>
+          <Button color='primary' variant='outlined' onClick={() => {
+            if (onCancelClick) {
+              onCancelClick()
+            }
+            setOpenDialog(false)
+          }}>
             キャンセル
           </Button>
           <Button color='primary' variant='contained' autoFocus onClick={() => handleAgreeClick()}>

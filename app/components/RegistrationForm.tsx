@@ -19,6 +19,7 @@ import { fetchUnconfirmedTransactionStatus } from '../domain/utils/fetches/fetch
 import Loading from './Loading';
 import type { PutBlobResult } from '@vercel/blob';
 import AlertsDialog from './AlertsDialog';
+import { useRouter } from 'next/navigation';
 
 type Inputs = {
   symbolPrivateKey: string;
@@ -42,6 +43,8 @@ export const RegistrationForm = () => {
       category: [] // カテゴリの初期値を空の配列に設定
     }
   });
+
+  const router = useRouter();
 
   const { symbolBlockChain, momijiBlockChain } = useSetupBlockChain();
   const [transactionsHistory, setTransactionsHistory] = useState<{message:string, url:string}[]>([])
@@ -83,7 +86,7 @@ export const RegistrationForm = () => {
         setOpenSnackbar(true);
       }else{
         setDialogTitle('公開鍵の確認');
-        setDialogMessage('初回のみSymbolアカウントの公開鍵を登録する必要があります。公開鍵を登録しますか？');
+        setDialogMessage('初回のみSymbolアカウントの公開鍵を登録する必要があります。aLiceと連携して公開鍵を登録しますか？');
         setOpenDialog(true);  
       }
     }else{
@@ -369,6 +372,25 @@ export const RegistrationForm = () => {
           const aliceEndPoint = `alice://sign?method=post&type=request_pubkey&callback=${Convert.utf8ToHex(callback)}`
           window.location.href = aliceEndPoint;
           setOpenDialog(false);
+          setTimeout(() => {
+            setSnackbarSeverity('error');
+            setSnackbarMessage('aLiceとの連携が必要です');    
+            setOpenSnackbar(true);
+          }
+          , 1000);
+          setTimeout(() => {
+            router.push('/settings');
+          }
+          , 2000);
+        }}
+        onCancelClick={() => {
+          setSnackbarSeverity('error');
+          setSnackbarMessage('aLiceとの連携が必要です');    
+          setOpenSnackbar(true);
+          setTimeout(() => {
+            router.push('/settings');
+          }
+          , 1500);
         }}
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
