@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState } from 'react';
-import { Box, Typography, Chip, Grid, CircularProgress, Backdrop, Button, List, ListItem, ListItemText } from '@mui/material';
+import { Box, Typography, Chip, Grid, CircularProgress, Backdrop, Button, List, ListItem, ListItemText, Paper } from '@mui/material';
 import { Address, MosaicId, PublicAccount } from 'symbol-sdk';
 import { ProductInfo } from '../domain/entities/productInfo/productInfo';
 import AlertsSnackbar from './AlertsSnackbar';
@@ -63,6 +63,22 @@ export const ProductDetail = () => {
         </Backdrop>
       ) : (
         <Box sx={{ p: 3 }}>
+          {productStockAmount == 0 ? <>
+            <Paper
+                sx={{
+                  p: 2,
+                  mt: 2,
+                  backgroundColor: 'error.main',
+                  color: 'white',
+                }}
+              >
+                <Box>
+                  <Box>
+                    <Box>申し訳ありません。現在在庫切れです</Box>
+                  </Box>
+                </Box>
+              </Paper>
+          </>:<></>}
           <List>
             {/* exchangeInfo */}
             <img src={productInfo?.imageUrl} alt="description" style={{ maxWidth: '500px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
@@ -125,6 +141,7 @@ export const ProductDetail = () => {
               justifyContent: 'center',
             }}
           >
+           {productStockAmount > 0 ? <>
             <Button
               variant="contained"
               color="primary"
@@ -132,6 +149,18 @@ export const ProductDetail = () => {
             >
               商品購入へ進む
             </Button>
+           </>:
+           <>
+            <Button
+              variant="contained"
+              color="primary"
+              onClick={() => router.push(`/`)}
+            >
+              ホームに戻る 
+            </Button>
+           
+           </>
+           }
           </Box>        
         </>
         }
