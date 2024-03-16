@@ -55,7 +55,8 @@ const SettingsComponent = () => {
         <Typography variant="body1" component="h1" gutterBottom>
             アプリイメージ動画
         </Typography>
-        <YouTubeEmbed videoid="I_hgEevVoGg" height={200} params="controls=0" />        
+
+        <YouTubeEmbed videoid="I_hgEevVoGg" params="controls=0" />
 
         <Typography variant="body1" component="h1" gutterBottom sx={{mt:2,mb:2}}>
             BRIDGE PAYとは
@@ -70,7 +71,22 @@ const SettingsComponent = () => {
             　お持ちでない場合はこちらをクリックしてテストネットアカウントを作成して下さい。
         </Typography>
         <Typography variant="caption" component="h1" gutterBottom sx={{mb:3}}>
-            　*100XYM入金済みの使い捨てのアカウントとなります。aLiceにインポートして使います。
+          　※こちらのアカウントは商品購入用の100XYM入金済みの使い捨てのアカウントとなります。<br />
+          　※生成された秘密鍵をaLiceにインポートしてご使用ください。<br />
+          {privateKey ?
+              <>
+                  　※100XYMで足りない場合は、
+                  <a
+                      href={`https://testnet.symbol.tools/?recipient=${Account.createFromPrivateKey(privateKey, NetworkType.TEST_NET).address.plain()}`} 
+                      target="_blank" 
+                      rel="noreferrer"
+                  >
+                      こちら
+                  </a>からXYMを入手して下さい。
+              </>
+              :
+              <></>
+          }
         </Typography>
         <Button
           disabled={privateKey?true:false}
@@ -92,7 +108,7 @@ const SettingsComponent = () => {
             })
             if (!response.ok) {
               setSnackbarSeverity('error');
-              setSnackbarMessage('管理者から手数料分のmanjuを送れませんでした');
+              setSnackbarMessage('管理者から手数料分のXYMを送れませんでした');
               setOpenSnackbar(true);
               setProgress(false);
               return
@@ -112,7 +128,7 @@ const SettingsComponent = () => {
               setSnackbarSeverity('success');
               setSnackbarMessage('クリップボードに秘密鍵をコピーしました');
               setOpenSnackbar(true);
-              setProgress(false);              
+              setProgress(false);
             }}
           >
             <ListItemText primary="作成された秘密鍵"
