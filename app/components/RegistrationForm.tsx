@@ -373,8 +373,8 @@ export const RegistrationForm = () => {
           window.location.href = aliceEndPoint;
           setOpenDialog(false);
           setTimeout(() => {
-            setSnackbarSeverity('error');
-            setSnackbarMessage('aLiceとの連携が必要です');    
+            setSnackbarSeverity('success');
+            setSnackbarMessage('aLiceとの連携を行って下さい');    
             setOpenSnackbar(true);
           }
           , 2000);
@@ -384,8 +384,8 @@ export const RegistrationForm = () => {
           , 3000);
         }}
         onCancelClick={() => {
-          setSnackbarSeverity('success');
-          setSnackbarMessage('aLiceとの連携を行って下さい');    
+          setSnackbarSeverity('error');
+          setSnackbarMessage('aLiceとの連携が必要です');    
           setOpenSnackbar(true);
           setTimeout(() => {
             router.push('/settings');
