@@ -271,7 +271,7 @@ export const RegistrationForm = () => {
 
         //TODO: aLiceの署名に置き換え
         setDialogTitle('署名');
-        setDialogMessage('Symbolアカウントにサービス登録用のキーを設定します。aLiceにて署名したペイロードを入力して下さい');
+        setDialogMessage('Symbolアカウントにサービス登録用のキーを設定します。aLiceにて署名したSignatureを入力して下さい');
         setOpenInputPayloadDialog(true);
 
       }else{
@@ -406,7 +406,7 @@ export const RegistrationForm = () => {
       <InputDialog
         openDialog={openInputPayloadDialog}
         setOpenDialog={setOpenInputPayloadDialog}
-        handleAgreeClick={handleInputPayload} // 署名済みペイロード入力処理関数を渡す
+        handleAgreeClick={handleInputPayload} // 署名済みSignature入力処理関数を渡す
         setProgress={setProgress}
         dialogTitle={dialogTitle}
         dialogMessage={dialogMessage}
