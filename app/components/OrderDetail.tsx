@@ -366,7 +366,7 @@ export const OrderDetail = () => {
               </ListItem>
               {/* productInfo */}
               <ListItem style={{ display: 'flex', justifyContent: 'center' }}>
-                <img src={exchangeInfo.productInfo.imageUrl} alt="description" style={{ maxWidth: '500px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
+                <img src={exchangeInfo.productInfo.imageUrl} alt="description" style={{ maxWidth: '400px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
               </ListItem>
               <ListItem>
                 <ListItemText primary="商品名" secondary={exchangeInfo.productInfo.productName} />

@@ -543,7 +543,7 @@ export const PurchaseForm = () => {
           <Loading value={progressValue} />
         </Backdrop>
       ) : (
-      <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
+      <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '400px', mx: 'auto' }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ mb: 2 }}>
             <TextField

@@ -416,7 +416,7 @@ export const RegistrationForm = () => {
           <Loading value={progressValue} />
         </Backdrop>
       ) : (
-      <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '500px', mx: 'auto' }}>
+      <Box component="section" sx={{ p: 2, width: '90%', maxWidth: '400px', mx: 'auto' }}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <Box sx={{ mb: 2 }}>
             <TextField
@@ -496,7 +496,7 @@ export const RegistrationForm = () => {
               onChange={handleFileChange}
               required
             />
-            {preview && <img src={preview} alt="preview" style={{ maxWidth: '500px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />}
+            {preview && <img src={preview} alt="preview" style={{ maxWidth: '400px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />}
             <label htmlFor="contained-button-file">
               <Button variant="contained" component="span">
                 画像を選択
