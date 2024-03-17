@@ -494,7 +494,7 @@ export const RegistrationForm = () => {
               ref={inputFileRef}
               style={{ display: 'none' }}
               onChange={handleFileChange}
-              required
+              // required 入っていると他入力フォームのエラーが表示されないため削除
             />
             {preview && <img src={preview} alt="preview" style={{ maxWidth: '400px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />}
             <label htmlFor="contained-button-file">
