@@ -365,8 +365,15 @@ export const OrderDetail = () => {
                 <ListItemText primary="取引期限" secondary={Utils.formatDateToYmdHms(new Date(exchangeInfo.expiredAt))} />
               </ListItem>
               {/* productInfo */}
-              <ListItem style={{ display: 'flex', justifyContent: 'center' }}>
-                <img src={exchangeInfo.productInfo.imageUrl} alt="description" style={{ maxWidth: '400px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
+              <ListItem>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'center',
+                  }}
+                >
+                  <img src={exchangeInfo.productInfo.imageUrl} alt="description" style={{ maxWidth: '400px', maxHeight: '300px', objectFit: 'contain', display: 'block' }} />
+                </Box>
               </ListItem>
               <ListItem>
                 <ListItemText primary="商品名" secondary={exchangeInfo.productInfo.productName} />
