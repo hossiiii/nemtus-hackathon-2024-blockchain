@@ -62,7 +62,7 @@ export const ProductList = () => {
           <Grid container spacing={4} justifyContent="center"> {/* 水平方向に中央揃えにする */}
             {productList?.map((product, index) => (
               <Grid item key={index}>
-                <Card onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' }}>
+                <Card onClick={() => router.push(`/product/detail?mosaicId=${product.mosaicId}`)} style={{ cursor: 'pointer' , maxWidth:400}}>
                 <CardContent style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                     <img src={product.imageUrl} alt="description" style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'contain', display: 'block' }} />
                     <Typography gutterBottom variant="h6" component="div" sx={{mt:1}}>
