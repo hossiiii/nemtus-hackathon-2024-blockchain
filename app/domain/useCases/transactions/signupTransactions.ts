@@ -7,7 +7,7 @@ import {
   SecretLockTransaction,
 } from 'symbol-sdk';
 import { accountMetaDataTransaction } from '../../utils/transactions/accountMetaDataTransaction';
-import { momijiAccountMetaDataKey, symbolSellerAccountMetaDataKey, symbolUserAccountMetaDataKey } from '../../../consts/consts';
+import { momijiAccountMetaDataKey } from '../../../consts/consts';
 import { firstValueFrom } from 'rxjs';
 import { fetchUnconfirmedTransactionStatus } from '../../utils/fetches/fetchUnconfirmedTransactionStatus';
 
@@ -37,24 +37,14 @@ export const signupTransactions = async (momijiBlockChain:any, symbolBlockChain:
   );
 
   // Symbolアカウントに対してパスフレーズで暗号化したアカウント情報をメタデータに記録するTxを作成
-  const accountMetaDataUserTx = await accountMetaDataTransaction(
+  const accountMetaDataTx = await accountMetaDataTransaction(
     symbolBlockChain,
-    symbolSellerAccountMetaDataKey,
+    key,
     momijiStrSignerQR,
     symbolTargetPublicAccount.address
   );
 
-  const accountMetaDataSellerTx = await accountMetaDataTransaction(
-    symbolBlockChain,
-    symbolUserAccountMetaDataKey,
-    momijiStrSignerQR,
-    symbolTargetPublicAccount.address
-  );
-
-  const aggregateArray = [
-    accountMetaDataUserTx.toAggregate(symbolTargetPublicAccount),
-    accountMetaDataSellerTx.toAggregate(symbolTargetPublicAccount),    
-  ];
+  const aggregateArray = [accountMetaDataTx.toAggregate(symbolTargetPublicAccount)];
 
   // 引数にsecretLockTxが指定されていたらアグリゲートTxに追加
   if (secretLockTx) {
